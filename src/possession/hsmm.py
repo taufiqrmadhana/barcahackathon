@@ -1,0 +1,92 @@
+"""Step 4: a temporal model over possession states, decoded with Viterbi.
+
+Hidden states:
+
+    H_ctrl  H_loose  A_ctrl  A_loose  D_1 ... D_m
+
+The loose states keep the team of the last possession while the ball travels, bounces or is
+contested, so a pass costs almost nothing. Possession can only change by entering the other
+team's control state, which needs control evidence for that team, and is cheaper at a frame where
+that team touches the ball. Dead ball is a chain of m states, so a stoppage lasts at least m
+frames: an explicit minimum duration (the semi-Markov part) that stops a one-second "dead" blip
+from splitting a possession in two. Leaving D goes straight into a control state, because a
+restart always has a taker.
+"""
+
+import numpy as np
+
+HC, HL, AC, AL = 0, 1, 2, 3
+GROUP_LABEL = np.array(["H", "H", "A", "A"])
+NEG = -1e9
+
+
+class Model:
+    def __init__(self, p):
+        self.m = max(1, int(p.dead_min_frames))
+        self.n_states = 4 + self.m
+        self.d_first, self.d_last = 4, 4 + self.m - 1
+        cost = np.full((self.n_states, self.n_states), np.inf)
+        for s in range(4):
+            cost[s, s] = 0.0
+        cost[HC, HL] = cost[HL, HC] = p.loose_cost
+        cost[AC, AL] = cost[AL, AC] = p.loose_cost
+        cost[HL, AC] = cost[AL, HC] = p.switch_cost
+        cost[HC, AC] = cost[AC, HC] = p.switch_cost + p.tackle_extra
+        for s in range(4):
+            cost[s, self.d_first] = p.dead_entry_cost
+        for i in range(self.d_first, self.d_last):
+            cost[i, i + 1] = 0.0
+        cost[self.d_last, self.d_last] = 0.0
+        cost[self.d_last, HC] = cost[self.d_last, AC] = p.dead_exit_cost
+        self.cost = cost
+        self.labels = np.concatenate([GROUP_LABEL, np.array(["D"] * self.m)])
+
+    def expand(self, emit):
+        """(N, 5) group emissions [HC, HL, AC, AL, D] -> (N, n_states)."""
+        return np.hstack([emit[:, :4], np.repeat(emit[:, 4:5], self.m, axis=1)])
+
+    def frame_cost(self, t, bonus):
+        cost = self.cost.copy()
+        to_h, to_a, dead_in, h_out, a_out = bonus[t]
+        if to_h:
+            cost[[AC, AL], HC] -= to_h
+        if to_a:
+            cost[[HC, HL], AC] -= to_a
+        if dead_in:
+            cost[:4, self.d_first] -= dead_in
+        if h_out:
+            cost[self.d_last, HC] -= h_out
+        if a_out:
+            cost[self.d_last, AC] -= a_out
+        return cost
+
+    def viterbi(self, emit, bonus):
+        """Best state path for one half. emit (N, 5), bonus (N, 5) cost reductions."""
+        e = self.expand(emit)
+        n, s = e.shape
+        active = np.flatnonzero(np.abs(bonus).sum(axis=1) > 0)
+        is_active = np.zeros(n, dtype=bool)
+        is_active[active] = True
+        base = -self.cost
+        back = np.zeros((n, s), dtype=np.int16)
+        total = e[0].copy()
+        total[self.d_first:self.d_last] = NEG
+        for t in range(1, n):
+            trans = -self.frame_cost(t, bonus) if is_active[t] else base
+            options = total[:, None] + trans
+            back[t] = options.argmax(axis=0)
+            total = options[back[t], np.arange(s)] + e[t]
+        path = np.empty(n, dtype=np.int16)
+        path[-1] = int(total.argmax())
+        for t in range(n - 1, 0, -1):
+            path[t - 1] = back[t, path[t]]
+        return path
+
+    def decode(self, emit, bonus, blocks, n_frames):
+        labels = np.full(n_frames, "X", dtype="<U1")
+        states = np.full(n_frames, -1, dtype=np.int16)
+        for _, first, last in blocks:
+            path = self.viterbi(emit[first:last + 1], bonus[first:last + 1])
+            states[first:last + 1] = path
+            labels[first:last + 1] = self.labels[path]
+        return labels, states
