@@ -100,8 +100,9 @@ def shape_report(dbg, gt, labels1):
     if graded.any():
         print("  mean P(D)  gt D {:.3f}  gt alive {:.3f}".format(d[graded & (gt == "D")].mean(),
                                                                d[alive].mean()))
-    print("  agreement with decode #1 where the ball is tracked: {:.3f}".format(
-        (team[dbg["train"]] == labels1[dbg["train"]]).mean()))
+    held = dbg["train"] & np.isin(labels1, ["H", "A"])
+    print("  team agreement with decode #1 where the ball is tracked (cross-fitted): {:.3f}"
+          .format((team[held] == labels1[held]).mean()))
 
 
 def main():

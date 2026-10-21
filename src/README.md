@@ -1,7 +1,8 @@
 # barcahackathon / src
 
 Own pipeline for More than a Hack 2027, Phase 1. Everything outside `src/` is the upstream
-repository (remote `upstream`), kept as is so `git pull upstream main` keeps working.
+repository (remote `upstream`), kept as is so `git pull upstream main` keeps working. The method,
+the possession rules and what was tried and dropped are in [TECHNICAL.md](TECHNICAL.md).
 
 ## Setup
 
@@ -18,64 +19,51 @@ gitignored: never commit the data or a submission.
 
 ```bash
 .venv/bin/python src/run.py                                  # -> evaluation/results/barca.csv
-.venv/bin/python src/run.py --name try --set switch_cost=30  # one-off override
-.venv/bin/python src/tune.py --grid switch_cost=10,20,30 dead_cost=10,20
-.venv/bin/python evaluation/run_evaluation.py                # official scorer, all results
 .venv/bin/python evaluation/validate_submission.py evaluation/results/barca.csv
+.venv/bin/python evaluation/run_evaluation.py                # official scorer, public window
 ```
 
-The first run parses the raw ATD (~200 MB) and caches it in `cache/` as `.npz`; later runs take
-a few seconds.
+The first run parses the raw ATD (~200 MB) into `cache/` and fits the shape model (about two
+minutes on 12 CPU cores); later runs reuse both. `src/run.py` regenerates the submitted file
+exactly from `src/params.json`.
+
+Analysis and tuning:
+
+```bash
+.venv/bin/python src/analyze.py --segments                   # error analysis, aggregates only
+.venv/bin/python src/robustness.py --seeds 5                 # score with the ball hidden on 41%
+.venv/bin/python src/tune.py --grid switch_cost=12,20 --hide 0.41
+.venv/bin/python src/run.py --name try --set switch_cost=30  # one-off override
+.venv/bin/python src/experiments/cv_probe.py                 # the CV check, needs requirements-experiments.txt
+```
 
 ## How it works
 
 ```
-ATD (players + ball) ──► features ──┐
-                                    ├──► per-frame evidence (H, A, D) ──► Viterbi ──► labels
-Smart Tagging ─────────► priors ────┘
+ATD ──► clean ──► evidence ──► events ───────────────────────────► transition bonuses ─┐
+                     │                                                                  │
+                     └──► emissions (ball) ──► HSMM decode #1 ──► shape model ──► emissions ──► HSMM decode #2, #3
+Smart Tagging ──► set-piece starts ───────────────────┘          (players only,
+                                                                   self-trained)
 ```
 
-| module | does |
-|---|---|
-| `possession/atd.py` | raw ATD to arrays `players (N, 46, 3)`, `ball (N, 3)`, slot teams; npz cache |
-| `possession/features.py` | metres; ball interpolated over short gaps; nearest home/away distance; ball speed; mean player speed; ball outside pitch |
-| `possession/tagging.py` | Smart Tagging to per-frame attacking-team prior, set-piece windows and restart frames |
-| `possession/model.py` | evidence scores per frame, then a switch-penalised Viterbi per half |
-| `possession/config.py` | every tunable number (`Params`); `src/params.json` is the submitted config |
-| `possession/pipeline.py` | glue: load, predict, write and validate, score against the public GT |
-
-**Evidence.** On frames with a ball position, the team whose nearest player is closer gets
-evidence, scaled by the distance gap and faded by `exp(-nearest / control_radius)`, so a loose
-ball far from everyone says almost nothing. Dead-ball evidence comes from a ball tracked outside
-the pitch, long missing-ball runs, slow players, and the start of tagged set pieces; a fast-moving
-observed ball counts against dead.
-
-**Decoder.** States H, A, D; switching H<->A costs `switch_cost`, alive<->D costs `dead_cost`.
-A team only takes possession once the accumulated evidence beats the cost, which is the "controlled
-possession" rule from CHALLENGE.md, and with weak evidence the last team keeps the ball. Each half
-starts dead (kickoff) and is decoded separately; everything outside the halves is `X`.
-
-## Scores (public 5 minutes, 17 possessions)
-
-| | spellF1 | macroF1 | possessions |
-|---|---|---|---|
-| baseline_smooth125 (upstream) | 0.4242 | 0.5812 | 16 |
-| `params.json` | 0.4800 | 0.7112 | 18 |
-
-The public window is tiny, and upstream shows that tuning on it can pick the wrong config for the
-full match. Prefer changes that make sense on video over changes that only move this number.
-
-## Open ideas
-
-- Smart Tagging prior (`w_tag`) hurts on the public window: check its timing and team mapping
-  against the video before trusting it.
-- Dead-ball detection is the weakest class (D F1 ~0.5): restarts, ball out of play, goal kicks.
-- Ball in the air: the nearest player is not in control while the ball is high and fast.
-- Optional CV: detect the ball on frames where the ATD lost it (homography projects tracking to
-  pixels, which gives training labels for free).
+| module | step | does |
+|---|---|---|
+| `possession/atd.py` | 1 | raw ATD to arrays, slot teams from the metadata; npz cache |
+| `possession/clean.py` | 1 | metres; off-pitch detections and slot jumps dropped; ball spikes and flicker islands removed; short plausible gaps interpolated; velocities; attacking direction per half |
+| `possession/evidence.py` | 2 | per frame: nearest player per team, ball-vs-player relative speed, control probability, ball location against the lines, resting ball, player speed |
+| `possession/events.py` | 3 | touches, passes, turnovers, deflections, duels, shots, stoppages (ball over a line, ball vanishing outwards, collective slowdown, tagged set piece), restarts (placed ball struck, throw-in, ball found again), stoppage-to-restart dead intervals |
+| `possession/shape.py` | 2/4 | players-only H/A/D classifier from team shape and motion, trained on the ball-based decode, cross-fitted over time blocks |
+| `possession/fuse.py` | 4 | emissions over the HSMM states and per-frame transition bonuses from events |
+| `possession/hsmm.py` | 4 | states H_ctrl, H_loose, A_ctrl, A_loose, D_1..D_m; Viterbi per half |
+| `possession/tagging.py` | 3 | Smart Tagging to per-frame phase team and set-piece starts |
+| `possession/config.py` | | every tunable number (`Params`); `src/params.json` is the submitted config |
+| `possession/pipeline.py` | | glue, caching, writing and validating the CSV |
+| `experiments/` | 5 | the CV ball-recovery check, not part of the pipeline |
 
 ## Rules to keep in mind
 
 - Labels must come out of the algorithm, never hand-annotated.
 - `src/run.py` must regenerate the submitted file exactly.
-- No match data (or extracts) in the public repo, and none sent to hosted LLMs.
+- No match data (or extracts) in the public repo, and none sent to hosted services. Analysis
+  scripts print aggregates only; nothing here writes frames or tracking out.

@@ -4,13 +4,15 @@ Control needs two things at once: a player close to the ball, and the ball movin
 player. A ball flying past a defender at 20 m/s is near him for a frame and controlled by nobody.
 """
 
+import warnings
+
 import numpy as np
 
 from .clean import run_length, since_last, until_next, FPS
 
 
 def sigmoid(x):
-    return 1.0 / (1.0 + np.exp(-x))
+    return 1.0 / (1.0 + np.exp(-np.clip(x, -50.0, 50.0)))
 
 
 def smooth(x, width):
@@ -71,7 +73,8 @@ def ball_location(ball_xy, pitch, p):
 def team_motion(players_xy, players_vel, teams):
     speed = np.hypot(players_vel[..., 0], players_vel[..., 1])
     out = {}
-    with np.errstate(invalid="ignore"):
+    with np.errstate(invalid="ignore"), warnings.catch_warnings():
+        warnings.simplefilter("ignore", RuntimeWarning)
         out["speed"] = np.nanmean(speed, axis=1)
         out["count"] = np.stack([(~np.isnan(players_xy[:, teams == s, 0])).sum(1)
                                  for s in (0, 1)], axis=1)

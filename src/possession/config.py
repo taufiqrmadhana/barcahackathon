@@ -67,6 +67,7 @@ class Params:
     shape_stride: int = 3
     shape_iter: int = 150
     shape_eps: float = 0.05
+    shape_rounds: int = 1            # refit the shape model on its own decode this many times
 
     # step 4: emissions
     ctrl_eps: float = 0.05

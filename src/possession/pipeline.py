@@ -68,13 +68,14 @@ class Inputs:
 
     def shape_proba(self, p, labels, train):
         codes = np.array([CODES.get(c, -1) for c in labels], dtype=np.int8)
+        X, names = self.shape_features(p)
         digest = hashlib.sha1(codes.tobytes() + train.tobytes() + repr(
             _key(p, CLEAN_KEYS + EVIDENCE_KEYS + ("shape_folds", "shape_guard", "shape_stride",
-                                                  "shape_iter"))).encode()).hexdigest()[:16]
+                                                  "shape_iter"))).encode()
+            + ",".join(names).encode()).hexdigest()[:16]
         path = os.path.join(CACHE_DIR, "shape_{}_{}.npy".format(self.game, digest))
         if os.path.isfile(path):
             return np.load(path)
-        X, _ = self.shape_features(p)
         q = shape.fit_predict(X, codes, train & (codes >= 0), self.graded, p)
         os.makedirs(CACHE_DIR, exist_ok=True)
         np.save(path, q)
@@ -101,10 +102,12 @@ def predict(inputs, p, debug=False):
     emit1, _ = fuse.emissions(ev, None, inputs.tags, evs, p)
     labels1, _ = model.decode(emit1, bonus, inputs.blocks, inputs.n)
 
-    train = shape_training_mask(inputs, ev, labels1, p)
-    q = inputs.shape_proba(p, labels1, train)
-    emit2, p_dead = fuse.emissions(ev, q, inputs.tags, evs, p)
-    labels, states = model.decode(emit2, bonus, inputs.blocks, inputs.n)
+    labels = labels1
+    for _ in range(max(1, p.shape_rounds)):
+        train = shape_training_mask(inputs, ev, labels, p)
+        q = inputs.shape_proba(p, labels, train)
+        emit2, p_dead = fuse.emissions(ev, q, inputs.tags, evs, p)
+        labels, states = model.decode(emit2, bonus, inputs.blocks, inputs.n)
     if not debug:
         return labels
     return labels, {"trk": trk, "ev": ev, "events": evs, "bonus": bonus, "emit": emit2,

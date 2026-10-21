@@ -5,11 +5,15 @@ a neighbourhood worth checking, not as the answer. Every row also shows full-mat
 (possession count, dead share, dead stretches), which a good config should keep plausible.
 
 The shape model is fitted once with the base params and frozen, so only the decode is repeated.
+With --hide, each config is also scored with the ball hidden on random gaps of the public window
+(see robustness.py), which is closer to what the rest of the match looks like; rows are ranked
+on the mean of the clean and hidden scores.
 
-    python src/tune.py --grid switch_cost=10,20,40 dead_entry_cost=10,30
+    python src/tune.py --grid switch_cost=10,20,40 dead_entry_cost=10,30 --hide 0.41 --seeds 3
 """
 
 import argparse
+import copy
 import itertools
 import os
 import sys
@@ -58,6 +62,8 @@ def main():
     parser.add_argument("--grid", nargs="+", default=DEFAULT_GRID, metavar="KEY=V1,V2")
     parser.add_argument("--params", default=DEFAULT_PARAMS)
     parser.add_argument("--top", type=int, default=20)
+    parser.add_argument("--hide", type=float, default=0.0)
+    parser.add_argument("--seeds", type=int, default=3)
     args = parser.parse_args()
 
     grid = parse_grid(args.grid)
@@ -67,21 +73,33 @@ def main():
     _, dbg = pipeline.predict(inputs, Params.load(base_path), debug=True)
     q = dbg["shape"]
 
+    masked = []
+    if args.hide > 0:
+        from robustness import PUBLIC, hide_ball
+        for seed in range(args.seeds):
+            other = copy.copy(inputs)
+            other.atd = hide_ball(inputs.atd, np.random.default_rng(seed), args.hide, *PUBLIC)
+            other._cache = {}
+            masked.append(other)
+
     rows = []
     for combo in itertools.product(*grid.values()):
         overrides = dict(zip(grid, combo))
         params = Params.load(base_path, **overrides)
         labels = decode_with(inputs, params, q)
         result = pipeline.score(labels, gt)
-        rows.append((result["spell_f1_mean"], result["macro_f1"], result["n_pred_spells"],
-                     full_stats(labels, inputs), overrides))
+        hidden = [pipeline.score(decode_with(m, params, q), gt)["spell_f1_mean"] for m in masked]
+        hidden = float(np.mean(hidden)) if hidden else result["spell_f1_mean"]
+        rows.append(((result["spell_f1_mean"] + hidden) / 2, result["spell_f1_mean"], hidden,
+                     result["macro_f1"], result["n_pred_spells"], full_stats(labels, inputs),
+                     overrides))
 
-    rows.sort(key=lambda row: (-row[0], -row[1]))
-    print("spellF1  macroF1  poss  | full: poss  dead  stretches | params")
-    for spell, macro, n, (fp, fd, fs), overrides in rows[:args.top]:
-        print("{:.4f}   {:.4f}   {:>4}  |      {:>4}  {:.3f}  {:>4}      | {}".format(
-            spell, macro, n, fp, fd, fs,
-            " ".join("{}={}".format(k, v) for k, v in overrides.items())))
+    rows.sort(key=lambda row: (-row[0], -row[3]))
+    print("rank     spellF1  hidden   macroF1  poss  | full: poss  dead  stretches | params")
+    for rank, spell, hidden, macro, n, (fp, fd, fs), overrides in rows[:args.top]:
+        print("{:.4f}   {:.4f}   {:.4f}   {:.4f}   {:>4}  |      {:>4}  {:.3f}  {:>4}      | {}"
+              .format(rank, spell, hidden, macro, n, fp, fd, fs,
+                      " ".join("{}={}".format(k, v) for k, v in overrides.items())))
 
 
 if __name__ == "__main__":
