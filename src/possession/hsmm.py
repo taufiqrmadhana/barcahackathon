@@ -58,7 +58,7 @@ class Model:
             cost[self.d_last, HC] -= h_out
         if a_out:
             cost[self.d_last, AC] -= a_out
-        return cost
+        return np.maximum(cost, 0.0)
 
     def viterbi(self, emit, bonus):
         """Best state path for one half. emit (N, 5), bonus (N, 5) cost reductions."""
@@ -82,11 +82,42 @@ class Model:
             path[t - 1] = back[t, path[t]]
         return path
 
-    def decode(self, emit, bonus, blocks, n_frames):
+    def margins(self, emit, bonus):
+        """Per-frame confidence of the best path: its score minus the best score of any path
+        with a different label (H / A / D) on that frame. Max-marginals, forward and backward."""
+        e = self.expand(emit)
+        n, s = e.shape
+        is_active = np.abs(bonus).sum(axis=1) > 0
+        base = -self.cost
+        fwd = np.empty((n, s))
+        fwd[0] = e[0]
+        fwd[0, self.d_first:self.d_last] = NEG
+        for t in range(1, n):
+            trans = -self.frame_cost(t, bonus) if is_active[t] else base
+            fwd[t] = (fwd[t - 1][:, None] + trans).max(axis=0) + e[t]
+        bwd = np.zeros(s)
+        groups = [np.flatnonzero(self.labels == lab) for lab in ("H", "A", "D")]
+        out = np.empty(n)
+        for t in range(n - 1, -1, -1):
+            total = fwd[t] + bwd
+            best = np.sort([total[g].max() for g in groups])
+            out[t] = best[-1] - best[-2]
+            if t:
+                trans = -self.frame_cost(t, bonus) if is_active[t] else base
+                bwd = (trans + (e[t] + bwd)[None, :]).max(axis=1)
+        return out
+
+    def decode(self, emit, bonus, blocks, n_frames, margins=False):
         labels = np.full(n_frames, "X", dtype="<U1")
         states = np.full(n_frames, -1, dtype=np.int16)
+        margin = np.zeros(n_frames)
         for _, first, last in blocks:
             path = self.viterbi(emit[first:last + 1], bonus[first:last + 1])
             states[first:last + 1] = path
             labels[first:last + 1] = self.labels[path]
+            if margins:
+                margin[first:last + 1] = self.margins(emit[first:last + 1],
+                                                      bonus[first:last + 1])
+        if margins:
+            return labels, states, margin
         return labels, states

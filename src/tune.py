@@ -5,15 +5,15 @@ a neighbourhood worth checking, not as the answer. Every row also shows full-mat
 (possession count, dead share, dead stretches), which a good config should keep plausible.
 
 The shape model is fitted once with the base params and frozen, so only the decode is repeated.
-With --hide, each config is also scored with the ball hidden on random gaps of the public window
-(see robustness.py), which is closer to what the rest of the match looks like; rows are ranked
-on the mean of the clean and hidden scores.
+With --hide, each config is also scored with the ball hidden on random gaps of the public window,
+ranked on the mean of the clean and hidden scores. This is a fast screen, not a clean test: the
+frozen shape probabilities come from the unmasked run, so the hidden score is optimistic. Check a
+shortlisted config with robustness.py, which reruns everything on the masked tracking.
 
     python src/tune.py --grid switch_cost=10,20,40 dead_entry_cost=10,30 --hide 0.41 --seeds 3
 """
 
 import argparse
-import copy
 import itertools
 import os
 import sys
@@ -75,12 +75,11 @@ def main():
 
     masked = []
     if args.hide > 0:
-        from robustness import PUBLIC, hide_ball
+        from robustness import hide_ball, masked_inputs, real_gaps
+        lengths = real_gaps(inputs)
         for seed in range(args.seeds):
-            other = copy.copy(inputs)
-            other.atd = hide_ball(inputs.atd, np.random.default_rng(seed), args.hide, *PUBLIC)
-            other._cache = {}
-            masked.append(other)
+            atd, _ = hide_ball(inputs.atd, np.random.default_rng(seed), args.hide, lengths)
+            masked.append(masked_inputs(inputs, atd))
 
     rows = []
     for combo in itertools.product(*grid.values()):

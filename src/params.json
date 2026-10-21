@@ -50,6 +50,7 @@
   "shape_iter": 150,
   "shape_eps": 0.05,
   "shape_rounds": 2,
+  "shape_conf": 0.0,
   "ctrl_eps": 0.05,
   "w_ball": 1.0,
   "w_shape": 1.0,

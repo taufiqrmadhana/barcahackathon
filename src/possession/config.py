@@ -68,6 +68,7 @@ class Params:
     shape_iter: int = 150
     shape_eps: float = 0.05
     shape_rounds: int = 1            # refit the shape model on its own decode this many times
+    shape_conf: float = 0.0          # > 0: train only on frames the decoder is this sure of
 
     # step 4: emissions
     ctrl_eps: float = 0.05

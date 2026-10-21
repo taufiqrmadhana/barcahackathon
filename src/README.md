@@ -31,10 +31,13 @@ Analysis and tuning:
 
 ```bash
 .venv/bin/python src/analyze.py --segments                   # error analysis, aggregates only
-.venv/bin/python src/robustness.py --seeds 5                 # score with the ball hidden on 41%
-.venv/bin/python src/tune.py --grid switch_cost=12,20 --hide 0.41
+.venv/bin/python src/spells.py                               # why each GT possession fails
+.venv/bin/python src/robustness.py --sim transplant context empirical --seeds 2
+                                                             # leak-free hidden-ball test
+.venv/bin/python src/tune.py --grid switch_cost=12,20 --hide 0.41   # fast screen, optimistic
 .venv/bin/python src/run.py --name try --set switch_cost=30  # one-off override
 .venv/bin/python src/experiments/cv_probe.py                 # the CV check, needs requirements-experiments.txt
+.venv/bin/python src/experiments/overlay.py --n 20           # tracking drawn on frames, to cache/overlays
 ```
 
 ## How it works
@@ -59,11 +62,14 @@ Smart Tagging ──► set-piece starts ─────────────
 | `possession/tagging.py` | 3 | Smart Tagging to per-frame phase team and set-piece starts |
 | `possession/config.py` | | every tunable number (`Params`); `src/params.json` is the submitted config |
 | `possession/pipeline.py` | | glue, caching, writing and validating the CSV |
-| `experiments/` | 5 | the CV ball-recovery check, not part of the pipeline |
+| `experiments/` | 5 | the CV ball-recovery check and a local overlay viewer, not part of the pipeline |
 
 ## Rules to keep in mind
 
 - Labels must come out of the algorithm, never hand-annotated.
 - `src/run.py` must regenerate the submitted file exactly.
 - No match data (or extracts) in the public repo, and none sent to hosted services. Analysis
-  scripts print aggregates only; nothing here writes frames or tracking out.
+  scripts print aggregates only. `overlay.py` writes frames to `cache/overlays/` (gitignored) for
+  local viewing only.
+- Hidden-ball numbers are robustness checks on simulated gaps, not estimates of the private score;
+  `tune.py --hide` reuses shape probabilities from the unmasked run and is optimistic.

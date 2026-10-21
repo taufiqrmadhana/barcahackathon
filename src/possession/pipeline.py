@@ -82,9 +82,12 @@ class Inputs:
         return q
 
 
-def shape_training_mask(inputs, ev, labels, p):
-    """Frames whose decode-#1 label comes from a tracked ball and is not next to a change."""
+def shape_training_mask(inputs, ev, labels, p, margin=None):
+    """Frames whose pseudo-label comes from a tracked ball and is not next to a change; with
+    shape_conf > 0, also only those the decoder was sure of (max-marginal margin)."""
     mask = inputs.graded & ev["seen"]
+    if p.shape_conf > 0 and margin is not None:
+        mask &= margin >= p.shape_conf
     change = np.zeros(len(labels), dtype=bool)
     change[1:] = labels[1:] != labels[:-1]
     near = np.convolve(change.astype(np.int8), np.ones(51, dtype=np.int8), mode="same") > 0
@@ -99,15 +102,18 @@ def predict(inputs, p, debug=False):
     model = hsmm.Model(p)
     bonus = fuse.bonuses(evs, inputs.n, p)
 
+    want = p.shape_conf > 0
     emit1, _ = fuse.emissions(ev, None, inputs.tags, evs, p)
-    labels1, _ = model.decode(emit1, bonus, inputs.blocks, inputs.n)
+    labels1, _, *margin = model.decode(emit1, bonus, inputs.blocks, inputs.n, margins=want)
 
     labels = labels1
-    for _ in range(max(1, p.shape_rounds)):
-        train = shape_training_mask(inputs, ev, labels, p)
+    rounds = max(1, p.shape_rounds)
+    for k in range(rounds):
+        train = shape_training_mask(inputs, ev, labels, p, margin[0] if margin else None)
         q = inputs.shape_proba(p, labels, train)
         emit2, p_dead = fuse.emissions(ev, q, inputs.tags, evs, p)
-        labels, states = model.decode(emit2, bonus, inputs.blocks, inputs.n)
+        labels, states, *margin = model.decode(emit2, bonus, inputs.blocks, inputs.n,
+                                               margins=want and k < rounds - 1)
     if not debug:
         return labels
     return labels, {"trk": trk, "ev": ev, "events": evs, "bonus": bonus, "emit": emit2,
