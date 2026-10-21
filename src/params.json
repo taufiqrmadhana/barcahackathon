@@ -1,0 +1,22 @@
+{
+  "max_gap": 25,
+  "w_ball": 1.0,
+  "w_filled": 0.5,
+  "control_radius": 2.5,
+  "margin_scale": 2.0,
+  "w_tag": 0.0,
+  "w_sp_dead": 0.6,
+  "sp_dead_frames": 50,
+  "w_sp_team": 0.6,
+  "w_outside": 2.0,
+  "dead_gap": 75,
+  "w_missing": 0.3,
+  "slow_speed": 1.5,
+  "w_slow": 0.6,
+  "w_missing_slow": 0.8,
+  "alive_ball_speed": 4.0,
+  "w_alive": 0.5,
+  "d_bias": 0.0,
+  "switch_cost": 20.0,
+  "dead_cost": 20.0
+}
