@@ -66,7 +66,31 @@ class Inputs:
         return self._get("shape_x", key,
                          lambda: shape.features(self.tracking(p), self.evidence(p)))
 
+    def pretrained_proba(self, p):
+        """Probabilities from a network trained on other matches: no cross-fit, nothing to leak."""
+        with open(p.pretrained_shape, "rb") as handle:
+            tag = hashlib.sha1(handle.read()).hexdigest()[:16]
+        key = repr(_key(p, CLEAN_KEYS + EVIDENCE_KEYS)).encode()
+        path = os.path.join(CACHE_DIR, "lstm_{}_{}_{}.npy".format(
+            self.game, tag, hashlib.sha1(key).hexdigest()[:8]))
+        if os.path.isfile(path):
+            return np.load(path)
+        from pretrain.net import Predictor  # torch is only needed when this is switched on
+        X, _ = self.shape_features(p)
+        q = Predictor.load(p.pretrained_shape).proba(X, [(f, l) for _, f, l in self.blocks])
+        os.makedirs(CACHE_DIR, exist_ok=True)
+        np.save(path, q)
+        return q
+
     def shape_proba(self, p, labels, train):
+        if p.pretrained_shape:
+            q_net = self.pretrained_proba(p)
+            if p.pretrained_mix >= 1.0:
+                return q_net
+            return p.pretrained_mix * q_net + (1.0 - p.pretrained_mix) * self._self_trained(p, labels, train)
+        return self._self_trained(p, labels, train)
+
+    def _self_trained(self, p, labels, train):
         codes = np.array([CODES.get(c, -1) for c in labels], dtype=np.int8)
         X, names = self.shape_features(p)
         digest = hashlib.sha1(codes.tobytes() + train.tobytes() + repr(

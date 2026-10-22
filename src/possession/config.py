@@ -67,6 +67,8 @@ class Params:
     shape_stride: int = 3
     shape_iter: int = 150
     shape_eps: float = 0.05
+    pretrained_shape: str = ""      # checkpoint of src/pretrain/train.py; empty keeps the self-trained model only
+    pretrained_mix: float = 1.0      # weight of the pretrained probabilities against the self-trained ones
     shape_rounds: int = 1            # refit the shape model on its own decode this many times
     shape_conf: float = 0.0          # > 0: train only on frames the decoder is this sure of
 

@@ -59,7 +59,11 @@ organizers/
 __pycache__/
 *.py[cod]
 .venv/
+.venv-pretrain/
 venv/
 env/
 .DS_Store
 cache/
+
+# -- external pretraining data and checkpoints (derived from third-party data) ----
+pretrain_data/

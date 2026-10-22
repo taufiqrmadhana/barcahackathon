@@ -1,0 +1,3 @@
+-r requirements-src.txt
+torch>=2.4
+kloppy>=3.16
