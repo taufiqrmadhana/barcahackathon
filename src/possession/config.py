@@ -72,8 +72,18 @@ class Params:
     shape_rounds: int = 1            # refit the shape model on its own decode this many times
     shape_conf: float = 0.0          # > 0: train only on frames the decoder is this sure of
 
+    # Optional external supervised evidence, applied only in the final decode.
+    ownership_model: str = ""       # local joblib checkpoint; empty preserves the baseline
+    supervised_shape_model: str = "" # replace final H/A shape ratio; preserve baseline P(D)
+    w_owner: float = 1.0
+    w_owner_switch: float = 12.0
+
     # step 4: emissions
     ctrl_eps: float = 0.05
+    near_radius: float = 1.3         # m; proximity-only ownership is 0.5 at this distance
+    near_margin: float = 0.5         # m; the other team's nearest must be this much farther for full weight
+    w_near: float = 0.0              # control = max(ctrl, w_near * nearest-team proximity); 0 keeps ctrl only
+    near_rounds: int = 0             # 1: also in the decodes that make shape pseudo-labels; 0: final decode only
     w_ball: float = 1.0
     w_shape: float = 1.0
     w_shape_known: float = 0.0
@@ -111,6 +121,8 @@ class Params:
     w_duel: float = 2.0
     touch_before: int = 2
     touch_after: int = 10
+    w_near_switch: float = 0.0       # switch-cost cut on tracked-ball frames where that team is nearest
+                                     # (scaled by its proximity); missing-ball frames keep the full cost
     w_stoppage: float = 8.0
     stop_before: int = 10
     stop_after: int = 25

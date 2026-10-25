@@ -42,6 +42,20 @@ def dead_score(ev, shape_q, events, p):
     return z
 
 
+def nearest_owner(ev, p):
+    """(N, 2) proximity-only ownership: that team's nearest slot is close to the ball and clearly
+    nearer than the other team's. Unlike ctrl it does not ask the ball to move with the player,
+    so it fires at the reception rather than once the receiver is carrying the ball. 0 where the
+    ball is not known; interpolated ball frames are trusted as in ctrl."""
+    d = np.where(np.isfinite(ev["dist"]), ev["dist"], 99.0)
+    prox = sigmoid((p.near_radius - d) / p.ctrl_softness)
+    lead = np.clip((d[:, ::-1] - d) / p.near_margin, 0.0, 1.0)
+    near = prox * lead
+    near[~ev["known"]] = 0.0
+    near[ev["known"] & ~ev["seen"]] *= p.filled_trust
+    return near
+
+
 def emissions(ev, shape_q, tags, events, p):
     n = len(ev["known"])
     emit = np.zeros((n, 5), dtype=np.float64)
@@ -49,6 +63,8 @@ def emissions(ev, shape_q, tags, events, p):
     eps = p.ctrl_eps
 
     c = np.nan_to_num(ev["ctrl"], nan=0.0)
+    if p.w_near:
+        c = np.maximum(c, p.w_near * nearest_owner(ev, p))
     p_hc = c[:, HOME] * (1 - c[:, AWAY])
     p_ac = c[:, AWAY] * (1 - c[:, HOME])
     p_l = np.clip(1 - p_hc - p_ac, 0.0, 1.0)
@@ -84,8 +100,13 @@ def _add(bonus, col, frame, value, before, after):
     bonus[lo:hi, col] = np.maximum(bonus[lo:hi, col], value)
 
 
-def bonuses(events, n, p):
+def bonuses(events, n, p, ev=None):
     bonus = np.zeros((n, 5), dtype=np.float64)
+    if p.w_near_switch and ev is not None:
+        near = nearest_owner(ev, p)
+        near[near < 0.05] = 0.0  # keep the decoder's fast path on frames with nothing nearby
+        bonus[:, TO_H] = p.w_near_switch * near[:, HOME]
+        bonus[:, TO_A] = p.w_near_switch * near[:, AWAY]
     touch = events["touch"]
     weight = {"turnover": p.w_turnover, "touch": p.w_touch, "duel": p.w_duel,
               "pass": p.w_touch, "deflection": 0.0}

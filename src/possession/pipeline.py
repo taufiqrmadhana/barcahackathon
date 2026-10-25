@@ -8,7 +8,7 @@
 
 import hashlib
 import os
-from dataclasses import asdict
+from dataclasses import asdict, replace
 
 import numpy as np
 import pandas as pd
@@ -124,23 +124,36 @@ def predict(inputs, p, debug=False):
     evs = events.build(trk, ev, inputs.tags, inputs.blocks, p)
     evs["tag_starts"] = inputs.tags["sp_start"]
     model = hsmm.Model(p)
-    bonus = fuse.bonuses(evs, inputs.n, p)
+    bonus = fuse.bonuses(evs, inputs.n, p, ev)
+    # The decodes that only make pseudo-labels for the shape model stay conservative unless
+    # near_rounds is set: short spells from the nearest-team terms make noisier training labels,
+    # and the shape model is what carries the frames without a ball.
+    pl = p if p.near_rounds else replace(p, w_near=0.0, w_near_switch=0.0)
+    bonus_pl = bonus if pl is p else fuse.bonuses(evs, inputs.n, pl, ev)
 
     want = p.shape_conf > 0
-    emit1, _ = fuse.emissions(ev, None, inputs.tags, evs, p)
-    labels1, _, *margin = model.decode(emit1, bonus, inputs.blocks, inputs.n, margins=want)
+    emit1, _ = fuse.emissions(ev, None, inputs.tags, evs, pl)
+    labels1, _, *margin = model.decode(emit1, bonus_pl, inputs.blocks, inputs.n, margins=want)
 
     labels = labels1
     rounds = max(1, p.shape_rounds)
     for k in range(rounds):
+        last = k == rounds - 1
         train = shape_training_mask(inputs, ev, labels, p, margin[0] if margin else None)
         q = inputs.shape_proba(p, labels, train)
-        emit2, p_dead = fuse.emissions(ev, q, inputs.tags, evs, p)
-        labels, states, *margin = model.decode(emit2, bonus, inputs.blocks, inputs.n,
-                                               margins=want and k < rounds - 1)
+        if last and p.supervised_shape_model:
+            from . import supervised_shape
+            q = supervised_shape.replace_team(q, supervised_shape.infer(inputs, p))
+        emit2, p_dead = fuse.emissions(ev, q, inputs.tags, evs, p if last else pl)
+        decode_bonus = bonus if last else bonus_pl
+        if last and p.ownership_model:
+            from . import ownership
+            emit2, decode_bonus = ownership.apply(emit2, decode_bonus, ownership.infer(inputs, p), p)
+        labels, states, *margin = model.decode(emit2, decode_bonus, inputs.blocks,
+                                               inputs.n, margins=want and not last)
     if not debug:
         return labels
-    return labels, {"trk": trk, "ev": ev, "events": evs, "bonus": bonus, "emit": emit2,
+    return labels, {"trk": trk, "ev": ev, "events": evs, "bonus": decode_bonus, "emit": emit2,
                     "p_dead": p_dead, "shape": q, "labels1": labels1, "states": states,
                     "train": train}
 

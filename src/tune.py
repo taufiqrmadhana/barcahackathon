@@ -40,11 +40,18 @@ def parse_grid(items):
 
 
 def decode_with(inputs, params, q):
+    if params.supervised_shape_model:
+        from possession import supervised_shape
+        q = supervised_shape.replace_team(q, supervised_shape.infer(inputs, params))
     trk, ev = inputs.tracking(params), inputs.evidence(params)
     evs = events.build(trk, ev, inputs.tags, inputs.blocks, params)
     evs["tag_starts"] = inputs.tags["sp_start"]
     emit, _ = fuse.emissions(ev, q, inputs.tags, evs, params)
-    labels, _ = hsmm.Model(params).decode(emit, fuse.bonuses(evs, inputs.n, params),
+    bonus = fuse.bonuses(evs, inputs.n, params, ev)
+    if params.ownership_model:
+        from possession import ownership
+        emit, bonus = ownership.apply(emit, bonus, ownership.infer(inputs, params), params)
+    labels, _ = hsmm.Model(params).decode(emit, bonus,
                                           inputs.blocks, inputs.n)
     return labels
 

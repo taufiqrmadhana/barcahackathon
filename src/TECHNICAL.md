@@ -231,6 +231,51 @@ intervals. Each should be judged on the hidden-ball runs per category, not on th
 
 ## 8. Reproduction
 
+### Experimental supervised ownership (2026-10-26)
+
+An optional GBM ownership/transition model now uses event-derived labels from
+[Metrica Sports sample games 1 and 2](https://github.com/metrica-sports/sample-data),
+with source acknowledgement. It is disabled by default (`ownership_model=""`).
+See [bench/README.md](bench/README.md) for label conventions, augmentation, exact
+commands, fixed-config leave-one-game-out evaluation, and data/cache provenance.
+The initial experiment adds evidence only in the final decode; self-trained shape
+and D evidence are frozen within each comparison. It does not yet replace all
+hand-crafted control evidence or introduce supervised shape.
+
+Mean spellF1 across the two held-out games (one corruption seed):
+
+| condition | baseline | nearest-team evidence | supervised owner | owner + transition |
+|---|---|---|---|---|
+| clean | 0.4949 | 0.5469 | 0.6498 | 0.6583 |
+| ATD ball mask | 0.4111 | 0.4510 | 0.5219 | 0.5283 |
+| mask + tracking corruption | 0.3613 | 0.4005 | 0.4694 | 0.4794 |
+
+The all-games model's fixed-config public sanity score rises from 0.5143 to 0.5677,
+but two leak-free transplanted public masks regress: 0.4903 to 0.4000 and 0.4593
+to 0.3571. Consequently this checkpoint is **experimental and not promoted to the
+default submission**. Per-frame macroF1 improves on both masks while spellF1 falls;
+this flags an unresolved temporal/domain-transfer problem rather than establishing
+that the classifier is ready for deployment. No weights were selected from these
+public results. Game 3, boundary-label audit, confidence calibration and supervised
+shape remain follow-up experiments; the two-game results do not settle them.
+
+Stage 2 (`ownership_v2`) adds Metrica game 3, an event-convention audit and a
+supervised replacement of the shape model's final H/A ratio (P(D) kept). Three-game
+leave-one-game-out mean spellF1, fixed weights:
+
+| condition | baseline | supervised owner | supervised shape | both |
+|---|---|---|---|---|
+| clean | 0.480 | 0.635 | 0.484 | 0.643 |
+| ATD ball mask | 0.413 | 0.523 | 0.450 | 0.562 |
+| mask + tracking corruption | 0.363 | 0.472 | 0.400 | 0.519 |
+
+On the public window the combined all-games checkpoints score 0.550 clean and
+0.600 / 0.563 on the two transplanted masks (baseline 0.514, 0.490, 0.459), so the
+stage-1 mask regression no longer appears once shape is supervised too. Both models
+stay opt-in (`ownership_model`, `supervised_shape_model`); see bench/README.md.
+
+### Default pipeline
+
 ```bash
 uv venv --python 3.11 .venv
 uv pip install --python .venv -r requirements-src.txt
