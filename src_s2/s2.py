@@ -205,8 +205,17 @@ def dead_mask(inp, x, y, valid, seen, vx, vy, kick, p):
     L, W, m = inp["L"], inp["W"], p.out_margin
     out = seen & ((x < -m) | (x > L + m) | (y < -m) | (y > W + m))
     bspeed = np.nan_to_num(np.hypot(vx, vy), nan=0.0)
-    still = np.where(seen, (sm < p.still_seen) & (uniform_filter1d(bspeed, p.speed_win) < p.ball_still),
-                     sm < p.still_missing)
+    still_missing = sm < p.still_missing
+    if inp.get("shape") is not None and p.get("shape_dead", 0) > 0:
+        # ball missing: the team-shape model's P(dead) (players only, cross-fitted) replaces the
+        # mean-speed rule, which fires in slow live phases (build-up) when the ball is lost
+        pdead = uniform_filter1d(inp["shape"][:, 2], p.get("shape_win", 75))
+        still_missing = (pdead > p.shape_dead) | (sm < p.get("still_missing_shape", 0))
+    still_seen = (sm < p.still_seen) & (uniform_filter1d(bspeed, p.speed_win) < p.ball_still)
+    if inp.get("shape") is not None and p.get("shape_dead_seen", 0) > 0:
+        # ball seen: a very confident shape-dead call (players set up for a free kick) also counts
+        still_seen |= uniform_filter1d(inp["shape"][:, 2], p.get("shape_win", 75)) > p.shape_dead_seen
+    still = np.where(seen, still_seen, still_missing)
     dead = still | out
     # out of play persists until the restart: the first kick (ball strike next to a player) with
     # the ball inside the pitch, after which the ball keeps moving; plus restart_lag frames (the
@@ -237,7 +246,7 @@ def dead_mask(inp, x, y, valid, seen, vx, vy, kick, p):
     return dead, {"sm": sm, "out": out, "still": still}
 
 
-def assemble(own, dead, cruns, p):
+def assemble(own, dead, cruns, p, proba=None):
     """Labels from owner + dead. Each alive stretch starts with the restarting team (team of the
     first contact run inside it); flicker shorter than min_spell frames is merged into its
     neighbours."""
@@ -247,7 +256,13 @@ def assemble(own, dead, cruns, p):
     teams = np.array([t for _, _, t in cruns])
     for a, b in runs(~dead):
         i = np.searchsorted(starts, a)
-        if i < len(starts) and starts[i] < b:
+        has = i < len(starts) and starts[i] < b
+        if has and proba is not None and starts[i] - a > p.get("restart_win", 10 ** 9):
+            # first contact far after the restart (ball missing): the restarting team is the one
+            # the team-shape model favours over the stretch before that contact
+            pr = proba[a:starts[i], :2].mean(0)
+            lab[a:starts[i]] = int(pr[1] > pr[0])
+        elif has:
             lab[a:starts[i]] = teams[i]
         elif lab[a] == -1:
             lab[a:b] = 0 if a == 0 else lab[a - 1]
@@ -270,8 +285,10 @@ def predict(inp, p, debug=False):
     con = contacts(inp, x, y, vx, vy, p)
     cruns = contact_runs(con["c"], con["kick"], p)
     own = shift(owner_from_runs(cruns, inp["n"], p), p.lag)
+    if inp.get("shape") is not None and p.get("shape_gap", 0) > 0:
+        own = shape_gaps(own, valid, inp["shape"], cruns, p)
     dead, dd = dead_mask(inp, x, y, valid, seen, vx, vy, con["kick"], p)
-    lab = assemble(own, dead, cruns, p)
+    lab = assemble(own, dead, cruns, p, inp.get("shape") if p.get("shape_gap", 0) > 0 else None)
     if debug:
         return lab, {"con": con, "cruns": cruns, "own": own, "dead": dead, **dd, "seen": seen}
     return lab
@@ -285,4 +302,45 @@ def shift(arr, lag, fill=-1):
         out[lag:] = arr[:-lag]
     else:
         out[:lag] = arr[-lag:]
+    return out
+
+
+def shape_gaps(own, valid, proba, cruns, p):
+    """Owner inside ball-missing gaps (>= shape_gap frames) from the team-shape model.
+
+    Inside a gap the contact logic has nothing to say: it holds the last owner X and, if the next
+    contact run belongs to the other team Y, cuts at alpha between release and that contact. With
+    r_Y = smoothed P(Y) / (P(H) + P(A)) from the shape model (players only):
+      X != Y  the switch goes to the start of the final stretch of the gap where r_Y > 0.5 (the
+              moment the teams' shapes turned); if the shapes still favour X at the end, keep alpha.
+      X == Y  an other-team spell is inserted only where r_other > shape_hi for >= shape_min frames
+              (strong, sustained evidence: an A-B-A inside one gap is the over-switching pattern).
+    """
+    from scipy.ndimage import uniform_filter1d
+    q = uniform_filter1d(proba[:, :2].astype(np.float64), p.get("shape_win", 75), axis=0)
+    r = q[:, 1] / np.maximum(q.sum(1), 1e-9)
+    n = len(own)
+    out = own.copy()
+    starts = np.array([a for a, _, _ in cruns] or [n])
+    teams = np.array([t for _, _, t in cruns] or [-1])
+    for a, b in runs(~valid):
+        if b - a < p.shape_gap or a == 0:
+            continue
+        X = own[a - 1]
+        j = np.searchsorted(starts, b)
+        nxt, Y = (starts[j], teams[j]) if j < len(starts) else (n, X)
+        if X < 0 or Y < 0:
+            continue
+        rY = r if Y == 1 else 1 - r
+        if X != Y:
+            fav = rY[a:b] > 0.5
+            if fav[-1]:
+                k = np.flatnonzero(~fav)
+                cut = a + (k[-1] + 1 if len(k) else 0)
+                out[a:cut] = X
+                out[cut:nxt] = Y
+        else:
+            for s, e in runs(1 - rY[a:b] > p.get("shape_hi", 1.01)):
+                if e - s >= p.get("shape_min", 75):
+                    out[a + s:a + e] = 1 - X
     return out

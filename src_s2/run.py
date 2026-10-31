@@ -83,6 +83,9 @@ def main():
     over = {k: parse(v) for k, v in (s.split("=") for s in args.set)}
     p = s2.Params.load(args.params, **over)
     inp = data.load()
+    if p.get("shape_gap", 0) > 0 or p.get("shape_dead", 0) > 0:
+        import shape
+        inp["shape"] = shape.get_proba(inp, p)
     gt = pd.read_csv(GT)["label"].values.astype("<U1")
     gtc = pm.label_codes(gt)
 
