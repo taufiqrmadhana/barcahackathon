@@ -65,6 +65,44 @@ starts dead (kickoff) and is decoded separately; everything outside the halves i
 The public window is tiny, and upstream shows that tuning on it can pick the wrong config for the
 full match. Prefer changes that make sense on video over changes that only move this number.
 
+## v2: TXT + XML metadata + homography
+
+```bash
+venv/bin/python src/run_v2.py                    # params_v2.json -> evaluation/results/barca_v2.csv
+venv/bin/python src/run_v2.py --bootstrap 1000   # with the bootstrap interval
+venv/bin/python src/run_v2.py --grid w_memory=0,0.6 d_bias=-0.1,0   # sweep, no file written
+venv/bin/python evaluation/run_evaluation.py     # official board
+```
+
+```
+metadata (XML) ─┐
+ATD (TXT) ──────┼──► features_v2 ──┐
+homography ─────┘                  ├──► model_v2.evidence ──► Viterbi per half ──► labels
+Smart Tagging ──► tagging.priors ──┘
+```
+
+| module | does |
+|---|---|
+| `possession/metadata.py` | XML: home/away ids and names, slot -> team (checked against the TXT), field size, fps, channel units, attack direction per half (swapped at halftime); real halves from `games.py` |
+| `possession/homography.py` | matrices normalised to h22 = 1, quality = valid x exp(-reprojection_error), image size inferred from the projected TXT ball, camera aim / zoom / pan speed, pitch-point `in_view` |
+| `possession/features_v2.py` | v1 features plus last-seen ball, metres to nearest line, last ball still in shot, players in view, per-half robust z-scores (median/MAD) of player, camera and ball speed |
+| `possession/model_v2.py` | v1 evidence, team evidence gated by normalised slowness and homography quality; D from slowness, still camera, set-piece window before the tagged start, and a dead memory (ball leaves play -> dead until a fast restart kick) |
+| `possession/pipeline_v2.py`, `run_v2.py` | glue, validated write, official metrics on the public window, GT-free whole-match summary |
+
+| public 5 min | spellF1 | macroF1 | D F1 | transF1 | possessions |
+|---|---|---|---|---|---|
+| v1 `params.json` | 0.4800 | 0.7112 | 0.515 | 0.381 | 18 |
+| v2 `params_v2.json` | 0.4970 | 0.7735 | 0.674 | 0.410 | 16 |
+
+The spellF1 gap is inside the public noise band (bootstrap ~0.35 on 17 possessions). The macroF1 and
+dead-ball gains came from the new terms: with them switched off (w_memory=0, team_gate=0) macroF1
+fell back to ~0.72. Whole match: 222 possessions, mean 14.6 s,
+D share ~49% (v1 ~43%) -- watch that number, it is the most likely over-fit.
+
+On the tactical feed the camera is wide (~60 m across) and the last ball position is almost always
+still in shot, so camera aim is a poor ball proxy (~23 m median error); its value here is quality
+weighting and stillness. On broadcast, `valid = 0` and `in_view` would carry much more signal.
+
 ## Open ideas
 
 - Smart Tagging prior (`w_tag`) hurts on the public window: check its timing and team mapping

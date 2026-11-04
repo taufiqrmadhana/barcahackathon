@@ -57,3 +57,30 @@ class Params:
         with open(path, "w") as handle:
             json.dump(asdict(self), handle, indent=2)
             handle.write("\n")
+
+
+@dataclass
+class ParamsV2(Params):
+    """v1 plus camera (homography), per-half normalised speeds and a dead-ball memory."""
+
+    # homography
+    err_scale: float = 1.0           # quality = exp(-reprojection_error / err_scale)
+    pan_window: int = 25             # frames, smoothing of camera pan speed
+
+    # normalised slowness: slow = sigmoid(-(z_player_speed - z_slow) / z_temp)
+    z_slow: float = -0.3
+    z_temp: float = 0.3
+    w_slow_z: float = 0.4            # D evidence from normalised slowness
+    team_gate: float = 0.5           # team evidence shrinks by team_gate * slow
+    w_cam_still: float = 0.2         # extra D when slow players and the camera is still
+    cam_still_speed: float = 0.5     # m/s of camera aim below which the camera is "still"
+
+    # dead memory: after the ball leaves play, stay dead until a fast restart kick
+    w_memory: float = 0.6
+    edge_margin: float = 2.0         # m; a ball lost within this of a line counts as leaving
+    restart_speed: float = 8.0       # m/s; observed ball faster than this restarts play
+    restart_min_delay: int = 50      # frames after the exit before a restart can count
+    memory_max: int = 1500           # frames; memory gives up after this long
+
+    # Smart Tagging set-piece window around the tagged start (restart is near the tag start)
+    sp_pre_frames: int = 50

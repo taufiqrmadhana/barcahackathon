@@ -1,0 +1,10 @@
+# v3 environment (Python 3.11): v2 deps + FILM (TensorFlow Hub) + video + model zoo
+numpy<2
+pandas
+tensorflow==2.16.2
+tf-keras==2.16.0
+tensorflow-hub==0.16.1
+setuptools<81            # tensorflow-hub still imports pkg_resources
+opencv-python-headless
+scikit-learn
+lightgbm
