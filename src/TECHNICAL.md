@@ -113,8 +113,9 @@ Public window (5 min, 17 possessions; `python evaluation/run_evaluation.py`):
 | baseline_smooth50 | 0.3256 | 0.6207 | 26 |
 | baseline_smooth125 | 0.4242 | 0.5812 | 16 |
 | previous version of this repo (switch-penalised Viterbi) | 0.4800 | 0.7112 | 18 |
-| **this pipeline** | **0.5143** | **0.8631** | 11 |
-| this pipeline, ball hidden, leak-free (6 masks, §6) | 0.5080 (sd 0.056) | 0.8373 | 12–14 |
+| October pipeline | 0.5143 | 0.8631 | 11 |
+| October pipeline, ball hidden, leak-free (6 masks, §6) | 0.5080 (sd 0.056) | 0.8373 | 12–14 |
+| **November pipeline (§9: video ball, whistle, match structure, ownership v2)** | **0.5333** | **0.9060** | 19 |
 
 All rows: same scorer (upstream `run_evaluation.py`, unchanged), same window (frames
 11185–18684), spellF1 = mean F1 over IoU 0.3–0.7 on H/A spells. The baselines were regenerated
@@ -346,10 +347,11 @@ Three of the four stoppages in the public window are whistles (fouls, offsides) 
 rolling inside the pitch; the tracking only sees the players slow down 2-4 s later, so every such
 dead ball started late. This referee's whistle is a narrow tone near 3.8 kHz. `cv/whistle.py`
 computes, per video frame from the video's own audio track, the peak power in 3.65-3.95 kHz over
-the median of the neighbouring bands (median 8 dB; whistle blasts 25-35 dB). A blast followed
-within 5 s by the collective slowdown that confirms a stoppage makes the frames from the whistle
-to the slowdown dead-ball evidence (`w_whistle_confirmed`), and the cost of entering D is cut
-around the blast (`w_whistle`). The confirmation requirement is what makes it safe: at frame 17933
+the median of the neighbouring bands (median 8 dB; whistle blasts 25-35 dB). A blast heard while
+the players are moving (>= 1.8 m/s) and followed within 5 s by the collective slowdown that
+confirms a stoppage forces `D` from 10 frames after the blast to the slowdown
+(`w_whistle_confirmed`), adds a little `D` evidence for 6 s after it (`w_whistle_dead`), and cuts
+the cost of entering `D` around the blast (`w_whistle`). The confirmation requirement is what makes it safe: at frame 17933
 a blast during play is not followed by a slowdown and changes nothing. Over the match, 26 blasts in
 predicted live play are confirmed; 16 of them move a dead-ball start earlier by 0.6-3 s. On the
 public window the two whistle stoppages now start at 12841 and 15900 (ground truth 12851 and 15889;
@@ -380,6 +382,8 @@ the model scoring the public window is trained on other folds' pseudo-labels fro
 decode, which do not depend on the window's ball (round 2 would leak it, §6). Same masks for every
 configuration, so differences are paired.
 
+First comparison (whistle confirmation weight 8, minimum stoppage 2 s, grid score floor 0.3):
+
 | decoder | ball | whistle | clean spellF1 / macroF1 | masked spellF1 | masked macroF1 |
 |---|---|---|---|---|---|
 | default | ATD | - | 0.529 / 0.819 | 0.450 | 0.822 |
@@ -389,10 +393,51 @@ configuration, so differences are paired.
 | ownership v2 | ATD | - | 0.513 / 0.830 | 0.627 | 0.853 |
 | ownership v2 | ATD | yes | 0.509 / 0.863 | 0.623 | 0.887 |
 | ownership v2 | ATD + video | - | 0.503 / 0.855 | 0.615 | 0.864 |
-| **ownership v2** | **ATD + video** | **yes** | **0.546 / 0.875** | **0.652** | **0.886** |
+| ownership v2 | ATD + video | yes | 0.546 / 0.875 | 0.652 | 0.886 |
 
 Ownership v2 (supervised ownership and supervised shape, §8) is the most robust decoder on every
-one of the six masks. The whistle raises macroF1 in every arm. The video track helps the
-supervised decoders under masks and costs the default decoder a little; with both, v2 is best on
-clean and masked spellF1. Its weights are flat around the defaults (ball-control weight 0-1,
-owner weight 1-1.5, switch cost 16-24 all within 0.641-0.652 masked), so nothing was tuned further.
+one of the six masks, the whistle raises macroF1 in every arm, and with v2 the video track helps
+under masks. The decoder weights are flat around their defaults (ball-control weight 0-1, owner
+weight 1-1.5, switch cost 16-24, touch weights, tackle cost: all within 0.62-0.65 masked) and were
+left alone. What did move the bench, each a paired gain on every mask:
+
+- whistle confirmation strong enough to force `D` from the blast to the slowdown (weight >= 12,
+  flat above), starting 10 frames after the blast onset rather than 5 (0.652 -> 0.664);
+- grid candidates from score 0.2 instead of 0.3 (0.664 -> 0.673);
+- **a 4 s minimum stoppage** instead of 2 s (`dead_min_frames` 100; 0.673 -> 0.700, flat from 4
+  to 6 s). The decoder's false dead balls were exactly the 2 s minimum long, wedged into slow
+  build-up or a player standing on the ball; the shortest public stoppage is 5.5 s and a throw-in
+  alone takes longer than 4 s.
+
+Two further changes are neutral on the bench and fix what the full two-round pipeline showed on
+the public window: a whistle only counts if the players were moving at the blast (>= 1.8 m/s; a
+blast during calm build-up at 12430 had forced a false stoppage), a confirmed stoppage carries a
+little `D` evidence for 6 s after the slowdown, and inside a stoppage-to-restart interval the ball
+being moved around before the paired restart (goal-kick set-up) no longer counts as play resuming
+(`inner_restarts` 0).
+
+Final, same bench (paired, six masks):
+
+| configuration | clean spellF1 / macroF1 | masked spellF1 | masked macroF1 | per-mask spellF1 |
+|---|---|---|---|---|
+| previous submission (default decoder) | 0.529 / 0.819 | 0.450 | 0.822 | 0.36 0.49 0.44 0.51 0.42 0.47 |
+| + ownership v2 | 0.513 / 0.830 | 0.627 | 0.853 | 0.51 0.69 0.62 0.57 0.65 0.71 |
+| + whistle, match structure, 4 s stoppages (ATD ball) | 0.563 / 0.874 | 0.658 | 0.897 | 0.56 0.69 0.66 0.62 0.68 0.74 |
+| **+ video ball (submitted)** | **0.588 / 0.887** | **0.700** | **0.898** | 0.59 0.74 0.73 0.65 0.71 0.79 |
+
+These use the round-1 shape model, so they are comparisons, not estimates of the private score.
+
+### 9.6 The submitted file
+
+`python src/run.py` with `src/params.json` (ownership v2, `ball_source` fused_full, whistle,
+`pre_kickoff_dead`, `goal_dead`, `dead_min_frames` 100, `inner_restarts` 0) on the public window:
+**spellF1 0.533, macroF1 0.906** (per class F1 H 0.895, A 0.882, D 0.942), 19 possessions against
+17; full match 352 possessions, dead share 0.461. The previous submission scored 0.514 / 0.863
+there with 11 possessions, ownership v1 0.568 / 0.867. On spellF1 these are inside the public
+window's noise (one possession is ~0.04); macroF1 rose by 0.04, and on the hidden-ball bench, where
+the full match's 41% missing ball lives, spellF1 rose from 0.45 to 0.70.
+
+Remaining public errors are timing on short possessions (an H spell after a duel starts 4.7 s late;
+two short spells are found 0.8-4 s off) and two 1-2 s spurious H spells. The video detector runs
+on the CPU at ~17 crops/s; reproducing it takes about 4 hours, and the INT8 detector's scores may
+differ in the last digits on a CPU with another instruction set, which could move a few frames.

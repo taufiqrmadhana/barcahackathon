@@ -81,7 +81,7 @@
   "tackle_extra": 5.0,
   "dead_entry_cost": 20.0,
   "dead_exit_cost": 30.0,
-  "dead_min_frames": 50,
+  "dead_min_frames": 100,
   "w_turnover": 8.0,
   "w_touch": 4.0,
   "w_duel": 2.0,
@@ -102,5 +102,10 @@
   "whistle_thresh": 24.0,
   "w_whistle": 10.0,
   "w_whistle_confirmed": 16.0,
-  "whistle_lag": 10
+  "whistle_lag": 10,
+  "ball_source": "fused_full",
+  "whistle_min_speed": 1.8,
+  "w_whistle_dead": 2.0,
+  "whistle_hold": 150,
+  "inner_restarts": 0
 }

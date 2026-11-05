@@ -32,7 +32,10 @@ def dead_score(ev, shape_q, events, p):
         z += p.w_shape_dead * np.log(qd / (1 - qd))
     for start, stop, conf, _ in events["dead"]:
         z[start:stop] += p.w_hold * conf
+    inner = inner_restart_mask(events, n, p)
     for f, _, conf, _ in events["restarts"]:
+        if inner[f]:
+            continue
         z[f:f + p.post_restart_frames] -= p.w_post_restart * conf
     for f in events["tag_starts"]:
         z[max(0, f - p.tag_dead_frames):f + p.tag_dead_frames] += p.w_tag_dead
@@ -40,18 +43,41 @@ def dead_score(ev, shape_q, events, p):
     moving = seen & inside & (ev["ball_speed"] > p.alive_ball_speed)
     z -= p.w_alive * moving
     if "whistles" in events:
-        speed = ev["player_speed_smooth"]
-        for f in events["whistles"][0]:
-            if p.w_whistle_dead:
-                z[f:f + p.whistle_hold] += p.w_whistle_dead
+        for f, slow in confirmed_whistles(events, ev, p):
+            # play stops at the whistle but players and ball take seconds to slow down; when they
+            # do, the stoppage started at the whistle, not at the slowdown -- and it lasts a while
             if p.w_whistle_confirmed:
-                # play stops at the whistle but players and ball take seconds to slow down; if they
-                # do slow down soon after, the stoppage started at the whistle, not at the slowdown
-                win = speed[f:f + p.whistle_confirm_window]
-                slow = np.flatnonzero(win < p.whistle_confirm_speed)
-                if len(slow):
-                    z[f + p.whistle_lag:f + slow[0] + 1] += p.w_whistle_confirmed
+                z[f + p.whistle_lag:f + slow + 1] += p.w_whistle_confirmed
+            if p.w_whistle_dead:
+                z[f + slow:f + slow + p.whistle_hold] += p.w_whistle_dead
     return z
+
+
+def inner_restart_mask(events, n, p):
+    """Frames strictly inside a paired stoppage-to-restart interval, before its restart: a struck
+    or reappearing ball there is the restart being set up, not play resuming."""
+    mask = np.zeros(n, dtype=bool)
+    if getattr(p, "inner_restarts", 1):
+        return mask
+    for start, stop, _, _ in events["dead"]:
+        mask[start:max(start, stop - p.restart_before)] = True
+    return mask
+
+
+def confirmed_whistles(events, ev, p):
+    """[(frame, frames to slowdown)] for whistle blasts heard while players were moving
+    (>= whistle_min_speed) and followed by the collective slowdown of a stoppage."""
+    out = []
+    if "whistles" not in events:
+        return out
+    speed = ev["player_speed_smooth"]
+    for f in events["whistles"][0]:
+        if speed[f] < p.whistle_min_speed:
+            continue
+        slow = np.flatnonzero(speed[f:f + p.whistle_confirm_window] < p.whistle_confirm_speed)
+        if len(slow):
+            out.append((int(f), int(slow[0])))
+    return out
 
 
 def nearest_owner(ev, p):
@@ -152,10 +178,13 @@ def bonuses(events, n, p, ev=None):
         _add(bonus, DEAD_IN, f, p.w_stoppage * conf, p.stop_before, p.stop_after)
     for f in events["shots"]:
         _add(bonus, DEAD_IN, f, p.w_shot_dead, 0, p.shot_window)
-    if p.w_whistle and "whistles" in events:
-        for f in events["whistles"][0]:
+    if p.w_whistle and "whistles" in events and ev is not None:
+        for f, _ in confirmed_whistles(events, ev, p):
             _add(bonus, DEAD_IN, f, p.w_whistle, p.whistle_before, p.whistle_after)
+    inner = inner_restart_mask(events, n, p)
     for f, team, conf, _ in events["restarts"]:
+        if inner[f]:
+            continue
         value = p.w_restart * conf
         if team in (HOME, -1):
             _add(bonus, H_OUT, f, value, p.restart_before, p.restart_after)

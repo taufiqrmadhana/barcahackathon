@@ -105,6 +105,8 @@ class Params:
     w_alive: float = 1.0
     w_hold: float = 5.0              # inside a stoppage-to-restart interval
     w_post_restart: float = 2.0      # just after a restart
+    inner_restarts: int = 1          # 0: a "restart" inside a stoppage-to-restart interval, before the
+                                     # restart it is paired with, is the ball being set up: no alive evidence
     post_restart_frames: int = 50
     w_tag_dead: float = 1.0          # around a tagged set piece start
     tag_dead_frames: int = 25
@@ -121,6 +123,8 @@ class Params:
     whistle_confirm_speed: float = 1.5   # m/s smoothed player speed that confirms a stoppage ...
     whistle_confirm_window: int = 125    # ... within this many frames after the whistle
     whistle_lag: int = 5                 # D starts this many frames after the blast begins
+    whistle_min_speed: float = 0.0       # players must be at least this fast at the blast (a real
+                                         # deceleration follows); 0 = any blast counts
 
     # step 4: transitions
     loose_cost: float = 1.0
