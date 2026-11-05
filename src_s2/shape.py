@@ -133,7 +133,10 @@ def get_proba(inp, p):
 
     import s2
     base = {k: v for k, v in p.items() if not k.startswith("shape") and k != "restart_win"}
-    key = hashlib.md5((json.dumps(base, sort_keys=True) + str(VERSION)).encode()).hexdigest()[:10]
+    # Key on the source too: a params-only key served stale probabilities after code changes.
+    here = os.path.dirname(os.path.abspath(__file__))
+    source = b"".join(open(os.path.join(here, f), "rb").read() for f in ("s2.py", "shape.py"))
+    key = hashlib.md5((json.dumps(base, sort_keys=True) + str(VERSION)).encode() + source).hexdigest()[:10]
     cache = os.path.join(os.environ.get("BARCA_CACHE_DIR", "."), "s2shape_{}.npy".format(key))
     if os.path.isfile(cache):
         return np.load(cache)
