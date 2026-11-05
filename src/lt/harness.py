@@ -69,6 +69,8 @@ def score(labels):
     global _GT
     if _GT is None:
         _GT = pipeline.public_gt()
+    if len(labels) < len(_GT):  # a windowed run: pad with X (never graded outside the window)
+        labels = np.concatenate([labels, np.full(len(_GT) - len(labels), "X", dtype=labels.dtype)])
     return pm.evaluate(_GT, pm.label_codes(labels))
 
 

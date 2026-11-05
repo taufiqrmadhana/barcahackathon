@@ -27,7 +27,7 @@ def build(tag="atd", prm=balltrack.Params, blocks=None):
     atd = atd_io.load()
     H = load_homography()[0]
     floors = {t: GRID_MIN_SCORE for t in tag.split("+") if t.startswith("grid")}
-    cands = balltrack.load_candidates(tag, floors)
+    cands = balltrack.fill_skipped(balltrack.load_candidates(tag, floors))
     blocks = blocks or half_video_blocks(GAME)
     return balltrack.fuse(atd["ball"][:, :2], cands, H, blocks, GAMES[GAME]["pitch"], prm,
                           players=atd["players"]), cands

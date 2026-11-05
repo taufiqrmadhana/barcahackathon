@@ -111,7 +111,8 @@ def add_whistles(evs, graded, p):
     """Referee whistle blasts from the audio track, if they are switched on."""
     if p.w_whistle or p.w_whistle_dead:
         from cv import whistle
-        evs["whistles"] = whistle.events(whistle.load(len(graded)), graded, p.whistle_thresh)
+        score = whistle.load(len(graded))[:len(graded)]
+        evs["whistles"] = whistle.events(score, graded, p.whistle_thresh)
     return evs
 
 

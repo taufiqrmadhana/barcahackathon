@@ -47,6 +47,30 @@ def load_candidates(tag="atd", min_score=None):
     return out
 
 
+def fill_skipped(cands, max_px=40.0, decay=0.9):
+    """A strided pass leaves every other frame without candidates. Where both neighbours of a
+    missing frame were processed, add midpoints of candidate pairs that are within max_px of each
+    other (a ball cannot be in two places), scored at decay * the weaker of the two."""
+    out = dict(cands)
+    frames = sorted(cands)
+    have = set(frames)
+    for f in frames:
+        g = f + 2
+        if g not in have or (f + 1) in have:
+            continue
+        a, b = cands[f], cands[g]
+        if not len(a) or not len(b):
+            continue
+        d = np.hypot(a[:, None, 0] - b[None, :, 0], a[:, None, 1] - b[None, :, 1])
+        i, j = np.nonzero(d <= max_px)
+        if not len(i):
+            continue
+        mid = (a[i] + b[j]) / 2.0
+        mid[:, 4] = decay * np.minimum(a[i, 4], b[j, 4])
+        out[f + 1] = mid[np.argsort(-mid[:, 4])][:6].astype(np.float32)
+    return out
+
+
 def to_pitch(H, frames, u, v):
     """Image pixels -> normalised pitch coordinates through the inverse homography per frame."""
     Hi = np.linalg.inv(H[frames])

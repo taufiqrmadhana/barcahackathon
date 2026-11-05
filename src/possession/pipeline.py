@@ -62,7 +62,7 @@ class Inputs:
             return self.atd
         fused = np.load(os.path.join(CACHE_DIR, "cv", p.ball_source + ".npz"))["xy"]
         ball = self.atd["ball"].copy()
-        ball[:, :2] = fused
+        ball[:, :2] = fused[:len(ball)]
         ball[:, 2] = np.nan
         return dict(self.atd, ball=ball)
 
