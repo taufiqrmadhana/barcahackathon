@@ -39,6 +39,18 @@ def dead_score(ev, shape_q, events, p):
     inside = beyond <= 0.0
     moving = seen & inside & (ev["ball_speed"] > p.alive_ball_speed)
     z -= p.w_alive * moving
+    if "whistles" in events:
+        speed = ev["player_speed_smooth"]
+        for f in events["whistles"][0]:
+            if p.w_whistle_dead:
+                z[f:f + p.whistle_hold] += p.w_whistle_dead
+            if p.w_whistle_confirmed:
+                # play stops at the whistle but players and ball take seconds to slow down; if they
+                # do slow down soon after, the stoppage started at the whistle, not at the slowdown
+                win = speed[f:f + p.whistle_confirm_window]
+                slow = np.flatnonzero(win < p.whistle_confirm_speed)
+                if len(slow):
+                    z[f + p.whistle_lag:f + slow[0] + 1] += p.w_whistle_confirmed
     return z
 
 
@@ -95,6 +107,27 @@ def emissions(ev, shape_q, tags, events, p):
     return emit, pd
 
 
+def add_whistles(evs, graded, p):
+    """Referee whistle blasts from the audio track, if they are switched on."""
+    if p.w_whistle or p.w_whistle_dead:
+        from cv import whistle
+        evs["whistles"] = whistle.events(whistle.load(len(graded)), graded, p.whistle_thresh)
+    return evs
+
+
+def force_pre_kickoff(emit, game, p):
+    """Make every non-D state impossible on stretches that are dead by the published timeline or
+    by the laws of the game (structure.py): before a kickoff, between a goal and its kick-off."""
+    from .structure import dead_intervals
+    spans = dead_intervals(game, p)
+    if not spans:
+        return emit
+    emit = emit.copy()
+    for lo, hi in spans:
+        emit[lo:hi, :4] = -1e6
+    return emit
+
+
 def _add(bonus, col, frame, value, before, after):
     lo, hi = max(0, frame - before), min(len(bonus), frame + after + 1)
     bonus[lo:hi, col] = np.maximum(bonus[lo:hi, col], value)
@@ -109,7 +142,7 @@ def bonuses(events, n, p, ev=None):
         bonus[:, TO_A] = p.w_near_switch * near[:, AWAY]
     touch = events["touch"]
     weight = {"turnover": p.w_turnover, "touch": p.w_touch, "duel": p.w_duel,
-              "pass": p.w_touch, "deflection": 0.0}
+              "pass": p.w_touch, "deflection": p.w_deflection}
     for f, team, conf, kind in zip(touch["frame"], touch["team"], touch["conf"], touch["kind"]):
         value = weight[kind] * conf
         if value > 0:
@@ -118,6 +151,9 @@ def bonuses(events, n, p, ev=None):
         _add(bonus, DEAD_IN, f, p.w_stoppage * conf, p.stop_before, p.stop_after)
     for f in events["shots"]:
         _add(bonus, DEAD_IN, f, p.w_shot_dead, 0, p.shot_window)
+    if p.w_whistle and "whistles" in events:
+        for f in events["whistles"][0]:
+            _add(bonus, DEAD_IN, f, p.w_whistle, p.whistle_before, p.whistle_after)
     for f, team, conf, _ in events["restarts"]:
         value = p.w_restart * conf
         if team in (HOME, -1):

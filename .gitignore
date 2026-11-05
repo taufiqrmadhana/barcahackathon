@@ -60,6 +60,7 @@ __pycache__/
 *.py[cod]
 .venv/
 .venv-pretrain/
+.venv-cv/
 venv/
 env/
 .DS_Store

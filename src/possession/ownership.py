@@ -167,7 +167,8 @@ def infer(inputs, params):
         if artifact["cleaning"] != cleaning:
             raise ValueError("ownership checkpoint cleaning differs from inference params")
         return proba(artifact, features(inputs.tracking(params), inputs.blocks))
-    return inputs._get("ownership", (digest, tuple(cleaning.values())), build)
+    # The ball track the features are built from is part of the key (ball_source).
+    return inputs._get("ownership", (digest, tuple(cleaning.values()), params.ball_source), build)
 
 
 def apply(emit, bonus, predictions, params):

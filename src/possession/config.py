@@ -18,6 +18,7 @@ class Params:
     ball_island_len: int = 3         # observed ball runs shorter than this ...
     ball_island_gap: int = 50        # ... with gaps this long either side are dropped
     max_gap: int = 12                # interpolate the ball across gaps up to this many frames
+    ball_source: str = ""            # "" = ATD ball; else a fused ATD+video track in cache/cv/<name>.npz
 
     # step 2: control evidence
     ctrl_radius: float = 1.3         # m; control probability is 0.5 at this distance
@@ -108,6 +109,18 @@ class Params:
     w_tag_dead: float = 1.0          # around a tagged set piece start
     tag_dead_frames: int = 25
     z_max: float = 4.0
+    pre_kickoff_dead: int = 1        # D on graded frames before a documented kickoff (FAQ.md)
+    goal_dead: int = 1               # D from the on-screen score change to the tagged kick-off
+    w_whistle: float = 0.0           # cut of the cost into D around a referee whistle (audio, cv/whistle.py)
+    w_whistle_dead: float = 0.0      # D evidence for whistle_hold frames after a whistle
+    whistle_thresh: float = 26.0     # dB of the 3.8 kHz tone over the neighbouring bands
+    whistle_before: int = 5
+    whistle_after: int = 20
+    whistle_hold: int = 50
+    w_whistle_confirmed: float = 0.0 # D evidence from a whistle until the players' slowdown that confirms it
+    whistle_confirm_speed: float = 1.5   # m/s smoothed player speed that confirms a stoppage ...
+    whistle_confirm_window: int = 125    # ... within this many frames after the whistle
+    whistle_lag: int = 5                 # D starts this many frames after the blast begins
 
     # step 4: transitions
     loose_cost: float = 1.0
@@ -119,6 +132,7 @@ class Params:
     w_turnover: float = 8.0
     w_touch: float = 4.0
     w_duel: float = 2.0
+    w_deflection: float = 0.0        # a one-touch of the other team inside a sequence (GT counts last touch)
     touch_before: int = 2
     touch_after: int = 10
     w_near_switch: float = 0.0       # switch-cost cut on tracked-ball frames where that team is nearest

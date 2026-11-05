@@ -23,14 +23,17 @@ PUBLIC_GT = os.path.join(ROOT, "evaluation", "gt", "{}_possession_gt_public.csv"
 CODES = {"H": 0, "A": 1, "D": 2}
 
 CLEAN_KEYS = ("player_margin", "max_player_speed", "vel_k", "ball_spike_speed",
-              "ball_island_len", "ball_island_gap", "max_gap")
+              "ball_island_len", "ball_island_gap", "max_gap", "ball_source")
+OPTIONAL_KEYS = ("ball_source",)
 EVIDENCE_KEYS = ("ctrl_radius", "ctrl_softness", "sync_free", "sync_scale", "filled_trust",
                  "corner_zone", "still_speed", "slow_window")
 
 
 def _key(params, names):
+    """Values of the named params. Optional inputs left at their empty default are omitted, so
+    adding such an option does not invalidate caches built before it existed."""
     values = asdict(params)
-    return tuple(values[k] for k in names)
+    return tuple(values[k] for k in names if not (k in OPTIONAL_KEYS and values[k] == ""))
 
 
 class Inputs:
@@ -53,9 +56,19 @@ class Inputs:
             self._cache[full] = build()
         return self._cache[full]
 
+    def ball_atd(self, p):
+        """The ATD dict, with the ball replaced by a fused ATD + video track if p.ball_source."""
+        if not p.ball_source:
+            return self.atd
+        fused = np.load(os.path.join(CACHE_DIR, "cv", p.ball_source + ".npz"))["xy"]
+        ball = self.atd["ball"].copy()
+        ball[:, :2] = fused
+        ball[:, 2] = np.nan
+        return dict(self.atd, ball=ball)
+
     def tracking(self, p):
         return self._get("trk", _key(p, CLEAN_KEYS),
-                         lambda: clean.build(self.atd, self.blocks, p))
+                         lambda: clean.build(self.ball_atd(p), self.blocks, p))
 
     def evidence(self, p):
         key = _key(p, CLEAN_KEYS + EVIDENCE_KEYS)
@@ -123,6 +136,7 @@ def predict(inputs, p, debug=False):
     ev = inputs.evidence(p)
     evs = events.build(trk, ev, inputs.tags, inputs.blocks, p)
     evs["tag_starts"] = inputs.tags["sp_start"]
+    evs = fuse.add_whistles(evs, inputs.graded, p)
     model = hsmm.Model(p)
     bonus = fuse.bonuses(evs, inputs.n, p, ev)
     # The decodes that only make pseudo-labels for the shape model stay conservative unless
@@ -133,6 +147,7 @@ def predict(inputs, p, debug=False):
 
     want = p.shape_conf > 0
     emit1, _ = fuse.emissions(ev, None, inputs.tags, evs, pl)
+    emit1 = fuse.force_pre_kickoff(emit1, inputs.game, p)
     labels1, _, *margin = model.decode(emit1, bonus_pl, inputs.blocks, inputs.n, margins=want)
 
     labels = labels1
@@ -145,6 +160,7 @@ def predict(inputs, p, debug=False):
             from . import supervised_shape
             q = supervised_shape.replace_team(q, supervised_shape.infer(inputs, p))
         emit2, p_dead = fuse.emissions(ev, q, inputs.tags, evs, p if last else pl)
+        emit2 = fuse.force_pre_kickoff(emit2, inputs.game, p)
         decode_bonus = bonus if last else bonus_pl
         if last and p.ownership_model:
             from . import ownership
