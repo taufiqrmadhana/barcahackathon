@@ -427,6 +427,26 @@ Final, same bench (paired, six masks):
 
 These use the round-1 shape model, so they are comparisons, not estimates of the private score.
 
+**Holdout masks.** Every choice above was made on the same six masks, so six fresh ones (seeds
+6-11, never looked at before) were scored once at the end. The ordering holds, and each component
+wins on all six of them:
+
+| on holdout masks | clean spellF1 | masked spellF1 | per-mask spellF1 |
+|---|---|---|---|
+| previous submission (default decoder, ATD ball) | 0.529 | 0.506 | 0.48 0.41 0.56 0.52 0.53 0.53 |
+| submitted, but default decoder | 0.578 | 0.539 | 0.58 0.52 0.59 0.52 0.49 0.55 |
+| submitted, but ownership v1 | 0.521 | 0.545 | 0.52 0.62 0.57 0.52 0.51 0.52 |
+| submitted, but no whistle | 0.546 | 0.615 | 0.61 0.65 0.65 0.61 0.59 0.58 |
+| submitted, but 2 s minimum stoppage | 0.558 | 0.614 | 0.60 0.64 0.66 0.60 0.59 0.59 |
+| submitted, but ATD ball only | 0.563 | 0.605 | 0.55 0.59 0.65 0.62 0.63 0.59 |
+| **submitted** | **0.588** | **0.646** | 0.63 0.68 0.69 0.63 0.62 0.62 |
+
+Pass 1 (crops around the ATD ball) turned out not to matter: with grid detections only, the bench
+gives 0.708 masked (0.700 with pass 1), and limiting the grid to ATD gaps at stride 2, as on the
+rest of the match, gives 0.699. The full pipeline with a grid-only track agrees with the submitted
+file on 97% of graded frames (public 0.533 / 0.899). Pass 1 can be skipped when reproducing the
+method, at the cost of not reproducing the submitted file byte for byte.
+
 ### 9.6 The submitted file
 
 `python src/run.py` with `src/params.json` (ownership v2, `ball_source` fused_full, whistle,
