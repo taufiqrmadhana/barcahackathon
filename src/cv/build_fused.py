@@ -20,7 +20,7 @@ from possession import atd as atd_io  # noqa: E402
 from starter.load_homography import load as load_homography  # noqa: E402
 
 
-GRID_MIN_SCORE = 0.3  # ATD-independent grid detections need more confidence than ATD-centred ones
+GRID_MIN_SCORE = 0.2  # ATD-independent grid detections need more confidence than ATD-centred ones
 
 
 def build(tag="atd", prm=balltrack.Params, blocks=None):

@@ -27,6 +27,32 @@ The first run parses the raw ATD (~200 MB) into `cache/` and fits the shape mode
 minutes on 12 CPU cores); later runs reuse both. `src/run.py` regenerates the submitted file
 exactly from `src/params.json`.
 
+### Video, audio and scoreboard inputs (November update, TECHNICAL.md section 9)
+
+The submitted config reads three things derived locally from the tactical video. They go to
+`cache/cv/` (gitignored, never committed or uploaded) and need a separate environment with the
+detector runtime:
+
+```bash
+uv venv --python 3.11 .venv-cv
+uv pip install --python .venv-cv -r requirements-cv.txt
+.venv-cv/bin/python src/cv/export_models.py          # YOLO11s COCO -> OpenVINO, INT8 (NNCF)
+# pass 1: crops around the ATD ball (about 1 h on 12 cores)
+.venv-cv/bin/python src/cv/detect_crops.py --start 11185 --end 54000
+# pass 2: ATD-independent grid, public window and selected frames (about 3 h)
+# The frame lists are committed (src/cv/frames/, frame indices only) so the pass is reproducible;
+# select_grid.py is how they were made (--public, then --stride 2 against an earlier decode).
+.venv-cv/bin/python src/cv/detect_grid.py --frames src/cv/frames/grid_frames_pub.txt --tag grid_pub
+.venv-cv/bin/python src/cv/detect_grid.py --frames src/cv/frames/grid_frames_pub_rest.txt --tag grid_pub_rest
+.venv-cv/bin/python src/cv/detect_grid.py --frames src/cv/frames/grid_frames.txt --tag grid
+.venv/bin/python src/cv/build_fused.py --tag atd+grid_pub+grid_pub_rest+grid --name fused_full
+.venv/bin/python src/cv/whistle.py                    # audio -> cache/cv/whistle38.npy
+```
+
+The scoreboard reading (goal -> kick-off dead intervals) runs on first use and is cached in
+`cache/cv/goal_dead_BAR-ATH.json`. The ownership checkpoints come from `src/bench/` (see
+bench/README.md).
+
 Analysis and tuning:
 
 ```bash

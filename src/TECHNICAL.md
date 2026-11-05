@@ -290,3 +290,109 @@ processing is local; nothing is sent to an external service.
 
 The audit: `python src/robustness.py --sim transplant context empirical --seeds 2` (about 30
 minutes) and `python src/spells.py`, optionally with `--hide context --seeds 2`.
+
+## 9. November update: what the ground truth rewards, video, audio and match structure
+
+### 9.1 The ground truth follows the last touch, not "controlled" possession
+
+CHALLENGE.md describes possession as *controlled* and says a deflection or a touch without
+control does not change it. The public ground truth does not behave that way: in a duel at frame
+15346 Barcelona own the ball for 19 frames (0.76 s) and Athletic get it straight back; 6 of the 17
+public possessions are shorter than 4 s. The ground truth is "the team the corrected tracking
+names as owning the ball", and that behaves like the team of the last touch. (Metrica's open
+sample games, labelled from their event logs, have the same structure: 34-43% of possessions under
+4 s, 17-18.5 possessions per 5 min, against 35% and 17 in the public window.)
+
+That changes where the score is. A prediction that matches every possession longer than 4 s
+exactly and misses all shorter ones scores spellF1 **0.56** on the public window -- which is where
+every version of this pipeline sat (0.51-0.57). Everything above that is in short possessions,
+and those live or die on the ball being where the tracking says it is at the moment of a touch.
+
+### 9.2 The video: a pretrained ball detector, no training on this match
+
+The ATD ball is missing on 41% of graded frames, and when present it is sometimes a static ghost
+on empty grass (frame 13785: the ATD ball sits still 8 m from everybody while the real ball is in a
+duel elsewhere) or 10-20 px off the real ball. `src/cv/` reads the tactical video directly:
+
+- **Detector**: the public Ultralytics YOLO11s COCO checkpoint (class "sports ball"), exported to
+  OpenVINO and INT8-quantised with NNCF on unlabelled frames of this video, run on the CPU
+  (`cv/detector.py`). Nothing is trained on this match and no label is involved. The ball is
+  4-10 px wide, too small for a downscaled full frame, so the detector sees native-resolution
+  square crops upscaled to 640 px (a 480 px crop around the expected ball finds a confident ball
+  within 30 px of the ATD on 56% of frames, against 19% within 15 px for the full frame at 1280).
+- **Pass 1** (`cv/detect_crops.py`): one crop per frame around the ATD ball (interpolated across
+  ATD gaps), frames 11185-53999.
+- **Pass 2** (`cv/detect_grid.py`, `cv/select_grid.py`): ATD-independent search with a 7-crop grid
+  over the playing area (far band 480 px crops, near band 640 px), on every public-window frame and
+  on graded frames where pass 1 found nothing and the ATD ball is missing or a ghost (no player
+  within 6 m), near frames a reference decode calls alive, at stride 2. Grid candidates need a score
+  of 0.2 (0.08 for ATD-centred ones).
+- **Fusion** (`cv/balltrack.py`): per frame, the ball is one of the video candidates (projected to
+  the pitch at the bottom of the box through the homography), the ATD ball, or "not seen"; a
+  Viterbi pass picks the sequence with the best detector scores, agreement with the ATD and
+  physically possible motion (free up to 1.4 m per frame, impossible beyond 3 m), with a penalty on
+  ATD ghosts. ATD-sourced frames are shifted by the local median video-ATD offset and the track is
+  lightly smoothed. Candidates more than 0.5 m outside the pitch are dropped (spare balls, ball
+  boys); a ball going out is left to the ATD. Output is a drop-in replacement for the ATD ball
+  (`ball_source` in `Params`).
+
+On the public window the fused track uses a video position on 64% of frames; where both exist it is
+a median 0.57 m from the ATD ball. On frames whose ATD ball was hidden (§9.5) it recovers a ball on
+~60%, 80% of them within 2 m of the hidden ATD position and ~10% grossly wrong (>10 m).
+
+### 9.3 The audio: the referee's whistle
+
+Three of the four stoppages in the public window are whistles (fouls, offsides) with the ball still
+rolling inside the pitch; the tracking only sees the players slow down 2-4 s later, so every such
+dead ball started late. This referee's whistle is a narrow tone near 3.8 kHz. `cv/whistle.py`
+computes, per video frame from the video's own audio track, the peak power in 3.65-3.95 kHz over
+the median of the neighbouring bands (median 8 dB; whistle blasts 25-35 dB). A blast followed
+within 5 s by the collective slowdown that confirms a stoppage makes the frames from the whistle
+to the slowdown dead-ball evidence (`w_whistle_confirmed`), and the cost of entering D is cut
+around the blast (`w_whistle`). The confirmation requirement is what makes it safe: at frame 17933
+a blast during play is not followed by a slowdown and changes nothing. Over the match, 26 blasts in
+predicted live play are confirmed; 16 of them move a dead-ball start earlier by 0.6-3 s. On the
+public window the two whistle stoppages now start at 12841 and 15900 (ground truth 12851 and 15889;
+before: missed, and 15971).
+
+### 9.4 Match structure that is certain
+
+- **Before the second-half kickoff**: FAQ.md states frames 110808-113741 are graded and all `D`.
+  The decoder had put 3-9 possessions there (players moving the ball before kickoff). They are now
+  forced to `D` (`pre_kickoff_dead`).
+- **Between a goal and its kick-off** the ball is dead by the laws of the game. Smart Tagging marks
+  four goals and four "Kick Off (After Goal)", but its GOALS interval starts with the attack, not
+  the goal, and one tagged goal was disallowed. The on-screen score (top-left graphic of the
+  tactical video) settles both: `cv/scoreboard.py` finds the frame where the score digits change
+  (white-pixel mask of the digits, sampled once a second). Three tagged goals change the score
+  (frames 46872, 74085, 157832; the 30th-minute one never does), and from that change to the tagged
+  kick-off every frame is forced to `D` (`goal_dead`). The decoder had possessions there too
+  (celebrations, the ball carried back to the centre spot).
+
+### 9.5 Choosing the configuration without the public window
+
+The public window has 17 possessions; its bootstrap interval is 0.31-0.70, and the full match has
+the ball missing 41% of the time against 12% in the window. Configurations were compared on a
+**leak-free hidden-ball bench** (`lt/masked.py`): the real missing-ball pattern of six other
+five-minute stretches is laid over the window (24-83% missing), the video arm may only use
+ATD-independent grid detections on the hidden frames, and the shape model is frozen at round 1 --
+the model scoring the public window is trained on other folds' pseudo-labels from the ball-only
+decode, which do not depend on the window's ball (round 2 would leak it, §6). Same masks for every
+configuration, so differences are paired.
+
+| decoder | ball | whistle | clean spellF1 / macroF1 | masked spellF1 | masked macroF1 |
+|---|---|---|---|---|---|
+| default | ATD | - | 0.529 / 0.819 | 0.450 | 0.822 |
+| default | ATD + video | yes | 0.483 / 0.863 | 0.449 | 0.834 |
+| ownership v1 | ATD | - | 0.480 / 0.845 | 0.514 | 0.841 |
+| ownership v1 | ATD + video | yes | 0.482 / 0.877 | 0.558 | 0.879 |
+| ownership v2 | ATD | - | 0.513 / 0.830 | 0.627 | 0.853 |
+| ownership v2 | ATD | yes | 0.509 / 0.863 | 0.623 | 0.887 |
+| ownership v2 | ATD + video | - | 0.503 / 0.855 | 0.615 | 0.864 |
+| **ownership v2** | **ATD + video** | **yes** | **0.546 / 0.875** | **0.652** | **0.886** |
+
+Ownership v2 (supervised ownership and supervised shape, §8) is the most robust decoder on every
+one of the six masks. The whistle raises macroF1 in every arm. The video track helps the
+supervised decoders under masks and costs the default decoder a little; with both, v2 is best on
+clean and masked spellF1. Its weights are flat around the defaults (ball-control weight 0-1,
+owner weight 1-1.5, switch cost 16-24 all within 0.641-0.652 masked), so nothing was tuned further.

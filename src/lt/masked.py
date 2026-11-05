@@ -59,13 +59,15 @@ def windowed(inputs, n=WINDOW):
 
 
 class Arms:
-    def __init__(self, grid_tags="grid_pub+grid_pub_rest", prm=balltrack.Params):
+    def __init__(self, grid_tags="grid_pub+grid_pub_rest", prm=balltrack.Params, grid_floor=None):
         self.inputs = hz.pipeline.Inputs()
         self.full_n = self.inputs.n
+        self.grid_floor = grid_floor
         self.H = load_homography()[0]
         self.pass1 = balltrack.load_candidates("atd")
         from cv.build_fused import GRID_MIN_SCORE
-        self.grid = balltrack.load_candidates(grid_tags, {t: GRID_MIN_SCORE for t in grid_tags.split("+")})
+        floor = GRID_MIN_SCORE if grid_floor is None else grid_floor
+        self.grid = balltrack.load_candidates(grid_tags, {t: floor for t in grid_tags.split("+")})
         self.prm = prm
         self.graded = self.inputs.graded
 
@@ -96,9 +98,10 @@ class Bench:
     prepare() writes one ATD-only and one ATD+video ball file per seed (cache/cv/mask_*); run()
     decodes a config on every seed with the shape model frozen and returns per-seed scores."""
 
-    def __init__(self, seeds=(-1, 0, 1, 2, 3, 4, 5)):
+    def __init__(self, seeds=(-1, 0, 1, 2, 3, 4, 5), prefix="mask", **arm_kw):
         self.seeds = list(seeds)
-        self.arms = Arms()
+        self.prefix = prefix
+        self.arms = Arms(**arm_kw)
         inputs = self.arms.inputs
         self.p0 = hz.base_params()
         # Round-1 shape probabilities: the model scoring the public window (fold 0) is trained only
@@ -112,7 +115,7 @@ class Bench:
 
     def prepare(self, force=False):
         for seed in self.seeds:
-            names = ["mask_atd_s{}".format(seed), "mask_fused_s{}".format(seed)]
+            names = ["{}_atd_s{}".format(self.prefix, seed), "{}_fused_s{}".format(self.prefix, seed)]
             if not force and all(os.path.isfile(os.path.join(hz.ROOT, "cache", "cv", n + ".npz"))
                                  for n in names):
                 continue
@@ -134,7 +137,7 @@ class Bench:
         for seed in self.seeds:
             self.inputs._cache = {k: v for k, v in self.inputs._cache.items()
                                   if k[0] not in ("trk", "ev", "ownership")}
-            pp = replace(p, ball_source="mask_{}_s{}".format(arm, seed))
+            pp = replace(p, ball_source="{}_{}_s{}".format(self.prefix, arm, seed))
             r = hz.score(hz.decode(self.inputs, pp, self.q, blocks=PUB))
             out.append((r["spell_f1_mean"], r["macro_f1"], r["n_pred_spells"]))
         return np.array(out)

@@ -94,5 +94,13 @@
   "shot_window": 75,
   "w_restart": 8.0,
   "restart_before": 10,
-  "restart_after": 10
+  "restart_after": 10,
+  "ownership_model": "pretrain_data/ownership_v2/ownership_all.joblib",
+  "supervised_shape_model": "pretrain_data/ownership_v2/shape_all.joblib",
+  "pre_kickoff_dead": 1,
+  "goal_dead": 1,
+  "whistle_thresh": 24.0,
+  "w_whistle": 10.0,
+  "w_whistle_confirmed": 16.0,
+  "whistle_lag": 10
 }

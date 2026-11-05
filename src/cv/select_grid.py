@@ -30,7 +30,18 @@ def main():
     ap.add_argument("--stride", type=int, default=2)
     ap.add_argument("--out", default=os.path.join(ROOT, "cache/cv/grid_frames.npy"))
     ap.add_argument("--exclude", default=os.path.join(ROOT, "cache/cv/grid_frames_pub.npy"))
+    ap.add_argument("--public", action="store_true",
+                    help="write the public-window lists instead: grid_frames_pub.npy (frames where "
+                         "pass 1 gave no video ball) and grid_frames_pub_rest.npy (the others)")
     args = ap.parse_args()
+    if args.public:
+        src = np.load(args.fused)["source"]
+        frames = np.arange(11185, 18685)
+        pub = frames[src[frames] != 1]
+        np.save(os.path.join(ROOT, "cache/cv/grid_frames_pub.npy"), pub)
+        np.save(os.path.join(ROOT, "cache/cv/grid_frames_pub_rest.npy"), np.setdiff1d(frames, pub))
+        print("public window: {} + {} frames".format(len(pub), 7500 - len(pub)))
+        return
     atd = atd_io.load()
     ball, P = atd["ball"], atd["players"]
     L, W = atd["pitch"]
