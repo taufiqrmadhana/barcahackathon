@@ -71,19 +71,24 @@ class Arms:
         self.prm = prm
         self.graded = self.inputs.graded
 
-    def fused(self, ball, hidden, use_pass1=True):
+    def fused(self, ball, hidden, use_pass1=True, grid_where=None, grid_stride=1):
+        """grid_where: optional bool mask of frames where grid detections may be used (to mimic
+        the full match, where the grid only ran where the ATD ball is missing or a ghost)."""
         cands = {}
         for f in range(*PUBLIC):
             parts = []
             if use_pass1 and not hidden[f] and f in self.pass1:
                 parts.append(self.pass1[f])
-            if f in self.grid:
+            use_grid = f in self.grid and (grid_where is None or grid_where[f]) and f % grid_stride == 0
+            if use_grid:
                 parts.append(self.grid[f])
             parts = [p for p in parts if len(p)]
             if parts:
                 c = np.concatenate(parts)
                 cands[f] = c[np.argsort(-c[:, 4])]
         atd = self.inputs.atd
+        if grid_stride > 1:
+            cands = balltrack.fill_skipped(cands)
         return balltrack.fuse(ball[:, :2], cands, self.H, [(1, PUBLIC[0], PUBLIC[1] - 1)],
                               GAMES[GAME]["pitch"], self.prm, players=atd["players"])
 
@@ -98,9 +103,13 @@ class Bench:
     prepare() writes one ATD-only and one ATD+video ball file per seed (cache/cv/mask_*); run()
     decodes a config on every seed with the shape model frozen and returns per-seed scores."""
 
-    def __init__(self, seeds=(-1, 0, 1, 2, 3, 4, 5), prefix="mask", **arm_kw):
+    def __init__(self, seeds=(-1, 0, 1, 2, 3, 4, 5), prefix="mask", use_pass1=True, gaps_only=False,
+                 grid_stride=1, **arm_kw):
         self.seeds = list(seeds)
         self.prefix = prefix
+        self.use_pass1 = use_pass1
+        self.gaps_only = gaps_only
+        self.grid_stride = grid_stride
         self.arms = Arms(**arm_kw)
         inputs = self.arms.inputs
         self.p0 = hz.base_params()
@@ -125,7 +134,11 @@ class Bench:
                 ball, hidden, _ = transplant(self.full_ball, self.arms.graded,
                                              np.random.default_rng(100 + seed))
             ball, hidden = ball[:WINDOW], hidden[:WINDOW]
-            fu = self.arms.fused(ball, hidden)
+            where = None
+            if self.gaps_only:
+                where = np.isnan(ball[:, 0])
+            fu = self.arms.fused(ball, hidden, use_pass1=self.use_pass1, grid_where=where,
+                                 grid_stride=self.grid_stride)
             xy = ball[:, :2].copy()
             pub = slice(*PUBLIC)
             xy[pub] = fu["xy"][pub]
