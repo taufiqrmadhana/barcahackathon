@@ -17,6 +17,7 @@ Everything works on float32 RGB in [0, 1], shape (B, H, W, 3).
 """
 
 import os
+import time as _time
 
 import numpy as np
 
@@ -37,13 +38,17 @@ class FilmInterpolator:
 
     name = "film"
 
-    def __init__(self, url=FILM_HUB_URL, batch_size=4):
+    def __init__(self, url=FILM_HUB_URL, batch_size=2):
         os.environ.setdefault("TF_CPP_MIN_LOG_LEVEL", "2")
         import tensorflow as tf
         import tensorflow_hub as hub
 
         self.tf = tf
-        self.model = hub.load(url)
+        gpus = tf.config.list_physical_devices("GPU")
+        self.device = "/GPU:0" if gpus else "/CPU:0"
+        print("FILM interpolator device: {} ({})".format(self.device, gpus or "CPU"), flush=True)
+        with tf.device(self.device):
+            self.model = hub.load(url)
         self.batch_size = batch_size
 
     def __call__(self, x0, x1, t=0.5):
@@ -51,14 +56,17 @@ class FilmInterpolator:
         x0 = np.asarray(x0, dtype=np.float32)
         x1 = np.asarray(x1, dtype=np.float32)
         out = np.empty_like(x0)
-        for start in range(0, len(x0), self.batch_size):
-            stop = start + self.batch_size
-            a, (h, w) = _pad(x0[start:stop])
-            b, _ = _pad(x1[start:stop])
-            time = np.full((len(a), 1), t, dtype=np.float32)
-            result = self.model({"x0": self.tf.constant(a), "x1": self.tf.constant(b),
-                                 "time": self.tf.constant(time)}, training=False)
-            out[start:stop] = np.clip(result["image"].numpy()[:, :h, :w], 0.0, 1.0)
+        with self.tf.device(self.device):
+            for start in range(0, len(x0), self.batch_size):
+                stop = start + self.batch_size
+                a, (h, w) = _pad(x0[start:stop])
+                b, _ = _pad(x1[start:stop])
+                time = np.full((len(a), 1), t, dtype=np.float32)
+                result = self.model({"x0": self.tf.constant(a), "x1": self.tf.constant(b),
+                                     "time": self.tf.constant(time)}, training=False)
+                out[start:stop] = np.clip(result["image"].numpy()[:, :h, :w], 0.0, 1.0)
+                if self.device == "/GPU:0":
+                    _time.sleep(0.015)  # yield to Windows DWM to prevent TDR timeout on Radeon GPU
         return out
 
 

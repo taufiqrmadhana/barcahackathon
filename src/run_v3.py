@@ -34,8 +34,10 @@ import possession_metrics as pm  # noqa: E402
 
 
 def headline(result):
+    f1_d = result.get("f1_D", result.get("per_class", {}).get("D", {}).get("f1", 0.0))
+    trans_f1 = result.get("trans_f1_25", result.get("transitions", {}).get(25, {}).get("f1", 0.0))
     return "spellF1 {:.4f}  macroF1 {:.4f}  D-F1 {:.3f}  transF1@25 {:.3f}  poss {:>3}".format(
-        result["spell_f1_mean"], result["macro_f1"], result["f1_D"], result["trans_f1_25"],
+        result["spell_f1_mean"], result["macro_f1"], f1_d, trans_f1,
         result["n_pred_spells"])
 
 

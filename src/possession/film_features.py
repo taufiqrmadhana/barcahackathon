@@ -201,7 +201,7 @@ class Store:
         return self.frames, self.values
 
 
-def extract(extractor, store, frames, chunk=32, log_every=20, budget_s=None):
+def extract(extractor, store, frames, chunk=32, log_every=4, budget_s=None):
     """Fill the store for `frames` (skipping cached ones). Returns number of new samples."""
     todo = store.missing(frames)
     started, done = time.time(), 0
@@ -212,7 +212,7 @@ def extract(extractor, store, frames, chunk=32, log_every=20, budget_s=None):
         if c % log_every == 0 or start + chunk >= len(todo):
             store.save()
             rate = done / max(time.time() - started, 1e-6)
-            print("  film {}/{} samples  {:.2f}/s  eta {:.0f} min".format(
+            print("  film {}/{} samples  {:.2f}/s  eta {:.1f} min".format(
                 done, len(todo), rate, (len(todo) - done) / max(rate, 1e-6) / 60), flush=True)
         if budget_s and time.time() - started > budget_s:
             break
