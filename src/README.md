@@ -4,10 +4,12 @@ Own pipeline for More than a Hack 2027, Phase 1. Everything outside `src/` is th
 repository (remote `upstream`), kept as is so `git pull upstream main` keeps working. The method,
 the possession rules and what was tried and dropped are in [TECHNICAL.md](TECHNICAL.md).
 
-November 12 update: the default combines this pipeline with contact ownership adapted from
-`neo/loop-pipeline`. Public spellF1 **0.6703**, macroF1 **0.9137** (previously 0.5333 / 0.9060).
-The public-score candidate reaches **0.6947 / 0.9143**. Comparison, external regressions and
-reproduction commands: [CONTACT_EXPERIMENTS.md](CONTACT_EXPERIMENTS.md).
+Latest: `valdi` is merged into `taufiq`. The default combines Taufiq's tracking/audio/shape,
+Neo's contact ownership, and Valdi's FILM video validator: public spellF1 **0.7053**, macroF1
+**0.9231**. Public CSV rows are independently decoded out-of-fold predictions. Exact video
+frame plan, setup, model fitting and limits: [VALDI_INTEGRATION.md](VALDI_INTEGRATION.md).
+The previous contact-only configuration is preserved in `configs/contact_default.json`;
+its experiments are documented in [CONTACT_EXPERIMENTS.md](CONTACT_EXPERIMENTS.md).
 
 ## Setup
 
@@ -26,8 +28,10 @@ gitignored: never commit the data or a submission.
 .venv/bin/python src/run.py                                  # -> evaluation/results/barca.csv
 .venv/bin/python evaluation/validate_submission.py evaluation/results/barca.csv
 .venv/bin/python evaluation/run_evaluation.py                # official scorer, public window
-# Alternative selected for the public score:
+# Earlier contact-only public-score candidate:
 .venv/bin/python src/run.py --params src/configs/contact_public.json --name contact_public
+# Previous contact-only default:
+.venv/bin/python src/run.py --params src/configs/contact_default.json --name contact_default
 # Reproduce the previous submission:
 .venv/bin/python src/run.py --params src/configs/ownership_v2.json --name ownership_before_contact
 ```
@@ -98,6 +102,7 @@ Smart Tagging ──► set-piece starts ─────────────
 | `possession/config.py` | | every tunable number (`Params`); `src/params.json` is the submitted config |
 | `possession/pipeline.py` | | glue, caching, writing and validating the CSV |
 | `possession/contact.py` | 5 | original-ATD contact vote, second H/A decode with the D mask locked, short-island cleanup; never feeds shape training |
+| `possession/hybrid.py` | 6 | Valdi camera/context + FILM features, public-trained classifier, independently decoded held-out public folds; preserves D and uncovered frames |
 | `experiments/` | 5 | the CV ball-recovery check and a local overlay viewer, not part of the pipeline |
 
 ## Rules to keep in mind

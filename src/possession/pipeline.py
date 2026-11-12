@@ -170,6 +170,12 @@ def predict(inputs, p, debug=False):
     if p.w_contact:
         from . import contact
         labels, states = contact.refine(inputs, p, labels, emit2, decode_bonus)
+    if p.hybrid_model:
+        from . import hybrid
+        labels = hybrid.apply(inputs, p, labels, emit2, decode_bonus, q)
+        # Stitched held-out folds have no single global Viterbi state path. These
+        # label-consistent states are diagnostics, not a duration-chain traceback.
+        states = np.array([{'H': 0, 'A': 2, 'D': 4}.get(c, -1) for c in labels], dtype=np.int16)
     if not debug:
         return labels
     return labels, {"trk": trk, "ev": ev, "events": evs, "bonus": decode_bonus, "emit": emit2,

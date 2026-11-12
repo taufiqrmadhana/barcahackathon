@@ -68,3 +68,5 @@ cache/
 
 # -- external pretraining data and checkpoints (derived from third-party data) ----
 pretrain_data/
+
+.venv-v3/

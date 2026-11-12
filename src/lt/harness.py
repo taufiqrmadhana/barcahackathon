@@ -67,6 +67,9 @@ def decode(inputs, p, q, extra=None, blocks=None):
             inputs.blocks = blocks
             inputs._cache = {}
         labels, _ = contact.refine(inputs, p, labels, emit, bonus)
+    if p.hybrid_model:
+        from possession import hybrid
+        labels = hybrid.apply(inputs, p, labels, emit, bonus, q)
     return labels
 
 

@@ -87,6 +87,9 @@ class Params:
     contact_switch_cost: float = -1.0 # < 0 uses switch_cost
     contact_min_frames: int = 0    # merge shorter H/A islands surrounded by the other team
     contact_local_switch: int = 0  # lower cost only toward a team supported by contact
+    hybrid_model: str = ''         # optional local Valdi video/context classifier checkpoint
+    hybrid_weight: float = .5
+    hybrid_lock_dead: int = 1
 
     # step 4: emissions
     ctrl_eps: float = 0.05

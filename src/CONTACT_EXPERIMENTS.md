@@ -1,12 +1,16 @@
 # Contact refinement, November 12, 2026
 
+This records the contact-only stage at f09da85. Its default is now preserved as
+`configs/contact_default.json`. The current default includes the Valdi merge described in
+[VALDI_INTEGRATION.md](VALDI_INTEGRATION.md).
+
 The default now adds Neo's contact-ownership idea to Taufiq's video, audio, external ownership
 and shape pipeline. No competition labels are loaded at inference and no frame is hand-corrected.
 
 | Full production pipeline, public five minutes | spellF1 | macroF1 | possessions |
 |---|---:|---:|---:|
 | Before this change, `configs/ownership_v2.json` | 0.5333 | 0.9060 | 19 |
-| Default, `params.json` | **0.6703** | **0.9137** | 20 |
+| Contact-only default, `configs/contact_default.json` | **0.6703** | **0.9137** | 20 |
 | Public-score candidate, `configs/contact_public.json` | **0.6947** | **0.9143** | 21 |
 
 There are 17 GT possessions. The default's improvement is +0.1369 spellF1 and +0.0078 macroF1.

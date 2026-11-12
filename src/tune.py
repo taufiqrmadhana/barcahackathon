@@ -58,6 +58,9 @@ def decode_with(inputs, params, q):
     if params.w_contact:
         from possession import contact
         labels, _ = contact.refine(inputs, params, labels, emit, bonus)
+    if params.hybrid_model:
+        from possession import hybrid
+        labels = hybrid.apply(inputs, params, labels, emit, bonus, q)
     return labels
 
 
