@@ -167,6 +167,9 @@ def predict(inputs, p, debug=False):
             emit2, decode_bonus = ownership.apply(emit2, decode_bonus, ownership.infer(inputs, p), p)
         labels, states, *margin = model.decode(emit2, decode_bonus, inputs.blocks,
                                                inputs.n, margins=want and not last)
+    if p.w_contact:
+        from . import contact
+        labels, states = contact.refine(inputs, p, labels, emit2, decode_bonus)
     if not debug:
         return labels
     return labels, {"trk": trk, "ev": ev, "events": evs, "bonus": decode_bonus, "emit": emit2,

@@ -1,5 +1,11 @@
 # Ball possession from tracking evidence, events and a semi-Markov decoder
 
+**Latest update (November 12):** contact refinement raises public spellF1 / macroF1 to
+**0.6703 / 0.9137** by default; the public-score candidate reaches **0.6947 / 0.9143**.
+See [CONTACT_EXPERIMENTS.md](CONTACT_EXPERIMENTS.md) for the method, branch audit, paired
+mask results, external regressions and exact configurations. Sections below describe the
+earlier stages; their references to the submitted configuration are historical.
+
 More than a Hack 2027, Phase 1 — technical document. Code: `src/` in this repository.
 
 ## 1. Approach

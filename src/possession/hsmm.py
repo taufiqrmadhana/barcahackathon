@@ -15,9 +15,50 @@ restart always has a taker.
 
 import numpy as np
 
+try:
+    from numba import njit
+except ImportError:
+    njit = None
+
 HC, HL, AC, AL = 0, 1, 2, 3
 GROUP_LABEL = np.array(["H", "H", "A", "A"])
 NEG = -1e9
+
+
+def _sparse_viterbi(emit, bonus, cost, sources, sizes, bonus_col, d_first, d_last):
+    """Visit only legal arcs, preserving the dense decoder's first-index tie rule."""
+    n, s = len(emit), len(cost)
+    back = np.zeros((n, s), dtype=np.int16)
+    total = np.empty(s, dtype=np.float64)
+    for j in range(s):
+        total[j] = emit[0, min(j, 4)]
+    for j in range(d_first, d_last):
+        total[j] = NEG
+    for t in range(1, n):
+        new = np.empty(s, dtype=np.float64)
+        for j in range(s):
+            best, previous = -np.inf, 0
+            for k in range(sizes[j]):
+                i = sources[j, k]
+                c = cost[i, j]
+                col = bonus_col[j, k]
+                if col >= 0:
+                    c = max(0.0, c - bonus[t, col])
+                value = total[i] - c
+                if value > best:
+                    best, previous = value, i
+            back[t, j] = previous
+            new[j] = best + emit[t, min(j, 4)]
+        total = new
+    path = np.empty(n, dtype=np.int16)
+    path[-1] = total.argmax()
+    for t in range(n - 1, 0, -1):
+        path[t - 1] = back[t, path[t]]
+    return path
+
+
+if njit is not None:
+    _sparse_viterbi = njit(cache=True)(_sparse_viterbi)
 
 
 class Model:
@@ -40,6 +81,20 @@ class Model:
         cost[self.d_last, HC] = cost[self.d_last, AC] = p.dead_exit_cost
         self.cost = cost
         self.labels = np.concatenate([GROUP_LABEL, np.array(["D"] * self.m)])
+        self.sizes = np.isfinite(cost).sum(axis=0)
+        self.sources = np.zeros((self.n_states, int(self.sizes.max())), dtype=np.int64)
+        self.bonus_col = np.full_like(self.sources, -1)
+        for j in range(self.n_states):
+            for k, i in enumerate(np.flatnonzero(np.isfinite(cost[:, j]))):
+                self.sources[j, k] = i
+                if j == HC and i in (AC, AL):
+                    self.bonus_col[j, k] = 0
+                elif j == AC and i in (HC, HL):
+                    self.bonus_col[j, k] = 1
+                elif j == self.d_first and i < 4:
+                    self.bonus_col[j, k] = 2
+                elif i == self.d_last and j in (HC, AC):
+                    self.bonus_col[j, k] = 3 if j == HC else 4
 
     def expand(self, emit):
         """(N, 5) group emissions [HC, HL, AC, AL, D] -> (N, n_states)."""
@@ -61,6 +116,12 @@ class Model:
         return np.maximum(cost, 0.0)
 
     def viterbi(self, emit, bonus):
+        if njit is not None:
+            return _sparse_viterbi(emit, bonus, self.cost, self.sources, self.sizes,
+                                    self.bonus_col, self.d_first, self.d_last)
+        return self.viterbi_reference(emit, bonus)
+
+    def viterbi_reference(self, emit, bonus):
         """Best state path for one half. emit (N, 5), bonus (N, 5) cost reductions."""
         e = self.expand(emit)
         n, s = e.shape

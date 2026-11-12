@@ -107,5 +107,12 @@
   "whistle_min_speed": 1.8,
   "w_whistle_dead": 2.0,
   "whistle_hold": 150,
-  "inner_restarts": 0
+  "inner_restarts": 0,
+  "w_contact": 1.0,
+  "contact_alpha": 0.5,
+  "contact_window": 125,
+  "contact_lock_dead": 1,
+  "contact_min_frames": 12,
+  "contact_switch_cost": 2.0,
+  "contact_local_switch": 1
 }

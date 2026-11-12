@@ -46,13 +46,18 @@ def decode_with(inputs, params, q):
     trk, ev = inputs.tracking(params), inputs.evidence(params)
     evs = events.build(trk, ev, inputs.tags, inputs.blocks, params)
     evs["tag_starts"] = inputs.tags["sp_start"]
+    evs = fuse.add_whistles(evs, inputs.graded, params)
     emit, _ = fuse.emissions(ev, q, inputs.tags, evs, params)
+    emit = fuse.force_pre_kickoff(emit, inputs.game, params)
     bonus = fuse.bonuses(evs, inputs.n, params, ev)
     if params.ownership_model:
         from possession import ownership
         emit, bonus = ownership.apply(emit, bonus, ownership.infer(inputs, params), params)
     labels, _ = hsmm.Model(params).decode(emit, bonus,
                                           inputs.blocks, inputs.n)
+    if params.w_contact:
+        from possession import contact
+        labels, _ = contact.refine(inputs, params, labels, emit, bonus)
     return labels
 
 

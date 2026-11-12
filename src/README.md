@@ -4,6 +4,11 @@ Own pipeline for More than a Hack 2027, Phase 1. Everything outside `src/` is th
 repository (remote `upstream`), kept as is so `git pull upstream main` keeps working. The method,
 the possession rules and what was tried and dropped are in [TECHNICAL.md](TECHNICAL.md).
 
+November 12 update: the default combines this pipeline with contact ownership adapted from
+`neo/loop-pipeline`. Public spellF1 **0.6703**, macroF1 **0.9137** (previously 0.5333 / 0.9060).
+The public-score candidate reaches **0.6947 / 0.9143**. Comparison, external regressions and
+reproduction commands: [CONTACT_EXPERIMENTS.md](CONTACT_EXPERIMENTS.md).
+
 ## Setup
 
 ```bash
@@ -21,6 +26,10 @@ gitignored: never commit the data or a submission.
 .venv/bin/python src/run.py                                  # -> evaluation/results/barca.csv
 .venv/bin/python evaluation/validate_submission.py evaluation/results/barca.csv
 .venv/bin/python evaluation/run_evaluation.py                # official scorer, public window
+# Alternative selected for the public score:
+.venv/bin/python src/run.py --params src/configs/contact_public.json --name contact_public
+# Reproduce the previous submission:
+.venv/bin/python src/run.py --params src/configs/ownership_v2.json --name ownership_before_contact
 ```
 
 The first run parses the raw ATD (~200 MB) into `cache/` and fits the shape model (about two
@@ -88,6 +97,7 @@ Smart Tagging ──► set-piece starts ─────────────
 | `possession/tagging.py` | 3 | Smart Tagging to per-frame phase team and set-piece starts |
 | `possession/config.py` | | every tunable number (`Params`); `src/params.json` is the submitted config |
 | `possession/pipeline.py` | | glue, caching, writing and validating the CSV |
+| `possession/contact.py` | 5 | original-ATD contact vote, second H/A decode with the D mask locked, short-island cleanup; never feeds shape training |
 | `experiments/` | 5 | the CV ball-recovery check and a local overlay viewer, not part of the pipeline |
 
 ## Rules to keep in mind

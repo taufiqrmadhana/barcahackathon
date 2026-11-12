@@ -79,6 +79,15 @@ class Params:
     w_owner: float = 1.0
     w_owner_switch: float = 12.0
 
+    # Optional second H/A decode using Neo's independent ATD contact ownership.
+    w_contact: float = 0.0
+    contact_alpha: float = 0.5
+    contact_window: int = 50         # abstain if no observed ball within this many frames
+    contact_lock_dead: int = 1      # retain all D frames from the first final decode
+    contact_switch_cost: float = -1.0 # < 0 uses switch_cost
+    contact_min_frames: int = 0    # merge shorter H/A islands surrounded by the other team
+    contact_local_switch: int = 0  # lower cost only toward a team supported by contact
+
     # step 4: emissions
     ctrl_eps: float = 0.05
     near_radius: float = 1.3         # m; proximity-only ownership is 0.5 at this distance

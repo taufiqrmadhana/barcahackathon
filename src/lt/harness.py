@@ -59,6 +59,14 @@ def decode(inputs, p, q, extra=None, blocks=None):
                                           "inputs": inputs, "p_dead": p_dead})
     model = hsmm.Model(p)
     labels, _ = model.decode(emit, bonus, blocks or inputs.blocks, inputs.n)
+    if p.w_contact:
+        from possession import contact
+        if blocks is not None and blocks != inputs.blocks:
+            import copy
+            inputs = copy.copy(inputs)
+            inputs.blocks = blocks
+            inputs._cache = {}
+        labels, _ = contact.refine(inputs, p, labels, emit, bonus)
     return labels
 
 

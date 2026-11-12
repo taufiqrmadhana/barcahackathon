@@ -57,12 +57,13 @@ def main():
                     default=["clean", "atd", "corrupt"])
     ap.add_argument("--seeds", nargs="+", type=int, default=[0])
     ap.add_argument("--fit-all", action="store_true")
+    ap.add_argument("--params", default=str(Path(ROOT, "src/configs/external_training.json")))
     args = ap.parse_args()
     if len(set(args.games)) != len(args.games) or len(args.games) < 2:
         raise ValueError("supply at least two distinct games")
     out = Path(args.out)
     out.mkdir(parents=True, exist_ok=True)
-    p = Params.load(str(Path(ROOT, "src/params.json")))
+    p = Params.load(args.params, pre_kickoff_dead=0, goal_dead=0)
     if p.ownership_model or p.supervised_shape_model or p.w_near or p.w_near_switch:
         raise ValueError("baseline configuration must not include experimental models")
     audits = [audit(game) for game in args.games]

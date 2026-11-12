@@ -174,10 +174,11 @@ def main():
     ap.add_argument("--seeds", nargs="+", type=int, default=[0])
     ap.add_argument("--audit-only", action="store_true")
     ap.add_argument("--fit-all", action="store_true", help="Fit deployable checkpoint; no evaluation")
+    ap.add_argument("--params", default=os.path.join(ROOT, "src", "configs", "external_training.json"))
     args = ap.parse_args()
     out = Path(args.out)
     out.mkdir(parents=True, exist_ok=True)
-    p = Params.load(os.path.join(ROOT, "src", "params.json"))
+    p = Params.load(args.params, pre_kickoff_dead=0, goal_dead=0)
     if p.ownership_model or p.w_near or p.w_near_switch:
         raise ValueError("experiment baseline must not already contain ownership/near evidence")
     audits = [audit(g) for g in metrica.GAMES]
