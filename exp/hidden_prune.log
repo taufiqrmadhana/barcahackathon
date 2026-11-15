@@ -1,0 +1,11 @@
+base: clean spellF1 0.6270 macroF1 0.8414 poss 20 | hidden (19 masks) spellF1 mean 0.4955 sd 0.0890 min 0.3294 macroF1 mean 0.7710 poss mean 15.8
+use_teleport=0: clean spellF1 0.6270 macroF1 0.8414 poss 20 | hidden (19 masks) spellF1 mean 0.4955 sd 0.0890 min 0.3294 macroF1 mean 0.7710 poss mean 15.8
+use_interp=0: clean spellF1 0.6270 macroF1 0.8405 poss 20 | hidden (19 masks) spellF1 mean 0.4935 sd 0.0889 min 0.3294 macroF1 mean 0.7696 poss mean 15.6
+use_merge=0: clean spellF1 0.6270 macroF1 0.8414 poss 20 | hidden (19 masks) spellF1 mean 0.4955 sd 0.0890 min 0.3294 macroF1 mean 0.7710 poss mean 15.8
+use_still_missing_speed=0: clean spellF1 0.6270 macroF1 0.8414 poss 20 | hidden (19 masks) spellF1 mean 0.4955 sd 0.0890 min 0.3294 macroF1 mean 0.7710 poss mean 15.8
+use_shape_gap=0: clean spellF1 0.6270 macroF1 0.8414 poss 20 | hidden (19 masks) spellF1 mean 0.4614 sd 0.1212 min 0.2182 macroF1 mean 0.7507 poss mean 14.4
+use_min_spell=0: clean spellF1 0.6270 macroF1 0.8414 poss 20 | hidden (19 masks) spellF1 mean 0.4968 sd 0.0905 min 0.3294 macroF1 mean 0.7711 poss mean 16.0
+use_shape_restart=0: clean spellF1 0.6270 macroF1 0.8414 poss 20 | hidden (19 masks) spellF1 mean 0.4984 sd 0.0897 min 0.3394 macroF1 mean 0.7709 poss mean 15.7
+use_restart_lag=0: clean spellF1 0.6270 macroF1 0.8452 poss 20 | hidden (19 masks) spellF1 mean 0.4955 sd 0.0890 min 0.3294 macroF1 mean 0.7726 poss mean 15.8
+use_teleport=0 use_interp=0 use_merge=0 use_still_missing_speed=0 use_shape_gap=0 use_min_spell=0 use_shape_restart=0 use_restart_lag=0: clean spellF1 0.6270 macroF1 0.8443 poss 20 | hidden (19 masks) spellF1 mean 0.4611 sd 0.1228 min 0.2182 macroF1 mean 0.7505 poss mean 14.3
+use_gap_kick=0: clean spellF1 0.6111 macroF1 0.8315 poss 19 | hidden (19 masks) spellF1 mean 0.4995 sd 0.0842 min 0.3294 macroF1 mean 0.7722 poss mean 15.4

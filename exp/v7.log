@@ -1,0 +1,14 @@
+base                   sigma 0.00 | public 0.6111 (min 0.6111) | pooled 0.5662 | full poss 322 dead 0.463
+gk                     sigma 0.00 | public 0.6270 (min 0.6270) | pooled 0.5744 | full poss 324 dead 0.462
+gk_rel2                sigma 0.00 | public 0.6154 (min 0.6154) | pooled 0.5750 | full poss 332 dead 0.462
+gk_rel3                sigma 0.00 | public 0.6256 (min 0.6256) | pooled 0.5317 | full poss 349 dead 0.462
+gk_rel4                sigma 0.00 | public 0.5300 (min 0.5300) | pooled 0.4810 | full poss 362 dead 0.462
+gk_rc1.0               sigma 0.00 | public 0.5889 (min 0.5889) | pooled 0.5487 | full poss 312 dead 0.462
+gk_rc2.0               sigma 0.00 | public 0.6270 (min 0.6270) | pooled 0.5744 | full poss 324 dead 0.462
+gk_rc1_rel3            sigma 0.00 | public 0.5949 (min 0.5949) | pooled 0.5450 | full poss 329 dead 0.462
+gk_minrun6             sigma 0.00 | public 0.6154 (min 0.6154) | pooled 0.5700 | full poss 331 dead 0.462
+gk_minrun12            sigma 0.00 | public 0.6270 (min 0.6270) | pooled 0.5487 | full poss 307 dead 0.462
+gk_merge5              sigma 0.00 | public 0.6270 (min 0.6270) | pooled 0.5692 | full poss 324 dead 0.462
+gk_clear.3             sigma 0.00 | public 0.6051 (min 0.6051) | pooled 0.5650 | full poss 331 dead 0.462
+gk_kdv1.5              sigma 0.00 | public 0.5949 (min 0.5949) | pooled 0.5600 | full poss 357 dead 0.459
+gk_kdv2.5              sigma 0.00 | public 0.6545 (min 0.6545) | pooled 0.5449 | full poss 290 dead 0.468

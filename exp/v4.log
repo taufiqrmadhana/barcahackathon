@@ -1,0 +1,16 @@
+auto                   sigma 0.00 | public 0.6111 (min 0.6111) | pooled 0.5662 | full poss 322 dead 0.463
+auto                   sigma 0.10 | public 0.5243 (min 0.4973) | pooled 0.4651 | full poss 379 dead 0.443
+auto                   sigma 0.20 | public 0.4907 (min 0.4778) | pooled 0.4513 | full poss 352 dead 0.445
+auto                   sigma 0.30 | public 0.5067 (min 0.4878) | pooled 0.4568 | full poss 358 dead 0.440
+auto_sm2               sigma 0.00 | public 0.6111 (min 0.6111) | pooled 0.5662 | full poss 322 dead 0.463
+auto_sm2               sigma 0.10 | public 0.5156 (min 0.4533) | pooled 0.4984 | full poss 371 dead 0.445
+auto_sm2               sigma 0.20 | public 0.4888 (min 0.4667) | pooled 0.5198 | full poss 345 dead 0.448
+auto_sm2               sigma 0.30 | public 0.5253 (min 0.4889) | pooled 0.5059 | full poss 342 dead 0.448
+auto_sm4               sigma 0.00 | public 0.6111 (min 0.6111) | pooled 0.5662 | full poss 322 dead 0.463
+auto_sm4               sigma 0.10 | public 0.5192 (min 0.4875) | pooled 0.5112 | full poss 370 dead 0.446
+auto_sm4               sigma 0.20 | public 0.4774 (min 0.4571) | pooled 0.4556 | full poss 327 dead 0.451
+auto_sm4               sigma 0.30 | public 0.4837 (min 0.4571) | pooled 0.4693 | full poss 331 dead 0.451
+auto_sm1               sigma 0.00 | public 0.6111 (min 0.6111) | pooled 0.5662 | full poss 322 dead 0.463
+auto_sm1               sigma 0.10 | public 0.5538 (min 0.5176) | pooled 0.5022 | full poss 360 dead 0.445
+auto_sm1               sigma 0.20 | public 0.4687 (min 0.4444) | pooled 0.4982 | full poss 347 dead 0.448
+auto_sm1               sigma 0.30 | public 0.4931 (min 0.4824) | pooled 0.5118 | full poss 350 dead 0.447

@@ -1,0 +1,6 @@
+{"sg9": {"smooth_win": 9},
+ "sg15": {"smooth_win": 15},
+ "floor999": {"noise_q": 0.999, "kick_noise": 1, "carry_noise": 1},
+ "sg9_floor999": {"smooth_win": 9, "noise_q": 0.999, "kick_noise": 1, "carry_noise": 1},
+ "sg15_floor999": {"smooth_win": 15, "noise_q": 0.999, "kick_noise": 1, "carry_noise": 1},
+ "sg9_floor99": {"smooth_win": 9, "noise_q": 0.99, "kick_noise": 1, "carry_noise": 1}}

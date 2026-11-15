@@ -1,0 +1,5 @@
+{"auto_z3_k8": {"kick_span_auto": 1, "noise_z": 3, "kick_span_max": 8},
+ "auto_z3_k12": {"kick_span_auto": 1, "noise_z": 3, "kick_span_max": 12},
+ "auto_z2_k8": {"kick_span_auto": 1, "noise_z": 2, "kick_span_max": 8},
+ "auto_z4_k12": {"kick_span_auto": 1, "noise_z": 4, "kick_span_max": 12},
+ "auto_z3_k12_sg9": {"kick_span_auto": 1, "noise_z": 3, "kick_span_max": 12, "smooth_win": 9}}

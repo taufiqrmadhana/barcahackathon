@@ -83,28 +83,10 @@ def kick_span(sigma, p):
 
 
 def clean_ball(bx, by, p, info=None):
-    """Drop teleports (points far from a 5-frame running median), interpolate gaps <= max_gap."""
+    """Ball track: seen frames only (S7b ablation: teleport filter and gap interpolation had no effect)."""
     seen = ~np.isnan(bx)
     x, y = bx.copy(), by.copy()
-    # running median over seen neighbours (+-2), teleport = point > teleport_m away from it
-    idx = np.flatnonzero(seen)
-    if len(idx) > 5 and p.on("use_teleport"):
-        xs, ys = x[idx], y[idx]
-        stack_x = np.stack([np.roll(xs, k) for k in range(-2, 3)])
-        stack_y = np.stack([np.roll(ys, k) for k in range(-2, 3)])
-        mx, my = np.median(stack_x, 0), np.median(stack_y, 0)
-        far = np.hypot(xs - mx, ys - my) > p.teleport_m
-        x[idx[far]] = np.nan
-        y[idx[far]] = np.nan
-    seen = ~np.isnan(x)
-    valid = seen.copy()
-    for a, b in runs(~seen):
-        if a == 0 or b == len(x) or b - a > p.max_gap or not p.on("use_interp"):
-            continue
-        t = np.arange(1, b - a + 1) / (b - a + 1)
-        x[a:b] = x[a - 1] + (x[b] - x[a - 1]) * t
-        y[a:b] = y[a - 1] + (y[b] - y[a - 1]) * t
-        valid[a:b] = True
+    valid = seen
     if info is not None:
         # noise level of the ball track: robust sigma of the 2nd difference of seen triples
         ok = seen[2:] & seen[1:-1] & seen[:-2]
@@ -210,15 +192,11 @@ def owner(c, p, n):
 
 
 def contact_runs(c, kick, p):
-    """Runs of same-team contact (gaps <= merge_gap bridged) that are long enough to count:
+    """Runs of same-team contact that are long enough to count:
     >= min_run frames, or containing a kick (a single strike is a touch too)."""
     out = []
     for team in (0, 1):
         m = c == team
-        # bridge short holes
-        for a, b in runs(~m):
-            if 0 < a and b < len(m) and b - a <= p.merge_gap and p.on("use_merge"):
-                m[a:b] = True
         for a, b in runs(m):
             if (b - a >= p.min_run or not p.on("use_min_run")
                     or (kick[a:b].any() and p.on("use_kick_exempt"))):
@@ -277,14 +255,12 @@ def dead_mask(inp, x, y, valid, seen, vx, vy, kick, p, gap_kick=None):
     if not p.on("use_out"):
         out = out & False
     bspeed = np.nan_to_num(np.hypot(vx, vy), nan=0.0)
-    still_missing = sm < p.still_missing
-    if not p.on("use_still_missing_speed"):
-        still_missing = still_missing & False
+    still_missing = np.zeros(n, bool)  # ball missing: only the shape model (below) and still_long call dead
     if inp.get("shape") is not None and p.get("shape_dead", 0) > 0 and p.on("use_shape_dead"):
         # ball missing: the team-shape model's P(dead) (players only, cross-fitted) replaces the
         # mean-speed rule, which fires in slow live phases (build-up) when the ball is lost
         pdead = uniform_filter1d(inp["shape"][:, 2], p.get("shape_win", 75))
-        still_missing = (pdead > p.shape_dead) | (sm < p.get("still_missing_shape", 0))
+        still_missing = pdead > p.shape_dead
     if p.on("use_still_long", 0):
         # S7 (151be54): ball missing and the 10 s mean player speed is walking pace (goal
         # celebrations, injuries, substitutions): the shape model has never seen these
@@ -299,8 +275,7 @@ def dead_mask(inp, x, y, valid, seen, vx, vy, kick, p, gap_kick=None):
     still = np.where(seen, still_seen, still_missing)
     dead = still | out
     # out of play persists until the restart: the first kick (ball strike next to a player) with
-    # the ball inside the pitch, after which the ball keeps moving; plus restart_lag frames (the
-    # public GT turns alive ~1 s after the restart strike)
+    # the ball inside the pitch, after which the ball keeps moving
     kicks = np.flatnonzero(kick & seen & ~out)
     exits = [(a, b) for a, b in runs(out)]
     hold_max = p.out_hold_max
@@ -345,7 +320,7 @@ def dead_mask(inp, x, y, valid, seen, vx, vy, kick, p, gap_kick=None):
         while i < len(kicks) and kicks[i] < t:
             k = kicks[i]
             if bspeed[min(n - 1, k + 5)] > p.restart_speed:
-                t = min(n, k + (p.restart_lag if p.on("use_restart_lag") else 0))
+                t = min(n, k)
                 break
             i += 1
         if len(fast):
@@ -385,10 +360,9 @@ def dead_mask(inp, x, y, valid, seen, vx, vy, kick, p, gap_kick=None):
     return dead, {"sm": sm, "out": out, "still": still}
 
 
-def assemble(own, dead, cruns, p, proba=None):
+def assemble(own, dead, cruns, p):
     """Labels from owner + dead. Each alive stretch starts with the restarting team (team of the
-    first contact run inside it); flicker shorter than min_spell frames is merged into its
-    neighbours."""
+    first contact run inside it)."""
     n = len(own)
     lab = own.copy()
     starts = np.array([a for a, _, _ in cruns])
@@ -396,12 +370,7 @@ def assemble(own, dead, cruns, p, proba=None):
     for a, b in runs(~dead):
         i = np.searchsorted(starts, a)
         has = i < len(starts) and starts[i] < b
-        if has and proba is not None and starts[i] - a > p.get("restart_win", 10 ** 9)                 and p.on("use_shape_restart"):
-            # first contact far after the restart (ball missing): the restarting team is the one
-            # the team-shape model favours over the stretch before that contact
-            pr = proba[a:starts[i], :2].mean(0)
-            lab[a:starts[i]] = int(pr[1] > pr[0])
-        elif has and p.on("use_first_contact"):
+        if has and p.on("use_first_contact"):
             lab[a:starts[i]] = teams[i]
         elif lab[a] == -1:
             lab[a:b] = 0 if a == 0 else lab[a - 1]
@@ -409,13 +378,6 @@ def assemble(own, dead, cruns, p, proba=None):
     for a, b in runs(lab == -1):
         lab[a:b] = lab[a - 1] if a > 0 else 0
     lab[dead] = D
-    # merge flicker: alive spells shorter than min_spell take the previous label
-    for _ in range(2 if p.on("use_min_spell") else 0):
-        ch =np.flatnonzero(np.diff(lab)) + 1
-        bounds = np.r_[0, ch, n]
-        for s, e in zip(bounds[:-1], bounds[1:]):
-            if lab[s] != D and e - s < p.min_spell and s > 0:
-                lab[s:e] = lab[s - 1]
     return lab
 
 
@@ -438,7 +400,7 @@ def predict(inp, p, debug=False):
     if inp.get("shape") is not None and p.get("shape_gap", 0) > 0 and p.on("use_shape_gap"):
         own = shape_gaps(own, valid, inp["shape"], cruns, p, con["gap_kick"])
     dead, dd = dead_mask(inp, x, y, valid, seen, vx, vy, con["kick_raw"], p, con["gap_kick"])
-    lab = assemble(own, dead, cruns, p, inp.get("shape") if p.get("shape_gap", 0) > 0 else None)
+    lab = assemble(own, dead, cruns, p)
     if debug:
         return lab, {"con": con, "cruns": cruns, "own": own, "dead": dead, **dd, "seen": seen}
     return lab

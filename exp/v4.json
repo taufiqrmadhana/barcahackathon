@@ -1,0 +1,4 @@
+{"auto": {"kick_span_auto": 1, "noise_z": 3, "kick_span_max": 12},
+ "auto_sm2": {"kick_span_auto": 1, "noise_z": 3, "kick_span_max": 12, "smooth_mult": 2},
+ "auto_sm4": {"kick_span_auto": 1, "noise_z": 3, "kick_span_max": 12, "smooth_mult": 4},
+ "auto_sm1": {"kick_span_auto": 1, "noise_z": 3, "kick_span_max": 12, "smooth_mult": 1}}

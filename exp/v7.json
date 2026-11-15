@@ -1,0 +1,13 @@
+{"gk": {"use_gap_kick": 1},
+ "gk_rel2": {"use_gap_kick": 1, "carry_rel": 2.0},
+ "gk_rel3": {"use_gap_kick": 1, "carry_rel": 3.0},
+ "gk_rel4": {"use_gap_kick": 1, "carry_rel": 4.0},
+ "gk_rc1.0": {"use_gap_kick": 1, "r_carry": 1.0},
+ "gk_rc2.0": {"use_gap_kick": 1, "r_carry": 2.0},
+ "gk_rc1_rel3": {"use_gap_kick": 1, "r_carry": 1.0, "carry_rel": 3.0},
+ "gk_minrun6": {"use_gap_kick": 1, "min_run": 6},
+ "gk_minrun12": {"use_gap_kick": 1, "min_run": 12},
+ "gk_merge5": {"use_gap_kick": 1, "merge_gap": 5},
+ "gk_clear.3": {"use_gap_kick": 1, "clear_margin": 0.3},
+ "gk_kdv1.5": {"use_gap_kick": 1, "kick_dv": 1.5},
+ "gk_kdv2.5": {"use_gap_kick": 1, "kick_dv": 2.5}}

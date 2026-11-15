@@ -1,0 +1,4 @@
+base                   sigma 0.00 | public 0.6270 (min 0.6270) | pooled 0.5744 | full poss 324 dead 0.462
+base                   sigma 0.10 | public 0.5358 (min 0.4774) | pooled 0.5076 | full poss 377 dead 0.445
+base                   sigma 0.20 | public 0.5185 (min 0.5000) | pooled 0.5335 | full poss 350 dead 0.448
+base                   sigma 0.30 | public 0.5549 (min 0.5222) | pooled 0.5199 | full poss 347 dead 0.448

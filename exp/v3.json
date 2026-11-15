@@ -1,0 +1,5 @@
+{"a_sg15": {"kick_span_auto": 1, "noise_z": 3, "kick_span_max": 12, "smooth_win": 15},
+ "a_sg25": {"kick_span_auto": 1, "noise_z": 3, "kick_span_max": 12, "smooth_win": 25},
+ "a_sg9_k20": {"kick_span_auto": 1, "noise_z": 3, "kick_span_max": 20, "smooth_win": 9},
+ "a_sg9_k6": {"kick_span_auto": 1, "noise_z": 3, "kick_span_max": 6, "smooth_win": 9},
+ "a_sg9_floor": {"kick_span_auto": 1, "noise_z": 3, "kick_span_max": 12, "smooth_win": 9, "noise_q":0.99,"kick_noise":1}}

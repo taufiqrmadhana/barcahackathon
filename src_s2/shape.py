@@ -153,8 +153,8 @@ def get_proba(inp, p):
         # ablation tooling: keep the shape probabilities of the default run (isolates the effect
         # of one rule from the effect of re-fitting the shape model on changed pseudo-labels)
         return np.load(frozen)
-    base = {k: v for k, v in p.items() if not k.startswith("shape") and k != "restart_win"}
-    flags = {k: bool(p.get(k, 0)) for k in ("use_graded_sign", "use_graded_train")}
+    base = {k: v for k, v in p.items() if not k.startswith("shape") }
+    flags = {k: bool(p.get(k, 0)) for k in ("use_graded_train",)}
     q = dict(inp)
     q["shape"] = None
     lab = s2.predict(q, s2.Params(base))
@@ -162,7 +162,7 @@ def get_proba(inp, p):
                          "s2shape_{}.npy".format(cache_key(inp, lab, flags)))
     if os.path.isfile(cache):
         return np.load(cache)
-    X, _ = features(inp, flags["use_graded_sign"])
+    X, _ = features(inp)
     seen = ~np.isnan(inp["bx"])
     edge = np.zeros(len(lab), bool)
     for c in np.flatnonzero(np.diff(lab)) + 1:

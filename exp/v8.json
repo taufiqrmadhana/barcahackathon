@@ -1,0 +1,5 @@
+{"t_1.0_3": {"use_gap_kick": 1, "r_carry2": 1.0, "carry_rel2": 3.0},
+ "t_1.0_4": {"use_gap_kick": 1, "r_carry2": 1.0, "carry_rel2": 4.0},
+ "t_0.8_4": {"use_gap_kick": 1, "r_carry2": 0.8, "carry_rel2": 4.0},
+ "t_1.0_6": {"use_gap_kick": 1, "r_carry2": 1.0, "carry_rel2": 6.0},
+ "t_0.6_6": {"use_gap_kick": 1, "r_carry2": 0.6, "carry_rel2": 6.0}}
