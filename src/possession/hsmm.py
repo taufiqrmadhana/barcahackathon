@@ -11,6 +11,9 @@ that team touches the ball. Dead ball is a chain of m states, so a stoppage last
 frames: an explicit minimum duration (the semi-Markov part) that stops a one-second "dead" blip
 from splitting a possession in two. Leaving D goes straight into a control state, because a
 restart always has a taker.
+
+An optional video-gated mode also permits entering the other team's loose state.
+Its two additional bonus columns must be -inf when that transition is ineligible.
 """
 
 import numpy as np
@@ -62,7 +65,10 @@ if njit is not None:
 
 
 class Model:
-    def __init__(self, p):
+    def __init__(self, p, loose_switch_cost=None):
+        if loose_switch_cost is not None and (not np.isfinite(loose_switch_cost) or loose_switch_cost < 0):
+            raise ValueError('loose switch cost must be finite and nonnegative')
+        self.loose_switch_cost = loose_switch_cost
         self.m = max(1, int(p.dead_min_frames))
         self.n_states = 4 + self.m
         self.d_first, self.d_last = 4, 4 + self.m - 1
@@ -73,6 +79,9 @@ class Model:
         cost[AC, AL] = cost[AL, AC] = p.loose_cost
         cost[HL, AC] = cost[AL, HC] = p.switch_cost
         cost[HC, AC] = cost[AC, HC] = p.switch_cost + p.tackle_extra
+        if loose_switch_cost is not None:
+            cost[[AC, AL], HL] = loose_switch_cost
+            cost[[HC, HL], AL] = loose_switch_cost
         for s in range(4):
             cost[s, self.d_first] = p.dead_entry_cost
         for i in range(self.d_first, self.d_last):
@@ -95,6 +104,10 @@ class Model:
                     self.bonus_col[j, k] = 2
                 elif i == self.d_last and j in (HC, AC):
                     self.bonus_col[j, k] = 3 if j == HC else 4
+                elif j == HL and i in (AC, AL):
+                    self.bonus_col[j, k] = 5
+                elif j == AL and i in (HC, HL):
+                    self.bonus_col[j, k] = 6
 
     def expand(self, emit):
         """(N, 5) group emissions [HC, HL, AC, AL, D] -> (N, n_states)."""
@@ -102,7 +115,7 @@ class Model:
 
     def frame_cost(self, t, bonus):
         cost = self.cost.copy()
-        to_h, to_a, dead_in, h_out, a_out = bonus[t]
+        to_h, to_a, dead_in, h_out, a_out = bonus[t, :5]
         if to_h:
             cost[[AC, AL], HC] -= to_h
         if to_a:
@@ -113,16 +126,23 @@ class Model:
             cost[self.d_last, HC] -= h_out
         if a_out:
             cost[self.d_last, AC] -= a_out
+        if self.loose_switch_cost is not None:
+            cost[[AC, AL], HL] -= bonus[t, 5]
+            cost[[HC, HL], AL] -= bonus[t, 6]
         return np.maximum(cost, 0.0)
 
     def viterbi(self, emit, bonus):
+        if self.loose_switch_cost is not None and bonus.shape != (len(emit), 7):
+            raise ValueError('loose switching requires seven transition-bonus columns')
         if njit is not None:
             return _sparse_viterbi(emit, bonus, self.cost, self.sources, self.sizes,
                                     self.bonus_col, self.d_first, self.d_last)
         return self.viterbi_reference(emit, bonus)
 
     def viterbi_reference(self, emit, bonus):
-        """Best state path for one half. emit (N, 5), bonus (N, 5) cost reductions."""
+        """Best path for one half; bonus has five columns, or seven with loose gates."""
+        if self.loose_switch_cost is not None and bonus.shape != (len(emit), 7):
+            raise ValueError('loose switching requires seven transition-bonus columns')
         e = self.expand(emit)
         n, s = e.shape
         active = np.flatnonzero(np.abs(bonus).sum(axis=1) > 0)

@@ -40,7 +40,8 @@ class HybridContracts(unittest.TestCase):
             pass
         inputs = Inputs();inputs.n=300;inputs.blocks=[(1,10,289)]
         rng = np.random.default_rng(3)
-        p = Params(dead_min_frames=10,hybrid_lock_dead=1,hybrid_weight=2.)
+        p = Params(dead_min_frames=10,hybrid_lock_dead=1,hybrid_weight=2.,
+                   hybrid_loose_threshold=.8)
         emit=rng.normal(size=(300,5));emit[100:150,4]+=5
         bonus=np.zeros_like(emit)
         from possession.hsmm import Model
@@ -99,8 +100,10 @@ class HybridContracts(unittest.TestCase):
             pass
         inputs = Inputs(); inputs.n = n; inputs.blocks = [(1, 0, n - 1)]
         p = Params(dead_min_frames=1, switch_cost=0, dead_entry_cost=0,
-                   dead_exit_cost=0, hybrid_lock_dead=0, hybrid_prune_max_frames=25)
+                   dead_exit_cost=0, hybrid_lock_dead=1, hybrid_prune_max_frames=25,
+                   hybrid_loose_threshold=.8, hybrid_dead_margin=12)
         baseline = np.full(n, 'H'); emit = np.zeros((n, 5)); bonus = emit.copy()
+        baseline[60:90] = 'D'
         prepared = (columns, np.ones(n, dtype=bool), frames, {})
         first = hybrid.refine(inputs, p, baseline, emit, bonus, None, a, prepared)
         second = hybrid.refine(inputs, p, baseline, emit, bonus, None, b, prepared)
@@ -121,6 +124,50 @@ class HybridContracts(unittest.TestCase):
         np.testing.assert_array_equal(q[:, 1], 0)
         np.testing.assert_allclose(q.sum(axis=1), 1.)
         self.assertGreater(q[x[:, 2] > 1, 2].mean(), q[x[:, 2] < -1, 2].mean())
+
+    def test_loose_eligibility_requires_confident_usable_video(self):
+        q = np.array([[.9,.1,0.], [.2,.8,0.], [.04,.36,.6],
+                      [0.,0.,1.], [np.nan,.8,.2], [.1,.9,0.]])
+        mask = np.array([True,True,True,True,True,False])
+        allowed = hybrid.loose_eligibility(q, mask, .8)
+        np.testing.assert_array_equal(allowed, [[True,False],[False,False],
+            [False,True],[False,False],[False,False],[False,False]])
+        np.testing.assert_array_equal(hybrid.loose_eligibility(q[:,[1,0,2]],mask,.8),
+                                      allowed[:,::-1])
+        with self.assertRaises(ValueError):
+            hybrid.loose_eligibility(q, mask, 0.)
+
+    def test_dead_flexibility_preserves_phase_centres_and_half_video_boundaries(self):
+        labels = np.array(list('A'*30+'D'*110+'H'*10+'D'*100+'A'*50+'X'*20+'D'*280))
+        mask = np.ones(len(labels), dtype=bool); mask[25] = False
+        blocks = [(1,0,299),(2,320,599)]
+        editable = hybrid.dead_flexibility(labels, mask, blocks, 12, 100)
+        self.assertTrue(editable[18:25].all())
+        self.assertFalse(editable[25])
+        self.assertTrue(editable[30:35].all())
+        self.assertFalse(editable[35:135].any())
+        self.assertTrue(editable[135:144].all())
+        self.assertFalse(editable[144:146].any())
+        self.assertFalse(editable[150:250].any())
+        self.assertFalse(editable[300:].any())
+        self.assertFalse(hybrid.dead_flexibility(labels, mask, blocks, 0, 100).any())
+
+    def test_bounded_dead_refinement_only_changes_eligible_edges(self):
+        class Inputs:
+            pass
+        inputs = Inputs(); inputs.n = 400; inputs.blocks = [(1,10,389)]
+        p = Params(dead_min_frames=20, hybrid_loose_threshold=.8, hybrid_dead_margin=12)
+        rng = np.random.default_rng(77)
+        emit = rng.normal(size=(400,5)); emit[100:240,4] += 5
+        bonus = np.zeros_like(emit)
+        from possession.hsmm import Model
+        baseline = Model(p).decode(emit, bonus, inputs.blocks, inputs.n)[0]
+        mask = np.zeros(400, dtype=bool); mask[50:350] = True
+        q = rng.dirichlet([1,1,1], size=400)
+        out = hybrid.decode(inputs,p,baseline,emit,bonus,q,mask)
+        editable = hybrid.dead_flexibility(baseline,mask,inputs.blocks,12,20)
+        self.assertFalse((((out=='D') != (baseline=='D')) & ~editable).any())
+        np.testing.assert_array_equal(out[~mask],baseline[~mask])
 
     def test_weak_island_is_removed_but_confident_short_possession_is_kept(self):
         labels=np.array(list('AAAHHAAA'))

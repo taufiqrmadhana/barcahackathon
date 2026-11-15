@@ -4,11 +4,14 @@ Own pipeline for More than a Hack 2027, Phase 1. Everything outside `src/` is th
 repository (remote `upstream`), kept as is so `git pull upstream main` keeps working. The method,
 the possession rules and what was tried and dropped are in [TECHNICAL.md](TECHNICAL.md).
 
-Latest (November 15): denser FILM video raises public spellF1 to **0.7882**, with
-macroF1 **0.9346**. The previous 0.7529 / 0.9353 checkpoint is preserved in
-`configs/pre_dense.json`. This favours the official spellF1 ranking metric, with a
-0.0008 macroF1 tradeoff. Frame plan, fitting and paired time-fold checks:
-[DENSE_VIDEO_EXPERIMENTS.md](DENSE_VIDEO_EXPERIMENTS.md).
+Latest (November 15): video-gated loose-ball switches and bounded dead-ball edge
+adjustments retain public spellF1 **0.7882** and raise macroF1 to **0.9355**.
+The preceding 0.7882 / 0.9346 configuration is frozen in `configs/pre_loose.json`.
+The gain is small and public-selected: [DECODER_EXPERIMENTS.md](DECODER_EXPERIMENTS.md).
+
+Denser FILM video produced the earlier spell gain. Its frame plan and paired checks
+are in [DENSE_VIDEO_EXPERIMENTS.md](DENSE_VIDEO_EXPERIMENTS.md). The intermediate
+0.7529 / 0.9353 checkpoint remains available in `configs/pre_dense.json`.
 
 The classifier blends the original video head with a head that omits discrete decoder
 labels. Its earlier 0.7444 / 0.9292 predecessor is preserved in `configs/pre_blend.json`;

@@ -1,5 +1,8 @@
 # Denser video evidence, November 15
 
+This records bcc4955, now frozen in `configs/pre_loose.json`. The subsequent decoder
+adjustments are documented in [DECODER_EXPERIMENTS.md](DECODER_EXPERIMENTS.md).
+
 Adding video observations improves public possession boundaries while keeping classifier
 training at 1 Hz. The deployed five-fold classifier specification and decoder are unchanged.
 

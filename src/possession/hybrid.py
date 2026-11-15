@@ -145,20 +145,71 @@ def decode(inputs, p, baseline, emit, bonus, proba, mask):
         off = ~mask & (baseline != lab)
         for col in cols:
             updated[off, col] = -1e6
+    lock_dead = p.hybrid_lock_dead
+    if lock_dead and p.hybrid_dead_margin > 0:
+        editable = dead_flexibility(baseline, mask, inputs.blocks,
+                                    p.hybrid_dead_margin, p.dead_min_frames)
+        dead = baseline == 'D'
+        updated[dead & ~editable, :4] = -1e6
+        updated[~dead & ~editable, 4] = -1e6
+        lock_dead = 0
+    allowed = (loose_eligibility(proba, mask, p.hybrid_loose_threshold)
+               if p.hybrid_loose_threshold > 0 else None)
     if p.w_contact:
-        labels = contact.refine(inputs, replace(p, contact_lock_dead=p.hybrid_lock_dead),
-                                 baseline, updated, bonus)[0]
+        labels = contact.refine(inputs, replace(p, contact_lock_dead=lock_dead),
+                                 baseline, updated, bonus, loose_allowed=allowed)[0]
     else:
-        if p.hybrid_lock_dead:
+        if lock_dead:
             updated[baseline == 'D', :4] = -1e6
             updated[baseline != 'D', 4] = -1e6
-        labels = hsmm.Model(p).decode(updated, bonus, inputs.blocks, inputs.n)[0]
+        if allowed is not None:
+            bonus = np.column_stack([bonus, np.where(allowed, bonus[:, :2], -np.inf)])
+        labels = hsmm.Model(p, loose_switch_cost=p.switch_cost if allowed is not None else None).decode(
+            updated, bonus, inputs.blocks, inputs.n)[0]
     labels[~mask] = baseline[~mask]
     if p.hybrid_prune_max_frames > 0:
         labels = prune_unconfirmed(labels, proba, mask, inputs.blocks,
                                    p.hybrid_prune_max_frames,
                                    p.hybrid_prune_min_confidence)
     return labels
+
+
+def loose_eligibility(proba, mask, threshold):
+    """A video-supported last touch may precede sustained control of the ball.
+
+    Eligibility only opens a transition; the usual emissions, switch cost and
+    duration constraints still decide the path. NaNs and absent video abstain.
+    """
+    if not 0 < threshold <= 1:
+        raise ValueError('loose-switch confidence must be in (0, 1]')
+    alive = proba[:, :2].sum(axis=1)
+    valid = mask & np.isfinite(proba).all(axis=1) & (alive > 0)
+    conditional = np.zeros((len(proba), 2), dtype=float)
+    np.divide(proba[:, :2], alive[:, None], out=conditional, where=valid[:, None])
+    return valid[:, None] & (conditional > threshold)
+
+
+def dead_flexibility(baseline, mask, blocks, maximum, minimum_dead):
+    """Editable edges of inferred D/alive phases, preserving a fixed phase centre.
+
+    D phases retain a centre of min(existing length, minimum_dead) frames, so an
+    OOF splice cannot shrink them below that length. Alive phases keep a centre
+    frame, so adjustments cannot merge neighbouring stoppages across a short restart.
+    """
+    editable = np.zeros(len(baseline), dtype=bool)
+    maximum = max(0, int(maximum))
+    for _, first, last in blocks:
+        dead = baseline[first:last + 1] == 'D'
+        edges = np.r_[first, np.flatnonzero(dead[1:] != dead[:-1]) + first + 1, last + 1]
+        for a, b in zip(edges[:-1], edges[1:]):
+            sides = int(a > first) + int(b <= last)
+            keep = max(1, int(minimum_dead)) if baseline[a] == 'D' else 1
+            width = min(maximum, max(0, b - a - keep) // sides) if sides else 0
+            if a > first:
+                editable[a:a + width] = True
+            if b <= last:
+                editable[b - width:b] = True
+    return editable & mask
 
 
 def prune_unconfirmed(labels, proba, mask, blocks, maximum=100, minimum=.5):

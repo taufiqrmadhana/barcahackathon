@@ -119,5 +119,7 @@
   "hybrid_weight": 1.0,
   "hybrid_lock_dead": 1,
   "hybrid_prune_max_frames": 100,
-  "hybrid_prune_min_confidence": 0.5
+  "hybrid_prune_min_confidence": 0.5,
+  "hybrid_loose_threshold": 0.8,
+  "hybrid_dead_margin": 12
 }

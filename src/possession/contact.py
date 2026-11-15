@@ -101,11 +101,13 @@ def infer(inputs, p):
     return inputs._get('contact_owner', (p.contact_alpha, p.contact_window), build)
 
 
-def refine(inputs, p, labels, emit, bonus):
+def refine(inputs, p, labels, emit, bonus, loose_allowed=None):
     """Second decode: change H/A with the contact vote; optionally keep every D frame.
 
     Recentring preserves the strongest alive emission on each frame. Without it an
     ownership vote would also create unintended evidence that the ball is alive.
+    Optional video eligibility opens loose-state entries with the same directional
+    event bonus and team-switch cost as the control-state entries.
     """
     from .hsmm import Model
     own = infer(inputs, p)
@@ -124,7 +126,12 @@ def refine(inputs, p, labels, emit, bonus):
         bonus[own == 0, 0] += reduction
         bonus[own == 1, 1] += reduction
         cost = p.switch_cost
-    labels, states = Model(replace(p, switch_cost=cost)).decode(
+    if loose_allowed is not None:
+        if loose_allowed.shape != (inputs.n, 2):
+            raise ValueError('loose-state eligibility must have shape (frames, 2)')
+        bonus = np.column_stack([bonus, np.where(loose_allowed, bonus[:, :2], -np.inf)])
+    labels, states = Model(replace(p, switch_cost=cost),
+                           loose_switch_cost=cost if loose_allowed is not None else None).decode(
         updated, bonus, inputs.blocks, inputs.n)
     if p.contact_min_frames > 0:
         labels = tidy(labels, inputs.blocks, p.contact_min_frames)

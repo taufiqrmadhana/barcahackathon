@@ -66,7 +66,8 @@ class ContactContracts(unittest.TestCase):
         bonus = rng.uniform(0, 20, (600, 5))
         labels, _ = hsmm.Model(p).decode(emit, bonus, inputs.blocks, inputs.n)
         before_e, before_b = emit.copy(), bonus.copy()
-        new, _ = contact.refine(inputs, p, labels, emit, bonus)
+        new, _ = contact.refine(inputs, p, labels, emit, bonus,
+                                loose_allowed=np.ones((inputs.n, 2), dtype=bool))
         np.testing.assert_array_equal(new == 'D', labels == 'D')
         np.testing.assert_array_equal(new == 'X', labels == 'X')
         np.testing.assert_array_equal(emit, before_e)

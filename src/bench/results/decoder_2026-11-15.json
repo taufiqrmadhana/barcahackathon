@@ -1,0 +1,593 @@
+{
+  "date": "2026-11-15",
+  "baseline_commit": "bcc4955",
+  "selected_on_public": true,
+  "private_score_known": false,
+  "method": "Video-gated transitions to opposing loose states plus bounded 12-frame D/alive edge adjustments",
+  "params": {
+    "player_margin": 5.0,
+    "max_player_speed": 12.0,
+    "vel_k": 2,
+    "ball_spike_speed": 45.0,
+    "ball_island_len": 3,
+    "ball_island_gap": 50,
+    "max_gap": 12,
+    "ctrl_radius": 1.3,
+    "ctrl_softness": 0.35,
+    "sync_free": 2.5,
+    "sync_scale": 3.0,
+    "filled_trust": 0.6,
+    "corner_zone": 3.0,
+    "still_speed": 1.2,
+    "slow_window": 50,
+    "ball_smooth": 9,
+    "touch_k": 3,
+    "touch_dv": 3.5,
+    "touch_spacing": 6,
+    "touch_radius": 2.0,
+    "touch_margin": 1.5,
+    "duel_radius": 1.5,
+    "seq_max_gap": 100,
+    "pass_min_travel": 5.0,
+    "shot_speed": 18.0,
+    "shot_range": 35.0,
+    "out_margin": 0.5,
+    "out_min_frames": 3,
+    "vanish_min_frames": 50,
+    "vanish_horizon": 0.4,
+    "decel_window": 25,
+    "decel_drop": 1.2,
+    "decel_to": 1.6,
+    "decel_lead": 20,
+    "rest_speed": 1.8,
+    "placed_min_frames": 25,
+    "placed_calm_speed": 1.8,
+    "restart_kick_speed": 5.0,
+    "kick_within": 20,
+    "reappear_min_frames": 75,
+    "dead_min_gap": 50,
+    "dead_max_gap": 2250,
+    "hold_kinds": "goal_line,touchline,vanish",
+    "hold_goal_line": 200,
+    "hold_touchline": 75,
+    "shape_folds": 8,
+    "shape_guard": 250,
+    "shape_stride": 3,
+    "shape_iter": 150,
+    "shape_eps": 0.05,
+    "shape_rounds": 2,
+    "shape_conf": 0.0,
+    "ctrl_eps": 0.05,
+    "w_ball": 1.0,
+    "w_shape": 1.0,
+    "w_shape_known": 0.0,
+    "w_tag": 0.0,
+    "w_dead": 1.0,
+    "d_bias": 0.0,
+    "w_out": 6.0,
+    "w_out_carry": 3.0,
+    "slow_speed": 1.3,
+    "slow_scale": 0.3,
+    "w_slow": 1.0,
+    "dead_gap": 75,
+    "w_missing": 0.0,
+    "w_missing_slow": 0.5,
+    "w_still": 2.0,
+    "w_shape_dead": 0.5,
+    "alive_ball_speed": 6.0,
+    "w_alive": 3.0,
+    "w_hold": 5.0,
+    "w_post_restart": 2.0,
+    "post_restart_frames": 50,
+    "w_tag_dead": 1.0,
+    "tag_dead_frames": 25,
+    "z_max": 4.0,
+    "loose_cost": 1.0,
+    "switch_cost": 16.0,
+    "tackle_extra": 5.0,
+    "dead_entry_cost": 20.0,
+    "dead_exit_cost": 30.0,
+    "dead_min_frames": 100,
+    "w_turnover": 8.0,
+    "w_touch": 4.0,
+    "w_duel": 2.0,
+    "touch_before": 2,
+    "touch_after": 10,
+    "w_stoppage": 8.0,
+    "stop_before": 10,
+    "stop_after": 25,
+    "w_shot_dead": 3.0,
+    "shot_window": 75,
+    "w_restart": 8.0,
+    "restart_before": 10,
+    "restart_after": 10,
+    "ownership_model": "pretrain_data/ownership_v2/ownership_all.joblib",
+    "supervised_shape_model": "pretrain_data/ownership_v2/shape_all.joblib",
+    "pre_kickoff_dead": 1,
+    "goal_dead": 1,
+    "whistle_thresh": 24.0,
+    "w_whistle": 10.0,
+    "w_whistle_confirmed": 16.0,
+    "whistle_lag": 10,
+    "ball_source": "fused_full",
+    "whistle_min_speed": 1.8,
+    "w_whistle_dead": 2.0,
+    "whistle_hold": 150,
+    "inner_restarts": 0,
+    "w_contact": 1.0,
+    "contact_alpha": 0.5,
+    "contact_window": 125,
+    "contact_lock_dead": 1,
+    "contact_min_frames": 12,
+    "contact_switch_cost": 4.0,
+    "contact_local_switch": 0,
+    "hybrid_model": "pretrain_data/valdi_hybrid_dense/film_logreg_blend.joblib",
+    "hybrid_weight": 1.0,
+    "hybrid_lock_dead": 1,
+    "hybrid_prune_max_frames": 100,
+    "hybrid_prune_min_confidence": 0.5,
+    "hybrid_loose_threshold": 0.8,
+    "hybrid_dead_margin": 12
+  },
+  "verification": {
+    "before_csv_sha256": "aed71af7e7877eca53973a197ce25ad9be88666624c3dbed3afa1d743d3d1593",
+    "reproduced_csv_sha256": "290d65146d6b5099c372745ddce61d9ec4e112ad8bc19d7ad23256b6b0e610f3",
+    "classifier_sha256": "67735d79f0679e3158c92e9246119f7721176cd1b9b7d3f85bcb046b97b925bd",
+    "feature_cache_sha256": "3e1e431ceb65342ac3ea3d7ff5bf10e8eaadfeb19a84df64f64f75b8498130c8",
+    "changed_frames": 122,
+    "public_changed_frames": 21,
+    "D_frames_changed": 96,
+    "D_changes_outside_eligible_edges": 0,
+    "outside_video_frames_changed": 0,
+    "frozen_shape_parity": true,
+    "old_default_exact": true,
+    "cached_probe_parity": true,
+    "results": [
+      {
+        "name": "before",
+        "spellF1": 0.788235294117647,
+        "macroF1": 0.934583918191877,
+        "public_possessions": 17,
+        "per_class": {
+          "H": {
+            "precision": 0.9444776119402986,
+            "recall": 0.9160393746381007,
+            "f1": 0.9300411522633745,
+            "support": 3454
+          },
+          "A": {
+            "precision": 0.9241037376048817,
+            "recall": 0.9402405898331393,
+            "f1": 0.9321023273706481,
+            "support": 2577
+          },
+          "D": {
+            "precision": 0.9234293193717278,
+            "recall": 0.9605173587474473,
+            "f1": 0.9416082749416084,
+            "support": 1469
+          }
+        },
+        "transition_f1_1s": 0.65,
+        "full_match": [
+          404,
+          0.4612764939536816,
+          129
+        ]
+      },
+      {
+        "name": "selected",
+        "spellF1": 0.788235294117647,
+        "macroF1": 0.9355125335006115,
+        "public_possessions": 17,
+        "per_class": {
+          "H": {
+            "precision": 0.9471947194719472,
+            "recall": 0.9140127388535032,
+            "f1": 0.9303079416531606,
+            "support": 3454
+          },
+          "A": {
+            "precision": 0.9243920972644377,
+            "recall": 0.9441210710128056,
+            "f1": 0.9341524284891535,
+            "support": 2577
+          },
+          "D": {
+            "precision": 0.9218241042345277,
+            "recall": 0.9632402995234853,
+            "f1": 0.9420772303595206,
+            "support": 1469
+          }
+        },
+        "transition_f1_1s": 0.65,
+        "full_match": [
+          407,
+          0.4611757744386461,
+          129
+        ]
+      }
+    ],
+    "selected_csv_sha256": "290d65146d6b5099c372745ddce61d9ec4e112ad8bc19d7ad23256b6b0e610f3",
+    "official_format_valid": true,
+    "submission_rows": 199319,
+    "unit_tests_passed": 33,
+    "repeated_cli_csv_byte_identical": true,
+    "classifier_unchanged": true,
+    "feature_cache_unchanged": true
+  },
+  "fold_audit": [
+    {
+      "folds": 3,
+      "threshold": 0.0,
+      "dead_margin": 0,
+      "spellF1": 0.6736842105263157,
+      "macroF1": 0.924743528703269,
+      "public_possessions": 21,
+      "changed_frames": 0,
+      "public_changed_frames": 0,
+      "changed_D_frames": 0
+    },
+    {
+      "folds": 3,
+      "threshold": 0.0,
+      "dead_margin": 12,
+      "spellF1": 0.6736842105263157,
+      "macroF1": 0.9271740345694163,
+      "public_possessions": 21,
+      "changed_frames": 98,
+      "public_changed_frames": 17,
+      "changed_D_frames": 98
+    },
+    {
+      "folds": 3,
+      "threshold": 0.8,
+      "dead_margin": 0,
+      "spellF1": 0.6736842105263157,
+      "macroF1": 0.9250783080818339,
+      "public_possessions": 21,
+      "changed_frames": 23,
+      "public_changed_frames": 3,
+      "changed_D_frames": 0
+    },
+    {
+      "folds": 3,
+      "threshold": 0.8,
+      "dead_margin": 12,
+      "spellF1": 0.6736842105263157,
+      "macroF1": 0.9275087623075294,
+      "public_possessions": 21,
+      "changed_frames": 121,
+      "public_changed_frames": 20,
+      "changed_D_frames": 98
+    },
+    {
+      "folds": 4,
+      "threshold": 0.0,
+      "dead_margin": 0,
+      "spellF1": 0.725,
+      "macroF1": 0.9272526078629783,
+      "public_possessions": 15,
+      "changed_frames": 0,
+      "public_changed_frames": 0,
+      "changed_D_frames": 0
+    },
+    {
+      "folds": 4,
+      "threshold": 0.0,
+      "dead_margin": 12,
+      "spellF1": 0.725,
+      "macroF1": 0.9276766305941777,
+      "public_possessions": 15,
+      "changed_frames": 97,
+      "public_changed_frames": 16,
+      "changed_D_frames": 97
+    },
+    {
+      "folds": 4,
+      "threshold": 0.8,
+      "dead_margin": 0,
+      "spellF1": 0.725,
+      "macroF1": 0.9271376619356637,
+      "public_possessions": 15,
+      "changed_frames": 33,
+      "public_changed_frames": 13,
+      "changed_D_frames": 0
+    },
+    {
+      "folds": 4,
+      "threshold": 0.8,
+      "dead_margin": 12,
+      "spellF1": 0.725,
+      "macroF1": 0.927561777132888,
+      "public_possessions": 15,
+      "changed_frames": 130,
+      "public_changed_frames": 29,
+      "changed_D_frames": 97
+    },
+    {
+      "folds": 5,
+      "threshold": 0.0,
+      "dead_margin": 0,
+      "spellF1": 0.788235294117647,
+      "macroF1": 0.934583918191877,
+      "public_possessions": 17,
+      "changed_frames": 0,
+      "public_changed_frames": 0,
+      "changed_D_frames": 0
+    },
+    {
+      "folds": 5,
+      "threshold": 0.0,
+      "dead_margin": 12,
+      "spellF1": 0.788235294117647,
+      "macroF1": 0.9348289265545064,
+      "public_possessions": 17,
+      "changed_frames": 96,
+      "public_changed_frames": 15,
+      "changed_D_frames": 96
+    },
+    {
+      "folds": 5,
+      "threshold": 0.8,
+      "dead_margin": 0,
+      "spellF1": 0.788235294117647,
+      "macroF1": 0.9352678755052001,
+      "public_possessions": 17,
+      "changed_frames": 26,
+      "public_changed_frames": 6,
+      "changed_D_frames": 0
+    },
+    {
+      "folds": 5,
+      "threshold": 0.8,
+      "dead_margin": 12,
+      "spellF1": 0.788235294117647,
+      "macroF1": 0.9355125335006115,
+      "public_possessions": 17,
+      "changed_frames": 122,
+      "public_changed_frames": 21,
+      "changed_D_frames": 96
+    },
+    {
+      "folds": 6,
+      "threshold": 0.0,
+      "dead_margin": 0,
+      "spellF1": 0.7333333333333332,
+      "macroF1": 0.9390351194896235,
+      "public_possessions": 19,
+      "changed_frames": 0,
+      "public_changed_frames": 0,
+      "changed_D_frames": 0
+    },
+    {
+      "folds": 6,
+      "threshold": 0.0,
+      "dead_margin": 12,
+      "spellF1": 0.7333333333333332,
+      "macroF1": 0.9398038267829262,
+      "public_possessions": 19,
+      "changed_frames": 104,
+      "public_changed_frames": 23,
+      "changed_D_frames": 104
+    },
+    {
+      "folds": 6,
+      "threshold": 0.8,
+      "dead_margin": 0,
+      "spellF1": 0.7333333333333332,
+      "macroF1": 0.9388065572721063,
+      "public_possessions": 19,
+      "changed_frames": 22,
+      "public_changed_frames": 2,
+      "changed_D_frames": 0
+    },
+    {
+      "folds": 6,
+      "threshold": 0.8,
+      "dead_margin": 12,
+      "spellF1": 0.7333333333333332,
+      "macroF1": 0.9395755854627817,
+      "public_possessions": 19,
+      "changed_frames": 126,
+      "public_changed_frames": 25,
+      "changed_D_frames": 104
+    }
+  ],
+  "reviewed_peer": {
+    "branch": "origin/valdi",
+    "commit": "1e82466eded754d2fbcc81d5d223847db4e17567",
+    "added_loop_columns": 20
+  },
+  "public_explorations": {
+    "dead": [
+      {
+        "radius": 12,
+        "weight": 1.0,
+        "spellF1": 0.788235294117647,
+        "macroF1": 0.9348289265545064,
+        "possessions": 17,
+        "dchanged": 96
+      },
+      {
+        "radius": 12,
+        "weight": 2.0,
+        "spellF1": 0.65,
+        "macroF1": 0.9299504347444353,
+        "possessions": 23,
+        "dchanged": 141
+      },
+      {
+        "radius": 25,
+        "weight": 1.0,
+        "spellF1": 0.788235294117647,
+        "macroF1": 0.9320104321683921,
+        "possessions": 17,
+        "dchanged": 167
+      },
+      {
+        "radius": 25,
+        "weight": 2.0,
+        "spellF1": 0.65,
+        "macroF1": 0.9279160952543136,
+        "possessions": 23,
+        "dchanged": 202
+      },
+      {
+        "radius": 50,
+        "weight": 1.0,
+        "spellF1": 0.788235294117647,
+        "macroF1": 0.9295194719197536,
+        "possessions": 17,
+        "dchanged": 208
+      },
+      {
+        "radius": 50,
+        "weight": 2.0,
+        "spellF1": 0.65,
+        "macroF1": 0.9249588121811136,
+        "possessions": 23,
+        "dchanged": 246
+      }
+    ],
+    "loop": [
+      {
+        "model": "logreg",
+        "features": 62,
+        "spellF1": 0.7111111111111111,
+        "macroF1": 0.9338562960488558,
+        "possessions": 19
+      },
+      {
+        "model": "logreg_blend",
+        "features": 62,
+        "spellF1": 0.7058823529411765,
+        "macroF1": 0.9378593157586658,
+        "possessions": 17
+      },
+      {
+        "model": "hist_gbm",
+        "features": 62,
+        "spellF1": 0.5882352941176471,
+        "macroF1": 0.934872316290976,
+        "possessions": 17
+      },
+      {
+        "model": "extra_trees",
+        "features": 62,
+        "spellF1": 0.7444444444444445,
+        "macroF1": 0.9238385904667332,
+        "possessions": 19
+      }
+    ],
+    "loose": [
+      {
+        "threshold": 0.8,
+        "loose_switch_cost": 4.0,
+        "spellF1": 0.788235294117647,
+        "macroF1": 0.9352678755052001,
+        "possessions": 17
+      },
+      {
+        "threshold": 0.8,
+        "loose_switch_cost": 8.0,
+        "spellF1": 0.788235294117647,
+        "macroF1": 0.934583918191877,
+        "possessions": 17
+      },
+      {
+        "threshold": 0.6,
+        "loose_switch_cost": 8.0,
+        "spellF1": 0.788235294117647,
+        "macroF1": 0.934583918191877,
+        "possessions": 17
+      },
+      {
+        "threshold": 0.9,
+        "loose_switch_cost": 8.0,
+        "spellF1": 0.788235294117647,
+        "macroF1": 0.934583918191877,
+        "possessions": 17
+      }
+    ],
+    "peer_blend": [
+      {
+        "peer_model": "loop",
+        "weight": 0.25,
+        "spellF1": 0.7555555555555555,
+        "macroF1": 0.9339851574042412,
+        "possessions": 19
+      },
+      {
+        "peer_model": "loop",
+        "weight": 0.5,
+        "spellF1": 0.7333333333333333,
+        "macroF1": 0.9346808720951431,
+        "possessions": 19
+      },
+      {
+        "peer_model": "trees",
+        "weight": 0.25,
+        "spellF1": 0.7333333333333333,
+        "macroF1": 0.9278509828336666,
+        "possessions": 19
+      }
+    ],
+    "threshold": [
+      {
+        "threshold": 0.5,
+        "spellF1": 0.7263157894736841,
+        "macroF1": 0.9360168797511529,
+        "possessions": 21
+      },
+      {
+        "threshold": 0.6,
+        "spellF1": 0.7263157894736841,
+        "macroF1": 0.9355675215000607,
+        "possessions": 21
+      },
+      {
+        "threshold": 0.9,
+        "spellF1": 0.788235294117647,
+        "macroF1": 0.934583918191877,
+        "possessions": 17
+      }
+    ],
+    "combined": [
+      {
+        "radius": 12,
+        "spellF1": 0.788235294117647,
+        "macroF1": 0.9355125335006115,
+        "possessions": 17
+      },
+      {
+        "radius": 25,
+        "spellF1": 0.788235294117647,
+        "macroF1": 0.9326939271180592,
+        "possessions": 17
+      }
+    ]
+  },
+  "loose_event_bonus_trial": {
+    "spellF1": 0.788235294117647,
+    "macroF1": 0.9352678755052001,
+    "possessions": 17
+  },
+  "limits": [
+    "Only 21 public frames changed; the macro gain is small",
+    "All choices and time partitions reuse the same 17 public possessions",
+    "No independently corrected private labels or unseen-match validation of the video head",
+    "The missed short possessions and delayed early handover remain unresolved"
+  ],
+  "source_sha256": {
+    "src/possession/hsmm.py": "c7ebac5a51a99864888297cc13a07349172aba13d047e0964205d1d2909c4398",
+    "src/possession/contact.py": "b484bc1186c2a89ce2802e30205eb7ab8a661659d26af59ae36ff253e9767d25",
+    "src/possession/hybrid.py": "0d245bed5a7c2d56e17d7343fb58c146472902e8646c6a2e9d7b9e085d5321dc",
+    "src/possession/config.py": "c26c83ee785b1fee562a161b187795d7c70d09aea672b8a77e6a1187dcd00b2b",
+    "src/params.json": "5d82827e2a58bfdfef269a7d25a9f1a004961c21f734498faeb188f6ec6e29e9",
+    "src/bench/loose_bench.py": "e1706d61fa8c9381168c93583b415d9ab605b119a0d507f14bac62cf34adcc62",
+    "src/bench/test_hsmm.py": "3af667e404fd938c14d4936226df29a74039d1cf46754d9242659866956b4956",
+    "src/bench/test_contact.py": "d6535bb09e8e952cabbfc53aed9918c5dba2daa09377d13b19435362c7b32611",
+    "src/bench/test_hybrid.py": "72f31ddad239e5b9349eb605886bbb1e3bdc7712d92b41b28cc9a6bbf00baa8b"
+  }
+}
