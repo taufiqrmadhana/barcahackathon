@@ -1,0 +1,114 @@
+{
+  "source_revision": "81e220d6ec81aa30fe72f4e36c4d8a3465dcb482",
+  "params": "/home/madgun737/Projects/barcahackathon/src/configs/macro_v2.json",
+  "selected_on_public": true,
+  "public_csv_is_out_of_fold": true,
+  "results": [
+    {
+      "kind": "fusion",
+      "confidence_power": 0.0,
+      "v2_blend": 0.0,
+      "macroF1": 0.9490982784380134,
+      "spellF1": 0.7529411764705882,
+      "possessions": 17
+    },
+    {
+      "kind": "fusion",
+      "confidence_power": 2.0,
+      "v2_blend": 0.15,
+      "macroF1": 0.9471619483753915,
+      "spellF1": 0.7411764705882353,
+      "possessions": 17
+    },
+    {
+      "kind": "fusion",
+      "confidence_power": 2.0,
+      "v2_blend": 0.0,
+      "macroF1": 0.9472748601206912,
+      "spellF1": 0.7411764705882353,
+      "possessions": 17
+    },
+    {
+      "kind": "fusion",
+      "confidence_power": 0.0,
+      "v2_blend": 0.15,
+      "macroF1": 0.9484203904213508,
+      "spellF1": 0.7529411764705882,
+      "possessions": 17
+    },
+    {
+      "kind": "fusion",
+      "confidence_power": 1.0,
+      "v2_blend": 0.0,
+      "macroF1": 0.9481211706882919,
+      "spellF1": 0.7294117647058823,
+      "possessions": 17
+    },
+    {
+      "kind": "fusion",
+      "confidence_power": 1.0,
+      "v2_blend": 0.15,
+      "macroF1": 0.9478953687169086,
+      "spellF1": 0.7294117647058823,
+      "possessions": 17
+    },
+    {
+      "kind": "fusion",
+      "confidence_power": 2.0,
+      "v2_blend": 0.05,
+      "macroF1": 0.9472748601206912,
+      "spellF1": 0.7411764705882353,
+      "possessions": 17
+    },
+    {
+      "kind": "trees",
+      "features": "soft",
+      "n_features": 34,
+      "macroF1": 0.9408422474026262,
+      "spellF1": 0.6666666666666666,
+      "possessions": 13
+    },
+    {
+      "kind": "trees",
+      "features": "soft_loop",
+      "n_features": 54,
+      "macroF1": 0.9370699031189115,
+      "spellF1": 0.625,
+      "possessions": 15
+    },
+    {
+      "kind": "trees",
+      "features": "kevin",
+      "n_features": 55,
+      "macroF1": 0.9227604723890684,
+      "spellF1": 0.5625,
+      "possessions": 15
+    }
+  ],
+  "date": "2026-11-15",
+  "source_branch": "origin/feat/kevinza-valdi",
+  "standalone_command": "python src/run_v3.py run --sets v2+flow+film --out results",
+  "standalone_seconds": 220,
+  "standalone_training_rows": 537,
+  "standalone_video_samples": 1257,
+  "standalone_reported_oof": {
+    "macroF1": 0.8106,
+    "spellF1": 0.4,
+    "possessions": 16,
+    "precision": "printed to 4 decimals"
+  },
+  "standalone_csv_public_is_in_sample": true,
+  "reported_approximately_091_not_reproduced": true,
+  "private_score_known": false,
+  "standalone_csv_public": {
+    "macro_f1": 0.9528964836444319,
+    "spell_f1_mean": 0.7862068965517242,
+    "n_pred_spells": 12
+  },
+  "sha256": {
+    "cache/BAR-ATH_v3_film_features.npz": "c73d94a957e7965d2a2a5ea7d685436e9b4d68691cbae65289a41f7183dd0e60",
+    "pretrain_data/macro_v2/ensemble.joblib": "fa51c79ad08d9a481a002df7cf49896adacac93e7133ccbce12d74af06e50c02",
+    "/tmp/barca_kevinza_valdi_81e220d/results/barca_v3.csv": "8008a5c2310c2e17471baa60085520990663d08860295f5d12c6bb094a3b141f",
+    "src/bench/kevinza_bench.py": "1e985ebefef3e9421e43f224f10de0906675fcb233180ed14633886ddabf8e2d"
+  }
+}
