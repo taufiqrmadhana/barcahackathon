@@ -5,8 +5,11 @@ repository (remote `upstream`), kept as is so `git pull upstream main` keeps wor
 the possession rules and what was tried and dropped are in [TECHNICAL.md](TECHNICAL.md).
 
 Latest (November 15): the default prioritises **macroF1**, as requested. Two video-cadence
-heads reach public macroF1 **0.9491**, spellF1 **0.7529**. Configuration and validation:
-[MACRO_V2.md](MACRO_V2.md), `configs/macro_v2.json`.
+heads plus a conditional motion expert reach public macroF1 **0.94955**, spellF1
+**0.7529**. Configuration and validation: [MACRO_V3.md](MACRO_V3.md), `configs/macro_v3.json`.
+A new spell alternative reaches **0.8000** spellF1 / **0.9423** macroF1 in
+`configs/balanced_v1.json`. These gains are sensitive to the public time partition.
+Macro v2 (**0.9491** / **0.7529**) remains in `configs/macro_v2.json`.
 The previous macro checkpoint (**0.9473** / **0.7647**) is in `configs/macro_v1.json`;
 the retained spell-focused alternative (**0.9355** / **0.7882**) is in `configs/spell_best.json`.
 
@@ -31,6 +34,9 @@ video validator. Public CSV rows are independently decoded out-of-fold predictio
 frame plan, setup, model fitting and limits: [VALDI_INTEGRATION.md](VALDI_INTEGRATION.md).
 The previous contact-only configuration is preserved in `configs/contact_default.json`;
 its experiments are documented in [CONTACT_EXPERIMENTS.md](CONTACT_EXPERIMENTS.md).
+
+[Kevinza-Valdi's latest branch was audited](KEVINZA_VALDI_AUDIT.md); its fusion and
+ExtraTrees changes did not improve the held-out macro checkpoint here.
 
 ## Setup
 

@@ -43,7 +43,9 @@ def main():
     gt = pipeline.public_gt()
     base_score = pipeline.score(baseline, gt)
     print('current baseline', flush=True); report(base_score)
-    prepared = hybrid.features(inputs, p, baseline, dbg['emit'], dbg['shape'], args.interp)
+    names = tuple(dict.fromkeys(k for group in args.sets for k in hybrid.FEATURE_SETS[group]))
+    prepared = hybrid.features(inputs, p, baseline, dbg['emit'], dbg['shape'], args.interp,
+                               feature_names=names)
     columns, mask, frames, legacy_params = prepared
     print('video samples',len(frames),'covered frames',int(mask.sum()),flush=True)
     out = Path(args.out); out.mkdir(parents=True, exist_ok=True)

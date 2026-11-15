@@ -23,6 +23,9 @@ def main():
     ap=argparse.ArgumentParser(description=__doc__)
     ap.add_argument('--models',nargs='+',required=True)
     ap.add_argument('--weights',nargs='+',type=float,required=True)
+    ap.add_argument('--team-expert',type=int,help='index of a zero-weight conditional H/A expert')
+    ap.add_argument('--primary-max',type=float,default=.8)
+    ap.add_argument('--expert-min',type=float,default=.9)
     ap.add_argument('--params',default=str(Path(ROOT,'src/params.json')))
     ap.add_argument('--set',nargs='+')
     ap.add_argument('--out',required=True)
@@ -31,7 +34,9 @@ def main():
     members=[joblib.load(path) for path in args.models]
     if any('base_params' not in m or 'tracking_ball_sha256' not in m for m in members):
         raise ValueError('fit members with run_hybrid.py to record baseline provenance')
-    artifact=hybrid.combine_artifacts(members,args.weights)
+    router = (dict(expert=args.team_expert,primary_max=args.primary_max,expert_min=args.expert_min)
+              if args.team_expert is not None else None)
+    artifact=hybrid.combine_artifacts(members,args.weights,router)
     p=Params.load(args.params,**parse_overrides(args.set))
     physical=lambda value:{k:v for k,v in value.items() if not k.startswith('hybrid_')}
     if physical(artifact['base_params'])!=physical(asdict(p)):
@@ -47,7 +52,7 @@ def main():
     joblib.dump(artifact,path)
     pipeline.write(str(Path(ROOT,'evaluation/results',args.name+'.csv')),labels)
     (path.parent/'result.json').write_text(json.dumps(dict(objective='macroF1',selected_on_public=True,
-        models=args.models,weights=args.weights,macroF1=result['macro_f1'],
+        models=args.models,weights=args.weights,team_router=router,macroF1=result['macro_f1'],
         spellF1=result['spell_f1_mean'],params=asdict(p)),indent=2)+'\n')
     report(result)
 

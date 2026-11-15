@@ -1,0 +1,1977 @@
+{
+  "date": "2026-11-15",
+  "baseline_commit": "e77e345",
+  "objective": "macroF1",
+  "selected_on_public": true,
+  "private_score_known": false,
+  "method": "macro-v2 primary plus conditional H/A routing to a 40-feature player-motion expert",
+  "params": {
+    "player_margin": 5.0,
+    "max_player_speed": 12.0,
+    "vel_k": 2,
+    "ball_spike_speed": 45.0,
+    "ball_island_len": 3,
+    "ball_island_gap": 50,
+    "max_gap": 12,
+    "ctrl_radius": 1.3,
+    "ctrl_softness": 0.35,
+    "sync_free": 2.5,
+    "sync_scale": 3.0,
+    "filled_trust": 0.6,
+    "corner_zone": 3.0,
+    "still_speed": 1.2,
+    "slow_window": 50,
+    "ball_smooth": 9,
+    "touch_k": 3,
+    "touch_dv": 3.5,
+    "touch_spacing": 6,
+    "touch_radius": 2.0,
+    "touch_margin": 1.5,
+    "duel_radius": 1.5,
+    "seq_max_gap": 100,
+    "pass_min_travel": 5.0,
+    "shot_speed": 18.0,
+    "shot_range": 35.0,
+    "out_margin": 0.5,
+    "out_min_frames": 3,
+    "vanish_min_frames": 50,
+    "vanish_horizon": 0.4,
+    "decel_window": 25,
+    "decel_drop": 1.2,
+    "decel_to": 1.6,
+    "decel_lead": 20,
+    "rest_speed": 1.8,
+    "placed_min_frames": 25,
+    "placed_calm_speed": 1.8,
+    "restart_kick_speed": 5.0,
+    "kick_within": 20,
+    "reappear_min_frames": 75,
+    "dead_min_gap": 50,
+    "dead_max_gap": 2250,
+    "hold_kinds": "goal_line,touchline,vanish",
+    "hold_goal_line": 200,
+    "hold_touchline": 75,
+    "shape_folds": 8,
+    "shape_guard": 250,
+    "shape_stride": 3,
+    "shape_iter": 150,
+    "shape_eps": 0.05,
+    "shape_rounds": 2,
+    "shape_conf": 0.0,
+    "ctrl_eps": 0.05,
+    "w_ball": 1.0,
+    "w_shape": 1.0,
+    "w_shape_known": 0.0,
+    "w_tag": 0.0,
+    "w_dead": 1.0,
+    "d_bias": 0.0,
+    "w_out": 6.0,
+    "w_out_carry": 3.0,
+    "slow_speed": 1.3,
+    "slow_scale": 0.3,
+    "w_slow": 1.0,
+    "dead_gap": 75,
+    "w_missing": 0.0,
+    "w_missing_slow": 0.5,
+    "w_still": 2.0,
+    "w_shape_dead": 0.5,
+    "alive_ball_speed": 6.0,
+    "w_alive": 3.0,
+    "w_hold": 5.0,
+    "w_post_restart": 2.0,
+    "post_restart_frames": 50,
+    "w_tag_dead": 1.0,
+    "tag_dead_frames": 25,
+    "z_max": 4.0,
+    "loose_cost": 1.0,
+    "switch_cost": 16.0,
+    "tackle_extra": 5.0,
+    "dead_entry_cost": 20.0,
+    "dead_exit_cost": 30.0,
+    "dead_min_frames": 100,
+    "w_turnover": 8.0,
+    "w_touch": 4.0,
+    "w_duel": 2.0,
+    "touch_before": 2,
+    "touch_after": 10,
+    "w_stoppage": 8.0,
+    "stop_before": 10,
+    "stop_after": 25,
+    "w_shot_dead": 3.0,
+    "shot_window": 75,
+    "w_restart": 8.0,
+    "restart_before": 10,
+    "restart_after": 10,
+    "ownership_model": "pretrain_data/ownership_v2/ownership_all.joblib",
+    "supervised_shape_model": "pretrain_data/ownership_v2/shape_all.joblib",
+    "pre_kickoff_dead": 1,
+    "goal_dead": 1,
+    "whistle_thresh": 24.0,
+    "w_whistle": 10.0,
+    "w_whistle_confirmed": 16.0,
+    "whistle_lag": 10,
+    "ball_source": "fused_full",
+    "whistle_min_speed": 1.8,
+    "w_whistle_dead": 2.0,
+    "whistle_hold": 150,
+    "inner_restarts": 0,
+    "w_contact": 1.0,
+    "contact_alpha": 0.5,
+    "contact_window": 125,
+    "contact_lock_dead": 1,
+    "contact_min_frames": 12,
+    "contact_switch_cost": 4.0,
+    "contact_local_switch": 0,
+    "hybrid_model": "pretrain_data/macro_v3/ensemble.joblib",
+    "hybrid_weight": 0.5,
+    "hybrid_lock_dead": 1,
+    "hybrid_prune_max_frames": 100,
+    "hybrid_prune_min_confidence": 0.5,
+    "hybrid_loose_threshold": 0.0,
+    "hybrid_dead_margin": 12,
+    "hybrid_dead_weight": 2.0
+  },
+  "verification": {
+    "full_stats": [
+      404,
+      0.46077289637850394,
+      129
+    ],
+    "changed_frames_vs_v2": 12,
+    "changed_public_frames_vs_v2": 4,
+    "video_coverage": 21175,
+    "public_possessions_are_heldout": true,
+    "all_builder_production_tuner_labels_identical": true,
+    "old_v2_labels_exactly_reproduced": true,
+    "dead_labels_equal_v2": true
+  },
+  "macro_result": {
+    "macro_f1": 0.9495503613484765,
+    "spell_f1_mean": 0.7529411764705882,
+    "n_pred_spells": 17,
+    "n_gt_spells": 17,
+    "per_class": {
+      "H": {
+        "precision": 0.966536026529997,
+        "recall": 0.9281991893456861,
+        "f1": 0.9469797666518979,
+        "support": 3454
+      },
+      "A": {
+        "precision": 0.9464150943396227,
+        "recall": 0.9732246798603027,
+        "f1": 0.959632676487469,
+        "support": 2577
+      },
+      "D": {
+        "precision": 0.9223744292237442,
+        "recall": 0.9625595643294759,
+        "f1": 0.9420386409060627,
+        "support": 1469
+      }
+    },
+    "transitions": {
+      "12": {
+        "precision": 0.5,
+        "recall": 0.5,
+        "f1": 0.5,
+        "n_gt": 20,
+        "n_pred": 20,
+        "n_matched": 10,
+        "n_missed": 10,
+        "n_spurious": 10,
+        "n_ambiguous": 0,
+        "mean_latency": 2.4,
+        "median_latency": 1.5,
+        "mean_abs_latency": 4.4,
+        "p90_abs_latency": 9.0,
+        "pairs": [
+          [
+            [
+              11351,
+              1,
+              0
+            ],
+            [
+              11360,
+              1,
+              0
+            ]
+          ],
+          [
+            [
+              13785,
+              1,
+              0
+            ],
+            [
+              13781,
+              1,
+              0
+            ]
+          ],
+          [
+            [
+              15346,
+              1,
+              0
+            ],
+            [
+              15354,
+              1,
+              0
+            ]
+          ],
+          [
+            [
+              11553,
+              0,
+              1
+            ],
+            [
+              11558,
+              0,
+              1
+            ]
+          ],
+          [
+            [
+              13704,
+              0,
+              1
+            ],
+            [
+              13699,
+              0,
+              1
+            ]
+          ],
+          [
+            [
+              15365,
+              0,
+              1
+            ],
+            [
+              15367,
+              0,
+              1
+            ]
+          ],
+          [
+            [
+              16400,
+              2,
+              1
+            ],
+            [
+              16400,
+              2,
+              1
+            ]
+          ],
+          [
+            [
+              17838,
+              2,
+              1
+            ],
+            [
+              17847,
+              2,
+              1
+            ]
+          ],
+          [
+            [
+              12851,
+              1,
+              2
+            ],
+            [
+              12850,
+              1,
+              2
+            ]
+          ],
+          [
+            [
+              15889,
+              1,
+              2
+            ],
+            [
+              15890,
+              1,
+              2
+            ]
+          ]
+        ],
+        "missed": [
+          [
+            11624,
+            1,
+            0
+          ],
+          [
+            12989,
+            2,
+            0
+          ],
+          [
+            15766,
+            1,
+            0
+          ],
+          [
+            17293,
+            1,
+            0
+          ],
+          [
+            18389,
+            2,
+            0
+          ],
+          [
+            12665,
+            0,
+            1
+          ],
+          [
+            14846,
+            0,
+            1
+          ],
+          [
+            15799,
+            0,
+            1
+          ],
+          [
+            17380,
+            0,
+            2
+          ],
+          [
+            18027,
+            1,
+            2
+          ]
+        ],
+        "spurious": [
+          [
+            11470,
+            1,
+            0
+          ],
+          [
+            11606,
+            1,
+            0
+          ],
+          [
+            12971,
+            2,
+            0
+          ],
+          [
+            18029,
+            1,
+            0
+          ],
+          [
+            18441,
+            2,
+            0
+          ],
+          [
+            11416,
+            0,
+            1
+          ],
+          [
+            12681,
+            0,
+            1
+          ],
+          [
+            14860,
+            0,
+            1
+          ],
+          [
+            17323,
+            1,
+            2
+          ],
+          [
+            18063,
+            0,
+            2
+          ]
+        ]
+      },
+      "25": {
+        "precision": 0.7,
+        "recall": 0.7,
+        "f1": 0.7,
+        "n_gt": 20,
+        "n_pred": 20,
+        "n_matched": 14,
+        "n_missed": 6,
+        "n_spurious": 6,
+        "n_ambiguous": 0,
+        "mean_latency": 1.2857142857142858,
+        "median_latency": 1.5,
+        "mean_abs_latency": 7.857142857142857,
+        "p90_abs_latency": 17.400000000000002,
+        "pairs": [
+          [
+            [
+              11351,
+              1,
+              0
+            ],
+            [
+              11360,
+              1,
+              0
+            ]
+          ],
+          [
+            [
+              11624,
+              1,
+              0
+            ],
+            [
+              11606,
+              1,
+              0
+            ]
+          ],
+          [
+            [
+              12989,
+              2,
+              0
+            ],
+            [
+              12971,
+              2,
+              0
+            ]
+          ],
+          [
+            [
+              13785,
+              1,
+              0
+            ],
+            [
+              13781,
+              1,
+              0
+            ]
+          ],
+          [
+            [
+              15346,
+              1,
+              0
+            ],
+            [
+              15354,
+              1,
+              0
+            ]
+          ],
+          [
+            [
+              11553,
+              0,
+              1
+            ],
+            [
+              11558,
+              0,
+              1
+            ]
+          ],
+          [
+            [
+              12665,
+              0,
+              1
+            ],
+            [
+              12681,
+              0,
+              1
+            ]
+          ],
+          [
+            [
+              13704,
+              0,
+              1
+            ],
+            [
+              13699,
+              0,
+              1
+            ]
+          ],
+          [
+            [
+              14846,
+              0,
+              1
+            ],
+            [
+              14860,
+              0,
+              1
+            ]
+          ],
+          [
+            [
+              15365,
+              0,
+              1
+            ],
+            [
+              15367,
+              0,
+              1
+            ]
+          ],
+          [
+            [
+              16400,
+              2,
+              1
+            ],
+            [
+              16400,
+              2,
+              1
+            ]
+          ],
+          [
+            [
+              17838,
+              2,
+              1
+            ],
+            [
+              17847,
+              2,
+              1
+            ]
+          ],
+          [
+            [
+              12851,
+              1,
+              2
+            ],
+            [
+              12850,
+              1,
+              2
+            ]
+          ],
+          [
+            [
+              15889,
+              1,
+              2
+            ],
+            [
+              15890,
+              1,
+              2
+            ]
+          ]
+        ],
+        "missed": [
+          [
+            15766,
+            1,
+            0
+          ],
+          [
+            17293,
+            1,
+            0
+          ],
+          [
+            18389,
+            2,
+            0
+          ],
+          [
+            15799,
+            0,
+            1
+          ],
+          [
+            17380,
+            0,
+            2
+          ],
+          [
+            18027,
+            1,
+            2
+          ]
+        ],
+        "spurious": [
+          [
+            11470,
+            1,
+            0
+          ],
+          [
+            18029,
+            1,
+            0
+          ],
+          [
+            18441,
+            2,
+            0
+          ],
+          [
+            11416,
+            0,
+            1
+          ],
+          [
+            17323,
+            1,
+            2
+          ],
+          [
+            18063,
+            0,
+            2
+          ]
+        ]
+      }
+    }
+  },
+  "balanced_result": {
+    "macro_f1": 0.9422792437995279,
+    "spell_f1_mean": 0.8,
+    "n_pred_spells": 15,
+    "n_gt_spells": 17,
+    "per_class": {
+      "H": {
+        "precision": 0.9656862745098039,
+        "recall": 0.9125651418645049,
+        "f1": 0.9383745162250668,
+        "support": 3454
+      },
+      "A": {
+        "precision": 0.9254337393872277,
+        "recall": 0.972836631742336,
+        "f1": 0.9485433219825955,
+        "support": 2577
+      },
+      "D": {
+        "precision": 0.9220694171578258,
+        "recall": 0.9584751531654186,
+        "f1": 0.9399198931909212,
+        "support": 1469
+      }
+    },
+    "transitions": {
+      "12": {
+        "precision": 0.5,
+        "recall": 0.45,
+        "f1": 0.4736842105263158,
+        "n_gt": 20,
+        "n_pred": 18,
+        "n_matched": 9,
+        "n_missed": 11,
+        "n_spurious": 9,
+        "n_ambiguous": 0,
+        "mean_latency": -0.6666666666666666,
+        "median_latency": 0.0,
+        "mean_abs_latency": 4.222222222222222,
+        "p90_abs_latency": 9.0,
+        "pairs": [
+          [
+            [
+              13785,
+              1,
+              0
+            ],
+            [
+              13781,
+              1,
+              0
+            ]
+          ],
+          [
+            [
+              15346,
+              1,
+              0
+            ],
+            [
+              15344,
+              1,
+              0
+            ]
+          ],
+          [
+            [
+              11553,
+              0,
+              1
+            ],
+            [
+              11556,
+              0,
+              1
+            ]
+          ],
+          [
+            [
+              13704,
+              0,
+              1
+            ],
+            [
+              13695,
+              0,
+              1
+            ]
+          ],
+          [
+            [
+              15365,
+              0,
+              1
+            ],
+            [
+              15368,
+              0,
+              1
+            ]
+          ],
+          [
+            [
+              16400,
+              2,
+              1
+            ],
+            [
+              16393,
+              2,
+              1
+            ]
+          ],
+          [
+            [
+              17838,
+              2,
+              1
+            ],
+            [
+              17847,
+              2,
+              1
+            ]
+          ],
+          [
+            [
+              12851,
+              1,
+              2
+            ],
+            [
+              12851,
+              1,
+              2
+            ]
+          ],
+          [
+            [
+              15889,
+              1,
+              2
+            ],
+            [
+              15890,
+              1,
+              2
+            ]
+          ]
+        ],
+        "missed": [
+          [
+            11351,
+            1,
+            0
+          ],
+          [
+            11624,
+            1,
+            0
+          ],
+          [
+            12989,
+            2,
+            0
+          ],
+          [
+            15766,
+            1,
+            0
+          ],
+          [
+            17293,
+            1,
+            0
+          ],
+          [
+            18389,
+            2,
+            0
+          ],
+          [
+            12665,
+            0,
+            1
+          ],
+          [
+            14846,
+            0,
+            1
+          ],
+          [
+            15799,
+            0,
+            1
+          ],
+          [
+            17380,
+            0,
+            2
+          ],
+          [
+            18027,
+            1,
+            2
+          ]
+        ],
+        "spurious": [
+          [
+            11472,
+            1,
+            0
+          ],
+          [
+            11606,
+            1,
+            0
+          ],
+          [
+            12972,
+            2,
+            0
+          ],
+          [
+            18029,
+            1,
+            0
+          ],
+          [
+            18441,
+            2,
+            0
+          ],
+          [
+            12682,
+            0,
+            1
+          ],
+          [
+            14860,
+            0,
+            1
+          ],
+          [
+            17322,
+            1,
+            2
+          ],
+          [
+            18063,
+            0,
+            2
+          ]
+        ]
+      },
+      "25": {
+        "precision": 0.7222222222222222,
+        "recall": 0.65,
+        "f1": 0.6842105263157895,
+        "n_gt": 20,
+        "n_pred": 18,
+        "n_matched": 13,
+        "n_missed": 7,
+        "n_spurious": 5,
+        "n_ambiguous": 0,
+        "mean_latency": -0.7692307692307693,
+        "median_latency": 0.0,
+        "mean_abs_latency": 8.0,
+        "p90_abs_latency": 17.0,
+        "pairs": [
+          [
+            [
+              11624,
+              1,
+              0
+            ],
+            [
+              11606,
+              1,
+              0
+            ]
+          ],
+          [
+            [
+              12989,
+              2,
+              0
+            ],
+            [
+              12972,
+              2,
+              0
+            ]
+          ],
+          [
+            [
+              13785,
+              1,
+              0
+            ],
+            [
+              13781,
+              1,
+              0
+            ]
+          ],
+          [
+            [
+              15346,
+              1,
+              0
+            ],
+            [
+              15344,
+              1,
+              0
+            ]
+          ],
+          [
+            [
+              11553,
+              0,
+              1
+            ],
+            [
+              11556,
+              0,
+              1
+            ]
+          ],
+          [
+            [
+              12665,
+              0,
+              1
+            ],
+            [
+              12682,
+              0,
+              1
+            ]
+          ],
+          [
+            [
+              13704,
+              0,
+              1
+            ],
+            [
+              13695,
+              0,
+              1
+            ]
+          ],
+          [
+            [
+              14846,
+              0,
+              1
+            ],
+            [
+              14860,
+              0,
+              1
+            ]
+          ],
+          [
+            [
+              15365,
+              0,
+              1
+            ],
+            [
+              15368,
+              0,
+              1
+            ]
+          ],
+          [
+            [
+              16400,
+              2,
+              1
+            ],
+            [
+              16393,
+              2,
+              1
+            ]
+          ],
+          [
+            [
+              17838,
+              2,
+              1
+            ],
+            [
+              17847,
+              2,
+              1
+            ]
+          ],
+          [
+            [
+              12851,
+              1,
+              2
+            ],
+            [
+              12851,
+              1,
+              2
+            ]
+          ],
+          [
+            [
+              15889,
+              1,
+              2
+            ],
+            [
+              15890,
+              1,
+              2
+            ]
+          ]
+        ],
+        "missed": [
+          [
+            11351,
+            1,
+            0
+          ],
+          [
+            15766,
+            1,
+            0
+          ],
+          [
+            17293,
+            1,
+            0
+          ],
+          [
+            18389,
+            2,
+            0
+          ],
+          [
+            15799,
+            0,
+            1
+          ],
+          [
+            17380,
+            0,
+            2
+          ],
+          [
+            18027,
+            1,
+            2
+          ]
+        ],
+        "spurious": [
+          [
+            11472,
+            1,
+            0
+          ],
+          [
+            18029,
+            1,
+            0
+          ],
+          [
+            18441,
+            2,
+            0
+          ],
+          [
+            17322,
+            1,
+            2
+          ],
+          [
+            18063,
+            0,
+            2
+          ]
+        ]
+      }
+    }
+  },
+  "sha256": {
+    "pretrain_data/macro_v3/ensemble.joblib": "61df257bbe957f2c695080e4c6246f0d52da675e0590f725ac3671f53ba32467",
+    "pretrain_data/balanced_v1/ensemble.joblib": "29094f8741152f89d52a1f621e059c1c3b33b1f152ba6de262d31e5d946a7fde",
+    "pretrain_data/macro_motion/film_motion_logreg.joblib": "68c28a20c01cf06b601a23166c7b4af1a707548f0be8729067a83d9256a76270",
+    "evaluation/results/macro_v3.csv": "ed3661a0dc66fb70b64c2d77119b77fecd741a335366a072c4e66ed9df5bb187",
+    "evaluation/results/balanced_v1.csv": "a29d919873f5f1a4ac2ea15ce512ae41782980555f719d94e29ba146e3c95d2d",
+    "previous_macro_v2_csv": "9b2a1e61aafa2e1985260bf930ba28982b8d897c64020355b926e089f83eb3f3",
+    "evaluation/results/barca.csv": "ed3661a0dc66fb70b64c2d77119b77fecd741a335366a072c4e66ed9df5bb187"
+  },
+  "fold_sensitivity": [
+    {
+      "folds": 3,
+      "objective": "baseline",
+      "macroF1": 0.92494512343089,
+      "spellF1": 0.6842105263157894,
+      "possessions": 21,
+      "per_class": {
+        "H": {
+          "precision": 0.942655627108249,
+          "recall": 0.889982628836132,
+          "f1": 0.9155621742367833,
+          "support": 3454
+        },
+        "A": {
+          "precision": 0.8915266617969321,
+          "recall": 0.9472254559565386,
+          "f1": 0.9185324553151458,
+          "support": 2577
+        },
+        "D": {
+          "precision": 0.9307128580946036,
+          "recall": 0.9509870660313138,
+          "f1": 0.9407407407407407,
+          "support": 1469
+        }
+      }
+    },
+    {
+      "folds": 3,
+      "objective": "candidate",
+      "macroF1": 0.9315385344570334,
+      "spellF1": 0.7222222222222222,
+      "possessions": 19,
+      "per_class": {
+        "H": {
+          "precision": 0.9450151057401812,
+          "recall": 0.9056166763173132,
+          "f1": 0.924896510940272,
+          "support": 3454
+        },
+        "A": {
+          "precision": 0.9096318333953143,
+          "recall": 0.9491656965463717,
+          "f1": 0.9289783516900874,
+          "support": 2577
+        },
+        "D": {
+          "precision": 0.9307128580946036,
+          "recall": 0.9509870660313138,
+          "f1": 0.9407407407407407,
+          "support": 1469
+        }
+      }
+    },
+    {
+      "folds": 4,
+      "objective": "baseline",
+      "macroF1": 0.9335861089692096,
+      "spellF1": 0.7052631578947368,
+      "possessions": 21,
+      "per_class": {
+        "H": {
+          "precision": 0.9345985401459854,
+          "recall": 0.9267515923566879,
+          "f1": 0.930658525948539,
+          "support": 3454
+        },
+        "A": {
+          "precision": 0.9418052256532067,
+          "recall": 0.9231664726426076,
+          "f1": 0.932392710170488,
+          "support": 2577
+        },
+        "D": {
+          "precision": 0.9134925758553906,
+          "recall": 0.9632402995234853,
+          "f1": 0.9377070907886017,
+          "support": 1469
+        }
+      }
+    },
+    {
+      "folds": 4,
+      "objective": "candidate",
+      "macroF1": 0.9301727777142993,
+      "spellF1": 0.6736842105263159,
+      "possessions": 21,
+      "per_class": {
+        "H": {
+          "precision": 0.9302189781021898,
+          "recall": 0.9224088013896931,
+          "f1": 0.9262974269515918,
+          "support": 3454
+        },
+        "A": {
+          "precision": 0.9358669833729216,
+          "recall": 0.9173457508731082,
+          "f1": 0.9265138154027043,
+          "support": 2577
+        },
+        "D": {
+          "precision": 0.9134925758553906,
+          "recall": 0.9632402995234853,
+          "f1": 0.9377070907886017,
+          "support": 1469
+        }
+      }
+    },
+    {
+      "folds": 5,
+      "objective": "baseline",
+      "macroF1": 0.9490982784380134,
+      "spellF1": 0.7529411764705882,
+      "possessions": 17,
+      "per_class": {
+        "H": {
+          "precision": 0.9664956233021431,
+          "recall": 0.9270411117544876,
+          "f1": 0.9463573222993942,
+          "support": 3454
+        },
+        "A": {
+          "precision": 0.9449886963074604,
+          "recall": 0.9732246798603027,
+          "f1": 0.9588988721085834,
+          "support": 2577
+        },
+        "D": {
+          "precision": 0.9223744292237442,
+          "recall": 0.9625595643294759,
+          "f1": 0.9420386409060627,
+          "support": 1469
+        }
+      }
+    },
+    {
+      "folds": 5,
+      "objective": "candidate",
+      "macroF1": 0.9495503613484765,
+      "spellF1": 0.7529411764705882,
+      "possessions": 17,
+      "per_class": {
+        "H": {
+          "precision": 0.966536026529997,
+          "recall": 0.9281991893456861,
+          "f1": 0.9469797666518979,
+          "support": 3454
+        },
+        "A": {
+          "precision": 0.9464150943396227,
+          "recall": 0.9732246798603027,
+          "f1": 0.959632676487469,
+          "support": 2577
+        },
+        "D": {
+          "precision": 0.9223744292237442,
+          "recall": 0.9625595643294759,
+          "f1": 0.9420386409060627,
+          "support": 1469
+        }
+      }
+    },
+    {
+      "folds": 6,
+      "objective": "baseline",
+      "macroF1": 0.9390740285400719,
+      "spellF1": 0.7444444444444445,
+      "possessions": 19,
+      "per_class": {
+        "H": {
+          "precision": 0.9434961742201294,
+          "recall": 0.9281991893456861,
+          "f1": 0.9357851722124927,
+          "support": 3454
+        },
+        "A": {
+          "precision": 0.9448971672487388,
+          "recall": 0.9448971672487388,
+          "f1": 0.9448971672487388,
+          "support": 2577
+        },
+        "D": {
+          "precision": 0.9193442622950819,
+          "recall": 0.9543907420013614,
+          "f1": 0.9365397461589846,
+          "support": 1469
+        }
+      }
+    },
+    {
+      "folds": 6,
+      "objective": "candidate",
+      "macroF1": 0.9369101423051703,
+      "spellF1": 0.7222222222222222,
+      "possessions": 19,
+      "per_class": {
+        "H": {
+          "precision": 0.9382499268364062,
+          "recall": 0.9281991893456861,
+          "f1": 0.9331974967253674,
+          "support": 3454
+        },
+        "A": {
+          "precision": 0.944487881157154,
+          "recall": 0.937524253007373,
+          "f1": 0.9409931840311587,
+          "support": 2577
+        },
+        "D": {
+          "precision": 0.9193442622950819,
+          "recall": 0.9543907420013614,
+          "f1": 0.9365397461589846,
+          "support": 1469
+        }
+      }
+    }
+  ],
+  "exploratory_balanced_sensitivity": [
+    {
+      "folds": 3,
+      "mode": "baseline",
+      "macroF1": 0.92494512343089,
+      "spellF1": 0.6842105263157894,
+      "possessions": 21
+    },
+    {
+      "folds": 3,
+      "mode": "routed",
+      "macroF1": 0.9315385344570334,
+      "spellF1": 0.7222222222222222,
+      "possessions": 19
+    },
+    {
+      "folds": 3,
+      "mode": "balanced",
+      "macroF1": 0.9349295958343644,
+      "spellF1": 0.6,
+      "possessions": 13
+    },
+    {
+      "folds": 4,
+      "mode": "baseline",
+      "macroF1": 0.9335861089692096,
+      "spellF1": 0.7052631578947368,
+      "possessions": 21
+    },
+    {
+      "folds": 4,
+      "mode": "routed",
+      "macroF1": 0.9301727777142993,
+      "spellF1": 0.6736842105263159,
+      "possessions": 21
+    },
+    {
+      "folds": 4,
+      "mode": "balanced",
+      "macroF1": 0.9253322923020582,
+      "spellF1": 0.7125,
+      "possessions": 15
+    },
+    {
+      "folds": 5,
+      "mode": "baseline",
+      "macroF1": 0.9490982784380134,
+      "spellF1": 0.7529411764705882,
+      "possessions": 17
+    },
+    {
+      "folds": 5,
+      "mode": "routed",
+      "macroF1": 0.9495503613484765,
+      "spellF1": 0.7529411764705882,
+      "possessions": 17
+    },
+    {
+      "folds": 5,
+      "mode": "balanced",
+      "macroF1": 0.9422792437995279,
+      "spellF1": 0.8,
+      "possessions": 15
+    },
+    {
+      "folds": 6,
+      "mode": "baseline",
+      "macroF1": 0.9390740285400719,
+      "spellF1": 0.7444444444444445,
+      "possessions": 19
+    },
+    {
+      "folds": 6,
+      "mode": "routed",
+      "macroF1": 0.9369101423051703,
+      "spellF1": 0.7222222222222222,
+      "possessions": 19
+    },
+    {
+      "folds": 6,
+      "mode": "balanced",
+      "macroF1": 0.9455592493545707,
+      "spellF1": 0.7529411764705883,
+      "possessions": 17
+    }
+  ],
+  "tests": {
+    "passed": 37,
+    "failed": 0
+  },
+  "official_validator": {
+    "valid": true,
+    "rows": 199319
+  },
+  "official_scorer_confirmed": true,
+  "exploratory_trials": {
+    "camera_results": [
+      {
+        "tag": "camera_core_1.0",
+        "C": 1.0,
+        "group": "core",
+        "features": 43,
+        "macroF1": 0.9419675467039642,
+        "spellF1": 0.6470588235294118,
+        "possessions": 17
+      },
+      {
+        "tag": "camera_core_0.3",
+        "C": 0.3,
+        "group": "core",
+        "features": 43,
+        "macroF1": 0.9270620542532878,
+        "spellF1": 0.6666666666666666,
+        "possessions": 13
+      },
+      {
+        "tag": "camera_all_1.0",
+        "C": 1.0,
+        "group": "all",
+        "features": 51,
+        "macroF1": 0.9372449649875171,
+        "spellF1": 0.6588235294117648,
+        "possessions": 17
+      },
+      {
+        "tag": "camera_all_0.3",
+        "C": 0.3,
+        "group": "all",
+        "features": 51,
+        "macroF1": 0.9262418281537809,
+        "spellF1": 0.68,
+        "possessions": 13
+      },
+      {
+        "tag": "camera_peaks_1.0",
+        "C": 1.0,
+        "group": "peaks",
+        "features": 42,
+        "macroF1": 0.9361162002180302,
+        "spellF1": 0.6588235294117648,
+        "possessions": 17
+      }
+    ],
+    "naive_results": [
+      {
+        "group": "all",
+        "C": 1.0,
+        "macroF1": 0.9438420918794667,
+        "spellF1": 0.6823529411764706,
+        "possessions": 17
+      },
+      {
+        "group": "all",
+        "C": 0.3,
+        "macroF1": 0.9327547181785754,
+        "spellF1": 0.7,
+        "possessions": 15
+      },
+      {
+        "group": "naive",
+        "C": 1.0,
+        "macroF1": 0.9367057018989184,
+        "spellF1": 0.6235294117647059,
+        "possessions": 17
+      }
+    ],
+    "binary_dead_results": [
+      {
+        "dead_model": "motion",
+        "mix": 0.25,
+        "macroF1": 0.9487688189994637,
+        "spellF1": 0.7529411764705882,
+        "possessions": 17
+      },
+      {
+        "dead_model": "motion",
+        "mix": 0.5,
+        "macroF1": 0.9476829026921014,
+        "spellF1": 0.7529411764705882,
+        "possessions": 17
+      },
+      {
+        "dead_model": "motion",
+        "mix": 1.0,
+        "macroF1": 0.9441247689467049,
+        "spellF1": 0.7529411764705882,
+        "possessions": 17
+      },
+      {
+        "dead_model": "audio",
+        "mix": 0.25,
+        "macroF1": 0.9487688189994637,
+        "spellF1": 0.7529411764705882,
+        "possessions": 17
+      },
+      {
+        "dead_model": "audio",
+        "mix": 0.5,
+        "macroF1": 0.9487587801131205,
+        "spellF1": 0.7529411764705882,
+        "possessions": 17
+      },
+      {
+        "dead_model": "audio",
+        "mix": 1.0,
+        "macroF1": 0.9439612195255584,
+        "spellF1": 0.7529411764705882,
+        "possessions": 17
+      },
+      {
+        "dead_model": "trees",
+        "mix": 0.25,
+        "macroF1": 0.94894092742012,
+        "spellF1": 0.7529411764705882,
+        "possessions": 17
+      },
+      {
+        "dead_model": "trees",
+        "mix": 0.5,
+        "macroF1": 0.9470102146227194,
+        "spellF1": 0.7111111111111111,
+        "possessions": 19
+      },
+      {
+        "dead_model": "trees",
+        "mix": 1.0,
+        "macroF1": 0.9444792271578956,
+        "spellF1": 0.7111111111111111,
+        "possessions": 19
+      }
+    ],
+    "confident_edges_results": [
+      {
+        "radius": 25,
+        "confidence": 0.8,
+        "macroF1": 0.9470683137367719,
+        "spellF1": 0.7529411764705882,
+        "possessions": 17
+      },
+      {
+        "radius": 50,
+        "confidence": 0.8,
+        "macroF1": 0.9438081193823357,
+        "spellF1": 0.7529411764705882,
+        "possessions": 17
+      },
+      {
+        "radius": 50,
+        "confidence": 0.9,
+        "macroF1": 0.9441176191185711,
+        "spellF1": 0.7529411764705882,
+        "possessions": 17
+      }
+    ],
+    "bias_results": [
+      {
+        "home_bias": 0.5,
+        "dead_bias": 0.0,
+        "macroF1": 0.9360124368657307,
+        "spellF1": 0.7411764705882354,
+        "possessions": 17
+      },
+      {
+        "home_bias": 1.0,
+        "dead_bias": 0.0,
+        "macroF1": 0.9331703708615299,
+        "spellF1": 0.7411764705882354,
+        "possessions": 17
+      },
+      {
+        "home_bias": -0.5,
+        "dead_bias": 0.0,
+        "macroF1": 0.9459377101499649,
+        "spellF1": 0.675,
+        "possessions": 15
+      },
+      {
+        "home_bias": -1.0,
+        "dead_bias": 0.0,
+        "macroF1": 0.94711686728622,
+        "spellF1": 0.6625,
+        "possessions": 15
+      },
+      {
+        "home_bias": 0.0,
+        "dead_bias": -0.25,
+        "macroF1": 0.9491119284092862,
+        "spellF1": 0.7529411764705882,
+        "possessions": 17
+      },
+      {
+        "home_bias": 0.0,
+        "dead_bias": -0.5,
+        "macroF1": 0.9482175180559692,
+        "spellF1": 0.7529411764705882,
+        "possessions": 17
+      },
+      {
+        "home_bias": 0.0,
+        "dead_bias": 0.25,
+        "macroF1": 0.9485357185085319,
+        "spellF1": 0.7529411764705882,
+        "possessions": 17
+      }
+    ],
+    "contact_results": [
+      {
+        "contact_weight": 0.0,
+        "switch_cost": 4.0,
+        "macroF1": 0.9432410519252478,
+        "spellF1": 0.6,
+        "possessions": 15
+      },
+      {
+        "contact_weight": 0.5,
+        "switch_cost": 4.0,
+        "macroF1": 0.9444908585823447,
+        "spellF1": 0.6125,
+        "possessions": 15
+      },
+      {
+        "contact_weight": 1.5,
+        "switch_cost": 4.0,
+        "macroF1": 0.9434427255605015,
+        "spellF1": 0.6266666666666666,
+        "possessions": 13
+      },
+      {
+        "contact_weight": 1.0,
+        "switch_cost": 2.0,
+        "macroF1": 0.9471763003877601,
+        "spellF1": 0.7111111111111111,
+        "possessions": 19
+      },
+      {
+        "contact_weight": 1.0,
+        "switch_cost": 8.0,
+        "macroF1": 0.9474038639573451,
+        "spellF1": 0.6375,
+        "possessions": 15
+      },
+      {
+        "contact_weight": 0.5,
+        "switch_cost": 2.0,
+        "macroF1": 0.9447167062502378,
+        "spellF1": 0.6125,
+        "possessions": 15
+      }
+    ],
+    "edge_prune_results": [
+      {
+        "maximum": 25,
+        "macroF1": 0.9490982784380134,
+        "spellF1": 0.7529411764705882,
+        "possessions": 17
+      },
+      {
+        "maximum": 50,
+        "macroF1": 0.9490982784380134,
+        "spellF1": 0.7529411764705882,
+        "possessions": 17
+      },
+      {
+        "maximum": 100,
+        "macroF1": 0.9490982784380134,
+        "spellF1": 0.7529411764705882,
+        "possessions": 17
+      }
+    ],
+    "expert_results": [
+      {
+        "mode": "full",
+        "weight": 0.1,
+        "macroF1": 0.9471784386421601,
+        "spellF1": 0.6625,
+        "possessions": 15
+      },
+      {
+        "mode": "full",
+        "weight": 0.25,
+        "macroF1": 0.9456060888945954,
+        "spellF1": 0.65,
+        "possessions": 15
+      },
+      {
+        "mode": "full",
+        "weight": 0.5,
+        "macroF1": 0.9421663734764284,
+        "spellF1": 0.7875,
+        "possessions": 15
+      },
+      {
+        "mode": "team",
+        "weight": 0.25,
+        "macroF1": 0.9454862633505644,
+        "spellF1": 0.65,
+        "possessions": 15
+      },
+      {
+        "mode": "team",
+        "weight": 0.5,
+        "macroF1": 0.9427908833629216,
+        "spellF1": 0.7875,
+        "possessions": 15
+      },
+      {
+        "mode": "route",
+        "weight": 1.0,
+        "macroF1": 0.9495503613484765,
+        "spellF1": 0.7529411764705882,
+        "possessions": 17
+      },
+      {
+        "mode": "entropy",
+        "weight": 0.5,
+        "macroF1": 0.9467270608984201,
+        "spellF1": 0.65,
+        "possessions": 15
+      },
+      {
+        "mode": "confidence",
+        "weight": 0.5,
+        "macroF1": 0.947968640708939,
+        "spellF1": 0.6625,
+        "possessions": 15
+      }
+    ],
+    "camera_route_results": [
+      {
+        "model": "camera_core_1.0",
+        "low": 0.8,
+        "high": 0.9,
+        "weight": 1.0,
+        "macroF1": 0.9470648589620548,
+        "spellF1": 0.6375,
+        "possessions": 15
+      },
+      {
+        "model": "camera_core_1.0",
+        "low": 0.7,
+        "high": 0.9,
+        "weight": 1.0,
+        "macroF1": 0.9480815615087993,
+        "spellF1": 0.6625,
+        "possessions": 15
+      },
+      {
+        "model": "camera_core_1.0",
+        "low": 0.8,
+        "high": 0.95,
+        "weight": 1.0,
+        "macroF1": 0.9490982784380134,
+        "spellF1": 0.7529411764705882,
+        "possessions": 17
+      },
+      {
+        "model": "camera_core_1.0",
+        "low": 0.8,
+        "high": 0.9,
+        "weight": 0.5,
+        "macroF1": 0.9490982784380134,
+        "spellF1": 0.7529411764705882,
+        "possessions": 17
+      },
+      {
+        "model": "naive_all_1.0",
+        "low": 0.8,
+        "high": 0.9,
+        "weight": 1.0,
+        "macroF1": 0.9490982784380134,
+        "spellF1": 0.7529411764705882,
+        "possessions": 17
+      },
+      {
+        "model": "naive_all_1.0",
+        "low": 0.7,
+        "high": 0.9,
+        "weight": 1.0,
+        "macroF1": 0.9490982784380134,
+        "spellF1": 0.7529411764705882,
+        "possessions": 17
+      },
+      {
+        "model": "naive_all_1.0",
+        "low": 0.8,
+        "high": 0.95,
+        "weight": 1.0,
+        "macroF1": 0.9490982784380134,
+        "spellF1": 0.7529411764705882,
+        "possessions": 17
+      },
+      {
+        "model": "naive_all_1.0",
+        "low": 0.8,
+        "high": 0.9,
+        "weight": 0.5,
+        "macroF1": 0.9490982784380134,
+        "spellF1": 0.7529411764705882,
+        "possessions": 17
+      }
+    ],
+    "selftrain_results": [
+      {
+        "strength": 0.1,
+        "weak_counts": [
+          63,
+          68,
+          62,
+          63,
+          66,
+          65
+        ],
+        "macroF1": 0.9479107025672914,
+        "spellF1": 0.7647058823529412,
+        "possessions": 17
+      },
+      {
+        "strength": 0.25,
+        "weak_counts": [
+          63,
+          68,
+          62,
+          63,
+          66,
+          65
+        ],
+        "macroF1": 0.9433803971528366,
+        "spellF1": 0.7555555555555555,
+        "possessions": 19
+      },
+      {
+        "strength": 0.5,
+        "weak_counts": [
+          63,
+          68,
+          62,
+          63,
+          66,
+          65
+        ],
+        "macroF1": 0.9419120657703869,
+        "spellF1": 0.7444444444444444,
+        "possessions": 19
+      }
+    ],
+    "motion_c_results": [
+      {
+        "C": 0.3,
+        "mode": "alone",
+        "macroF1": 0.9345824783717194,
+        "spellF1": 0.7625,
+        "possessions": 15
+      },
+      {
+        "C": 0.3,
+        "mode": "mix",
+        "macroF1": 0.9356159372192384,
+        "spellF1": 0.6375,
+        "possessions": 15
+      },
+      {
+        "C": 0.3,
+        "mode": "route",
+        "macroF1": 0.9490982784380134,
+        "spellF1": 0.7529411764705882,
+        "possessions": 17
+      },
+      {
+        "C": 3.0,
+        "mode": "alone",
+        "macroF1": 0.939790780413129,
+        "spellF1": 0.7375,
+        "possessions": 15
+      },
+      {
+        "C": 3.0,
+        "mode": "mix",
+        "macroF1": 0.9482597729789793,
+        "spellF1": 0.7529411764705883,
+        "possessions": 17
+      },
+      {
+        "C": 3.0,
+        "mode": "route",
+        "macroF1": 0.947400163132467,
+        "spellF1": 0.7176470588235294,
+        "possessions": 17
+      }
+    ]
+  }
+}

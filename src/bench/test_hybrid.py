@@ -215,6 +215,57 @@ class HybridContracts(unittest.TestCase):
         with self.assertRaises(ValueError):
             hybrid.combine_artifacts([members[0],broken],[.5,.5])
 
+    def test_team_router_keeps_dead_odds_and_abstains_without_confident_evidence(self):
+        q = np.array([[.4,.4,.2], [.9,.05,.05], [.4,.4,.2],
+                      [0.,0.,1.], [.4,.4,.2], [.4,.4,.2]])
+        expert = np.array([[.01,.98,.01], [.01,.98,.01], [.2,.7,.1],
+                           [.01,.98,.01], [np.nan,.9,.1], [.01,.98,.01]])
+        mask = np.array([True,True,True,True,True,False])
+        out = hybrid.route_teams(q,expert,mask)
+        self.assertGreater(out[0,1],.79)
+        np.testing.assert_array_equal(out[:,2],q[:,2])
+        np.testing.assert_array_equal(out[1:],q[1:])
+        np.testing.assert_allclose(out.sum(axis=1),1.)
+        np.testing.assert_array_equal(q[0],[.4,.4,.2])
+        swapped = hybrid.route_teams(q[:,[1,0,2]],expert[:,[1,0,2]],mask)
+        np.testing.assert_allclose(swapped,out[:,[1,0,2]])
+
+    def test_team_expert_uses_its_matching_heldout_head_and_can_abstain(self):
+        n=500; frames=np.arange(n)
+        columns={'x':np.sin(frames/13.),'z':np.cos(frames/29.)}
+        gt=((frames//17)%3).astype(np.int8)
+        changed=gt.copy(); changed[:100]=(changed[:100]+1)%3
+        def train(target):
+            return [hybrid.fit(columns,frames,target,names,'logreg','film',{},
+                               gap=5,train_stride=1,logreg_c=c)
+                    for names,c in [(('x',),.3),(('z',),.3),(('x','z'),3.)]]
+        members=train(gt); modified=train(changed)
+        router=dict(expert=2,primary_max=.8,expert_min=.9)
+        first=hybrid.combine_artifacts(members,[.75,.25,0.],router)
+        second=hybrid.combine_artifacts(modified,[.75,.25,0.],router)
+        self.assertEqual(first['version'],hybrid.ROUTED_ENSEMBLE_VERSION)
+        class Inputs:
+            pass
+        inputs=Inputs(); inputs.n=n; inputs.blocks=[(1,0,n-1)]
+        p=Params(dead_min_frames=1,switch_cost=0,dead_entry_cost=0,dead_exit_cost=0,
+                 hybrid_lock_dead=0)
+        baseline=np.full(n,'H'); emit=np.zeros((n,5)); bonus=emit.copy()
+        mask=np.ones(n,dtype=bool); other=mask.copy(); other[200:]=False
+        views=[(columns,m,frames,{}) for m in (mask,mask,other)]
+        a=hybrid.refine(inputs,p,baseline,emit,bonus,None,first,views)
+        b=hybrid.refine(inputs,p,baseline,emit,bonus,None,second,views)
+        np.testing.assert_array_equal(a[:100],b[:100])
+        plain=hybrid.combine_artifacts(members,[.75,.25,0.])
+        without=hybrid.refine(inputs,p,baseline,emit,bonus,None,plain,views)
+        np.testing.assert_array_equal(a[200:],without[200:])
+        views[2]=(columns,np.zeros(n,dtype=bool),frames,{})
+        np.testing.assert_array_equal(hybrid.refine(
+            inputs,p,baseline,emit,bonus,None,first,views),without)
+        for invalid in [dict(router,expert=0), dict(router,expert=3),
+                        dict(router,primary_max=.95), dict(router,expert_min=float('nan'))]:
+            with self.assertRaises(ValueError):
+                hybrid.combine_artifacts(members,[.75,.25,0.],invalid)
+
     def test_weak_island_is_removed_but_confident_short_possession_is_kept(self):
         labels=np.array(list('AAAHHAAA'))
         proba=np.tile([.2,.6,.2],(len(labels),1))

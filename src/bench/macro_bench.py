@@ -42,9 +42,9 @@ def main():
         for name in ('baseline','candidate'):
             p,original,prepared=ready[name]
             def refit(source,view):
-                if source['version']==hybrid.ENSEMBLE_VERSION:
+                if source['version'] in hybrid.ENSEMBLE_VERSIONS:
                     return hybrid.combine_artifacts([refit(m,v) for m,v in zip(source['members'],view)],
-                                                    source['weights'])
+                                                    source['weights'],source.get('team_router'))
                 if folds==source['folds']:
                     return source
                 columns,mask,frames,legacy=view
@@ -52,7 +52,8 @@ def main():
                     source['kind'],legacy,n_folds=folds,gap=source['purge_frames'],
                     train_stride=source['train_stride'],logreg_c=source.get('logreg_c',.3))
             a=refit(original,prepared)
-            mask=(np.logical_and.reduce([v[1] for v in prepared]) if isinstance(prepared,list)
+            mask=(np.logical_and.reduce([v[1] for v,w in zip(prepared,a['weights']) if w>0])
+                  if isinstance(prepared,list)
                   else prepared[1])
             labels=hybrid.refine(inputs,p,base,dbg['emit'],dbg['bonus'],dbg['shape'],a,prepared)
             np.testing.assert_array_equal(labels[~mask],base[~mask])

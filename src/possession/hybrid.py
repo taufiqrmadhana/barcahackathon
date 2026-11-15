@@ -19,6 +19,8 @@ from .paths import SRC
 
 VERSION = 1
 ENSEMBLE_VERSION = 2
+ROUTED_ENSEMBLE_VERSION = 3
+ENSEMBLE_VERSIONS = (ENSEMBLE_VERSION, ROUTED_ENSEMBLE_VERSION)
 CURRENT = ('current_team', 'current_dead', 'current_H', 'current_A', 'current_D',
            'current_shape_H', 'current_shape_D')
 # Discrete decoder outputs and durations can make the video head repeat an early
@@ -32,6 +34,9 @@ FEATURE_SETS = {
     'all': validator.V2_COLS + CURRENT + validator.FLOW_COLS + validator.NAIVE_COLS + validator.FILM_COLS,
 }
 FEATURE_SETS['film_soft'] = tuple(name for name in FEATURE_SETS['film'] if name not in HARD_CONTEXT)
+MOTION = ('h_press_mean_d75', 'a_press_mean_d75', 'h_speed_d75', 'a_speed_d75',
+          'h_y_std_s25', 'a_y_std_s25')
+FEATURE_SETS['film_motion'] = FEATURE_SETS['film_soft'] + tuple('spatial_' + k for k in MOTION)
 
 
 def covered_intervals(frames, mask, max_gap=25):
@@ -39,7 +44,7 @@ def covered_intervals(frames, mask, max_gap=25):
     return batches.covered_intervals(frames,mask,max_gap)
 
 
-def features(inputs, p, labels, emit, shape, kind='film', legacy_params=None):
+def features(inputs, p, labels, emit, shape, kind='film', legacy_params=None, feature_names=()):
     legacy = pipeline_v2.Inputs(inputs.game)
     # In a masked experiment the context must see the caller's masked ATD.
     legacy.atd = dict(inputs.atd)
@@ -80,6 +85,10 @@ def features(inputs, p, labels, emit, shape, kind='film', legacy_params=None):
             maximum_filter1d(video['film_near_home'][sl], 21, mode='nearest')
             - maximum_filter1d(video['film_near_away'][sl], 21, mode='nearest'))
     columns.update(video)
+    if any(name.startswith('spatial_') for name in feature_names):
+        raw, names = inputs.shape_features(p)
+        for name in MOTION:
+            columns['spatial_' + name] = raw[:, names.index(name)]
     return columns, mask, frames, asdict(vp)
 
 
@@ -270,7 +279,7 @@ def prune_unconfirmed(labels, proba, mask, blocks, maximum=100, minimum=.5):
     return out
 
 
-def combine_artifacts(members, weights):
+def combine_artifacts(members, weights, team_router=None):
     """Combine aligned held-out heads; a member cannot borrow another fold's labels."""
     weights = np.asarray(weights, dtype=float)
     if (len(members) < 2 or weights.shape != (len(members),)
@@ -288,6 +297,17 @@ def combine_artifacts(members, weights):
     out = dict(version=ENSEMBLE_VERSION, model_name='ensemble', members=members,
                weights=weights / weights.sum(), edges=reference['edges'],
                **{k:reference[k] for k in timeline})
+    if team_router is not None:
+        if set(team_router) != {'expert', 'primary_max', 'expert_min'}:
+            raise ValueError('team router needs expert, primary_max and expert_min')
+        expert = team_router['expert']
+        if (not isinstance(expert, (int, np.integer)) or isinstance(expert, bool)
+                or not 0 <= expert < len(members) or weights[expert] != 0):
+            raise ValueError('team expert must reference a zero-weight ensemble member')
+        if not .5 <= team_router['primary_max'] <= team_router['expert_min'] <= 1.:
+            raise ValueError('team router confidence thresholds must satisfy .5 <= primary <= expert <= 1')
+        out['team_router'] = dict(team_router)
+        out['version'] = ROUTED_ENSEMBLE_VERSION
     for key in ('tracking_ball_sha256','base_params'):
         if any(key in member for member in members):
             if not all(key in member for member in members):
@@ -303,20 +323,48 @@ def combine_artifacts(members, weights):
 
 def prepare_features(inputs, p, baseline, emit, shape, artifact):
     if artifact['version'] == VERSION:
-        return features(inputs,p,baseline,emit,shape,artifact['kind'],artifact['legacy_params'])
-    if artifact['version'] == ENSEMBLE_VERSION:
+        return features(inputs,p,baseline,emit,shape,artifact['kind'],artifact['legacy_params'],
+                        artifact['names'])
+    if artifact['version'] in ENSEMBLE_VERSIONS:
         return [prepare_features(inputs,p,baseline,emit,shape,m) for m in artifact['members']]
     raise ValueError('hybrid checkpoint schema differs')
 
 
+def route_teams(primary, expert, mask, primary_max=.8, expert_min=.9):
+    """Use a confident expert only for uncertain conditional H/A; preserve P(D).
+
+    Missing/invalid expert evidence abstains. The primary's confidence and all
+    probability values outside the gate remain unchanged, including dead-ball odds.
+    """
+    if not .5 <= primary_max <= expert_min <= 1.:
+        raise ValueError('team router confidence thresholds must satisfy .5 <= primary <= expert <= 1')
+    valid = (mask & np.isfinite(primary).all(axis=1) & np.isfinite(expert).all(axis=1)
+             & (primary >= 0).all(axis=1) & (expert >= 0).all(axis=1))
+    alive, other_alive = primary[:, :2].sum(axis=1), expert[:, :2].sum(axis=1)
+    valid &= (alive > 0) & (other_alive > 0)
+    h = np.divide(primary[:, 0], alive, out=np.full(len(primary), .5), where=valid)
+    other = np.divide(expert[:, 0], other_alive, out=np.full(len(primary), .5), where=valid)
+    gate = valid & (np.maximum(h, 1-h) < primary_max) & (np.maximum(other, 1-other) > expert_min)
+    out = primary.copy()
+    out[gate, 0] = (1-primary[gate, 2])*other[gate]
+    out[gate, 1] = (1-primary[gate, 2])*(1-other[gate])
+    return out
+
+
 def refine(inputs, p, baseline, emit, bonus, shape, artifact, prepared=None):
+    router = None
+    expert = expert_view = None
     if artifact['version'] == VERSION:
         members, weights = [artifact], np.array([1.])
         views = [prepared if prepared is not None else prepare_features(
             inputs,p,baseline,emit,shape,artifact)]
-    elif artifact['version'] == ENSEMBLE_VERSION:
+    elif artifact['version'] in ENSEMBLE_VERSIONS:
         all_members = artifact['members']
-        all_weights = combine_artifacts(all_members,artifact['weights'])['weights']
+        checked = combine_artifacts(all_members, artifact['weights'], artifact.get('team_router'))
+        if checked['version'] != artifact['version']:
+            raise ValueError('ensemble schema and team router metadata differ')
+        all_weights = checked['weights']
+        router = checked.get('team_router')
         if prepared is not None and (not isinstance(prepared,list) or len(prepared) != len(all_members)):
             raise ValueError('ensemble inference needs one prepared feature view per member')
         active = np.flatnonzero(all_weights > 0)
@@ -324,6 +372,10 @@ def refine(inputs, p, baseline, emit, bonus, shape, artifact, prepared=None):
         weights = all_weights[active]
         views = ([prepared[i] for i in active] if prepared is not None else
                  [prepare_features(inputs,p,baseline,emit,shape,m) for m in members])
+        if router is not None:
+            expert = all_members[router['expert']]
+            expert_view = (prepared[router['expert']] if prepared is not None else
+                           prepare_features(inputs,p,baseline,emit,shape,expert))
     else:
         raise ValueError('hybrid checkpoint schema differs')
     mask = np.logical_and.reduce([view[1] for view in views])
@@ -332,15 +384,23 @@ def refine(inputs, p, baseline, emit, bonus, shape, artifact, prepared=None):
         return baseline.copy()
     matrices = [validator.matrix(view[0],member['names'],rows)
                 for view,member in zip(views,members)]
-    def predict(models):
+    if expert is not None:
+        expert_mask = mask & expert_view[1]
+        expert_rows = np.flatnonzero(expert_mask)
+        expert_x = validator.matrix(expert_view[0], expert['names'], expert_rows)
+    def predict(models, expert_model=None):
         q = np.full((inputs.n, 3), np.nan)
         if len(models) == 1:
             q[rows] = validator._proba3(models[0],matrices[0])
         else:
             q[rows] = sum(weight * validator._proba3(model,x)
                           for weight,model,x in zip(weights,models,matrices))
+        if expert_model is not None and len(expert_rows):
+            other = np.full((inputs.n, 3), np.nan)
+            other[expert_rows] = validator._proba3(expert_model, expert_x)
+            q = route_teams(q, other, expert_mask, router['primary_max'], router['expert_min'])
         return decode(inputs,p,baseline,emit,bonus,q,mask)
-    output = predict([member['full'] for member in members])
+    output = predict([member['full'] for member in members], expert['full'] if expert else None)
     # Independent whole-half decoding per held-out model prevents decoding neighbours
     # with a model trained on the held-out labels and bleeding those labels back in.
     reference = members[0]
@@ -348,7 +408,7 @@ def refine(inputs, p, baseline, emit, bonus, shape, artifact, prepared=None):
     ids = np.clip(np.searchsorted(reference['edges'], public, side='right') - 1,
                   0, reference['folds'] - 1)
     for f in range(reference['folds']):
-        labels = predict([member['heads'][f] for member in members])
+        labels = predict([member['heads'][f] for member in members], expert['heads'][f] if expert else None)
         held = public[ids == f]
         output[held] = labels[held]
     return output
