@@ -1,54 +1,167 @@
+"""Main entry point for possession pipeline (HSMM + Shape + Camera + FILM Validator).
+
+Usage:
+    python src/run.py                         # run full pipeline -> evaluation/results/barca.csv
+    python src/run.py run --sets v2+flow+film # explicit subcommand / feature set
+    python src/run.py extract --scope public  # extract FILM features for public window
+    python src/run.py batches                 # inspect selected validation batches
+"""
+
 import argparse
 import os
 import sys
 import time
+import warnings
 
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+warnings.filterwarnings("ignore")
 
-from possession.config import Params
-from possession.paths import RESULTS_DIR, SRC
-from possession import pipeline
+import numpy as np
 
-DEFAULT_PARAMS = os.path.join(SRC, "params.json")
-
-
-def parse_overrides(pairs):
-    out = {}
-    for pair in pairs or []:
-        key, _, value = pair.partition("=")
-        try:
-            out[key] = int(value) if value.lstrip("-").isdigit() else float(value)
-        except ValueError:
-            out[key] = value
-    return out
+from possession import batches as batch_sel
+from possession import film_features, pipeline, validator
+from possession.config import CameraParams
+from possession.paths import RESULTS_DIR
 
 
-def report(result):
-    print("spellF1 {:.4f}  macroF1 {:.4f}  possessions {} (gt {})  mean {:.1f}s (gt {:.1f}s)".format(
-        result["spell_f1_mean"], result["macro_f1"], result["n_pred_spells"],
-        result["n_gt_spells"], result["mean_spell_duration_s"],
-        result["gt_mean_spell_duration_s"]))
-    print("per class F1  " + "  ".join("{} {:.3f}".format(k, v["f1"])
-                                       for k, v in result["per_class"].items()))
+def headline(result):
+    f1_d = result.get("f1_D", result.get("per_class", {}).get("D", {}).get("f1", 0.0))
+    trans_f1 = result.get("trans_f1_25", result.get("transitions", {}).get(25, {}).get("f1", 0.0))
+    return "spellF1 {:.4f}  macroF1 {:.4f}  D-F1 {:.3f}  transF1@25 {:.3f}  poss {:>3}".format(
+        result["spell_f1_mean"], result["macro_f1"], f1_d, trans_f1, result["n_pred_spells"]
+    )
+
+
+def scope_samples(mask, reasons, stride, scope):
+    if scope == "public":
+        return batch_sel.samples(reasons["public"] & mask, stride)
+    return batch_sel.samples(mask, stride)
+
+
+def cmd_batches(inputs, params, gt, args):
+    mask, reasons, labels = pipeline.select_batches(inputs, params, gt)
+    print(batch_sel.describe(mask, reasons, labels))
+    for scope in ("public", "all"):
+        s = scope_samples(mask, reasons, args.stride, scope)
+        print("  {:<6} {:>6} FILM samples at stride {}".format(scope, len(s), args.stride))
+
+
+def cmd_extract(inputs, params, gt, args):
+    mask, reasons, _ = pipeline.select_batches(inputs, params, gt)
+    frames = scope_samples(mask, reasons, args.stride, args.scope)
+    store = film_features.Store(args.interp)
+    todo = store.missing(frames)
+    print("{} samples in scope '{}', {} cached, {} to extract".format(
+        len(frames), args.scope, len(frames) - len(todo), len(todo)), flush=True)
+    if len(todo) == 0:
+        return
+    if args.scope == "all":
+        order = np.random.default_rng(0).permutation(len(todo))
+        frames = np.sort(todo[order])
+    extractor = pipeline.make_extractor(
+        inputs, params, args.interp,
+        batch_size=args.gpu_batch_size, gpu_sleep_s=args.gpu_sleep)
+    budget = args.budget_min * 60 if args.budget_min else None
+    film_features.extract(extractor, store, frames, chunk=args.chunk, budget_s=budget)
+
+
+def cmd_run(inputs, params, gt, args):
+    store = film_features.Store(args.interp)
+    layer = pipeline.Layer(
+        inputs, params, gt, store,
+        fusion=validator.FusionConfig(weight=args.weight),
+    )
+    print("FILM samples: {} cached, {} in batches, {} with public labels".format(
+        len(store.frames), len(layer.sample_frames), len(layer.train_frames)))
+    print("validated frames: {} ({:.1%} of graded)".format(
+        int(layer.mask.sum()), layer.mask.sum() / sum(l - f + 1 for _, f, l in inputs.blocks)))
+    if len(layer.train_frames) < 100:
+        raise SystemExit("not enough FILM samples in the public window: run `extract --scope public`")
+
+    base_v2 = layer.evaluate(layer.v2_labels, args.bootstrap)
+    base_loop = layer.evaluate(layer.labels, args.bootstrap)
+    print("\ncamera-viterbi (no val)     " + headline(base_v2))
+    print("hsmm-shape (no val)         " + headline(base_loop))
+
+    zoo = validator.model_zoo()
+    folds = validator.contiguous_folds(layer.train_frames, args.folds)
+    results = {}
+    print("\nmodel selection (contiguous {}-fold CV on public samples)"
+          .format(args.folds))
+    for set_name in args.sets:
+        names = validator.FEATURE_SETS[set_name]
+        x = validator.matrix(layer.columns, names, layer.train_frames)
+        best, report = validator.select_model(x, layer.y, folds, zoo, layer.train_frames)
+        print("  [{}]".format(set_name))
+        for name, r in sorted(report.items(), key=lambda kv: kv[1]["log_loss"]):
+            print("    {:<14} log-loss {:.3f}  frame macroF1 {:.3f}{}".format(
+                name, r["log_loss"], r["macro_f1"], "   <- best" if name == best else ""))
+        proba = layer.proba(names, zoo[best], args.folds, oof=True)
+        labels = layer.decode(proba, decoder=args.decoder)
+        results[set_name] = (best, proba, labels, layer.evaluate(labels))
+
+    print("\nout-of-fold result on the public window, fusion weight {} (decoder: {})".format(
+        args.weight, args.decoder))
+    print("  {:<28} {}".format("camera-viterbi", headline(base_v2)))
+    print("  {:<28} {}".format("hsmm-shape", headline(base_loop)))
+    for set_name, (best, _, _, r) in results.items():
+        print("  {:<28} {}".format(set_name + " / " + best, headline(r)))
+
+    final = args.final if args.final in results else list(results)[-1]
+    best, proba, _, _ = results[final]
+    print("\nfusion weight sensitivity ({} / {}):".format(final, best))
+    for w in (0.25, 0.5, 1.0, 2.0):
+        print("  w={:<5} {}".format(
+            w, headline(layer.evaluate(layer.decode(proba, w, decoder=args.decoder)))))
+
+    names = validator.FEATURE_SETS[final]
+    full = layer.proba(names, zoo[best], oof=False)
+    labels = layer.decode(full, decoder=args.decoder)
+    path = pipeline.write(os.path.join(args.out, args.name + ".csv"), labels)
+    changed = (labels != layer.labels) & (layer.labels != "X")
+    print("\nwrote {}  ({} / {}; {} frames changed vs hsmm-shape, {:.2%} of graded)".format(
+        os.path.relpath(path), final, best, int(changed.sum()),
+        changed.sum() / max(1, (layer.labels != "X").sum())))
+    if args.bootstrap:
+        r = layer.evaluate(results[final][2], args.bootstrap)
+        for key in ("spell_f1_ci", "macro_f1_ci"):
+            print("  hsmm {} {}   fused (oof) {} {}".format(key, base_loop.get(key), key, r.get(key)))
+    print("\nwhole match (no ground truth needed):")
+    for tag, lab in (("cam", layer.v2_labels), ("hsmm", layer.labels), ("full", labels)):
+        for row in pipeline.match_summary(lab, inputs.blocks):
+            print("  {:<4} half {half}: {possessions} possessions, mean {mean_s:.1f}s, "
+                  "H {share_H:.1%}  A {share_A:.1%}  D {share_D:.1%}".format(tag, **row))
 
 
 def main():
-    parser = argparse.ArgumentParser()
-    parser.add_argument("--params", default=DEFAULT_PARAMS)
-    parser.add_argument("--set", nargs="+", metavar="KEY=VALUE", help="override params")
+    parser = argparse.ArgumentParser(description=__doc__.splitlines()[0])
+    parser.add_argument("command", nargs="?", default="run", choices=("batches", "extract", "run"))
+    parser.add_argument("--interp", default="film", choices=("film",))
+    parser.add_argument("--scope", default="public", choices=("public", "all"))
+    parser.add_argument("--stride", type=int, default=batch_sel.BatchConfig.stride)
+    parser.add_argument("--chunk", type=int, default=8)
+    parser.add_argument("--gpu-batch-size", type=int, default=1)
+    parser.add_argument("--gpu-sleep", type=float, default=0.08)
+    parser.add_argument("--budget-min", type=float, default=0)
+    parser.add_argument("--weight", type=float, default=validator.FusionConfig.weight)
+    parser.add_argument("--decoder", default="loop", choices=("loop", "v2"))
+    parser.add_argument("--folds", type=int, default=5)
+    parser.add_argument("--sets", nargs="+", default=["v2+flow+film"],
+                        choices=list(validator.FEATURE_SETS))
+    parser.add_argument("--final", default="v2+flow+film", choices=list(validator.FEATURE_SETS))
+    parser.add_argument("--bootstrap", type=int, default=0)
     parser.add_argument("--name", default="barca")
     parser.add_argument("--out", default=RESULTS_DIR)
     parser.add_argument("--refresh", action="store_true", help="re-read the raw ATD")
     args = parser.parse_args()
 
-    params = Params.load(args.params if os.path.isfile(args.params) else None,
-                         **parse_overrides(args.set))
     started = time.time()
     inputs = pipeline.Inputs(refresh=args.refresh)
-    labels = pipeline.predict(inputs, params)
-    path = pipeline.write(os.path.join(args.out, args.name + ".csv"), labels)
-    print("wrote {} in {:.0f}s".format(os.path.relpath(path), time.time() - started))
-    report(pipeline.score(labels))
+    params = CameraParams()
+    gt = pipeline.public_gt()
+    {"batches": cmd_batches, "extract": cmd_extract, "run": cmd_run}[args.command](
+        inputs, params, gt, args)
+    print("\ndone in {:.0f}s".format(time.time() - started))
 
 
 if __name__ == "__main__":

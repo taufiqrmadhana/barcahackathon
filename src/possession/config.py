@@ -2,8 +2,28 @@ import json
 from dataclasses import asdict, dataclass, fields
 
 
+class _Configurable:
+    @classmethod
+    def load(cls, path=None, **overrides):
+        values = {}
+        if path:
+            with open(path) as handle:
+                values.update(json.load(handle))
+        values.update({k: v for k, v in overrides.items() if v is not None})
+        known = {f.name for f in fields(cls)}
+        unknown = set(values) - known
+        if unknown:
+            raise KeyError("unknown params: {}".format(sorted(unknown)))
+        return cls(**values)
+
+    def save(self, path):
+        with open(path, "w") as handle:
+            json.dump(asdict(self), handle, indent=2)
+            handle.write("\n")
+
+
 @dataclass
-class Params:
+class Params(_Configurable):
     player_margin: float = 5.0
     max_player_speed: float = 12.0
     vel_k: int = 2
@@ -57,7 +77,7 @@ class Params:
     shape_stride: int = 3
     shape_iter: int = 150
     shape_eps: float = 0.05
-    shape_rounds: int = 1
+    shape_rounds: int = 2
     shape_conf: float = 0.0
 
     ctrl_eps: float = 0.05
@@ -78,7 +98,7 @@ class Params:
     w_still: float = 2.0
     w_shape_dead: float = 0.5
     alive_ball_speed: float = 6.0
-    w_alive: float = 1.0
+    w_alive: float = 3.0
     w_hold: float = 5.0
     w_post_restart: float = 2.0
     post_restart_frames: int = 50
@@ -87,10 +107,10 @@ class Params:
     z_max: float = 4.0
 
     loose_cost: float = 1.0
-    switch_cost: float = 20.0
+    switch_cost: float = 16.0
     tackle_extra: float = 5.0
     dead_entry_cost: float = 20.0
-    dead_exit_cost: float = 20.0
+    dead_exit_cost: float = 30.0
     dead_min_frames: int = 50
     w_turnover: float = 8.0
     w_touch: float = 4.0
@@ -106,50 +126,40 @@ class Params:
     restart_before: int = 10
     restart_after: int = 10
 
-    @classmethod
-    def load(cls, path=None, **overrides):
-        values = {}
-        if path:
-            with open(path) as handle:
-                values.update(json.load(handle))
-        values.update({k: v for k, v in overrides.items() if v is not None})
-        known = {f.name for f in fields(cls)}
-        unknown = set(values) - known
-        if unknown:
-            raise KeyError("unknown params: {}".format(sorted(unknown)))
-        return cls(**values)
-
-    def save(self, path):
-        with open(path, "w") as handle:
-            json.dump(asdict(self), handle, indent=2)
-            handle.write("\n")
-
 
 @dataclass
-class ParamsV2(Params):
+class CameraParams(_Configurable):
+    max_gap: int = 25
+    w_ball: float = 1.0
     w_filled: float = 0.5
     control_radius: float = 2.5
     margin_scale: float = 2.0
+    w_tag: float = 0.0
     w_sp_dead: float = 0.6
     sp_dead_frames: int = 50
     w_sp_team: float = 0.6
     w_outside: float = 2.0
-    dead_cost: float = 30.0
-
+    dead_gap: int = 75
+    w_missing: float = 0.3
+    slow_speed: float = 1.5
+    w_slow: float = 0.6
+    w_missing_slow: float = 0.8
+    alive_ball_speed: float = 4.0
+    w_alive: float = 0.5
+    d_bias: float = -0.1
+    switch_cost: float = 20.0
+    dead_cost: float = 20.0
     err_scale: float = 1.0
     pan_window: int = 25
-
     z_slow: float = -0.3
     z_temp: float = 0.3
     w_slow_z: float = 0.4
     team_gate: float = 0.5
     w_cam_still: float = 0.2
     cam_still_speed: float = 0.5
-
     w_memory: float = 0.6
     edge_margin: float = 2.0
     restart_speed: float = 8.0
     restart_min_delay: int = 50
     memory_max: int = 1500
-
     sp_pre_frames: int = 50
