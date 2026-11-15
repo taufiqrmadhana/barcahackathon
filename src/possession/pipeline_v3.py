@@ -1,3 +1,4 @@
+from copy import copy
 import os
 import numpy as np
 
@@ -137,11 +138,13 @@ class Layer:
 
     def decode(self, proba, weight=None, decoder="loop"):
         cfg = self.fusion if weight is None else validator.FusionConfig(
-            weight=weight, p_floor=self.fusion.p_floor, peak_window=self.fusion.peak_window)
+            weight=weight, p_floor=self.fusion.p_floor, peak_window=self.fusion.peak_window,
+            v2_blend=self.fusion.v2_blend, conf_pow=self.fusion.conf_pow)
         if decoder == "v2":
             fused = validator.fuse(self.v2_evidence, proba, self.mask, cfg)
             return model_v2.decode(fused, self.inputs.blocks, self.params)
-        fused_emit = validator.fuse_hsmm(self.loop["emit"], proba, self.mask, cfg)
+        fused_emit = validator.fuse_hsmm(self.loop["emit"], proba, self.mask, cfg,
+                                         v2_evidence=self.v2_evidence)
         labels, _ = self.hsmm_model.decode(fused_emit, self.loop["bonus"], self.inputs.blocks, self.n)
         return labels
 

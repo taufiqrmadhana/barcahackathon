@@ -35,9 +35,11 @@ FEATURE_SETS = {
 
 @dataclass
 class FusionConfig:
-    weight: float = 1.0
+    weight: float = 1.25
     p_floor: float = 0.02
     peak_window: int = 2
+    v2_blend: float = 0.15
+    conf_pow: float = 2.0
 
 
 def _rolling_max(x, w):
@@ -168,7 +170,7 @@ def matrix(columns, names, rows):
 
 def model_zoo(seed=0):
     from sklearn.ensemble import (ExtraTreesClassifier, HistGradientBoostingClassifier,
-                                  RandomForestClassifier)
+                                  RandomForestClassifier, VotingClassifier)
     from sklearn.impute import SimpleImputer
     from sklearn.linear_model import LogisticRegression
     from sklearn.pipeline import make_pipeline
@@ -179,11 +181,11 @@ def model_zoo(seed=0):
                                         LogisticRegression(C=0.3, max_iter=3000)),
         "random_forest": lambda: make_pipeline(
             SimpleImputer(strategy="median"),
-            RandomForestClassifier(n_estimators=400, min_samples_leaf=8, max_features="sqrt",
+            RandomForestClassifier(n_estimators=500, min_samples_leaf=2, max_features="sqrt",
                                    n_jobs=-1, random_state=seed)),
         "extra_trees": lambda: make_pipeline(
             SimpleImputer(strategy="median"),
-            ExtraTreesClassifier(n_estimators=400, min_samples_leaf=8, max_features="sqrt",
+            ExtraTreesClassifier(n_estimators=500, min_samples_leaf=2, max_features="sqrt",
                                  n_jobs=-1, random_state=seed)),
         "hist_gbm": lambda: HistGradientBoostingClassifier(
             max_depth=3, learning_rate=0.05, max_iter=250, l2_regularization=1.0,
@@ -249,7 +251,7 @@ def select_model(x, y, folds, zoo, frames=None):
     for name, factory in zoo.items():
         oof = cross_validate(x, y, folds, factory, frames)
         report[name] = {"log_loss": log_loss(y, oof), "macro_f1": macro_f1(y, oof), "oof": oof}
-    best = min(report, key=lambda k: report[k]["log_loss"])
+    best = min(report, key=lambda k: report[k]["log_loss"] - 1.5 * report[k]["macro_f1"])
     return best, report
 
 
@@ -263,11 +265,21 @@ def fuse(score, proba, mask, cfg=FusionConfig()):
     return out
 
 
-def fuse_hsmm(emit, proba, mask, cfg=FusionConfig()):
+def fuse_hsmm(emit, proba, mask, cfg=FusionConfig(), v2_evidence=None):
     p = np.clip(proba, cfg.p_floor, 1.0 - cfg.p_floor)
     logp = np.log(p)
     logp -= logp.mean(axis=1, keepdims=True)
+    if cfg.conf_pow > 0:
+        conf = np.nan_to_num(p.max(axis=1), nan=0.33) ** cfg.conf_pow
+        logp = logp * (conf[:, None] / (0.65 ** cfg.conf_pow))
     out = emit.copy()
+    if v2_evidence is not None and cfg.v2_blend > 0:
+        v2c = v2_evidence - v2_evidence.mean(axis=1, keepdims=True)
+        out[:, 0] += cfg.v2_blend * v2c[:, 0]
+        out[:, 1] += cfg.v2_blend * v2c[:, 0]
+        out[:, 2] += cfg.v2_blend * v2c[:, 1]
+        out[:, 3] += cfg.v2_blend * v2c[:, 1]
+        out[:, 4] += cfg.v2_blend * v2c[:, 2]
     ok = mask & np.isfinite(logp).all(axis=1)
     out[ok, 0] += cfg.weight * logp[ok, 0]
     out[ok, 1] += cfg.weight * logp[ok, 0]
