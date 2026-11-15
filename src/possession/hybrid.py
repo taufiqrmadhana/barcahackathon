@@ -20,6 +20,10 @@ from .paths import SRC
 VERSION = 1
 CURRENT = ('current_team', 'current_dead', 'current_H', 'current_A', 'current_D',
            'current_shape_H', 'current_shape_D')
+# Discrete decoder outputs and durations can make the video head repeat an early
+# mistake. The complementary head keeps the continuous evidence and video instead.
+HARD_CONTEXT = ('current_H', 'current_A', 'current_D', 'v2_is_H', 'v2_is_A',
+                'v2_is_D', 'v2_since_change', 'v2_until_change')
 FEATURE_SETS = {
     'context': validator.V2_COLS + CURRENT,
     'flow': validator.V2_COLS + CURRENT + validator.FLOW_COLS + validator.NAIVE_COLS,
@@ -77,9 +81,22 @@ def features(inputs, p, labels, emit, shape, kind='film', legacy_params=None):
     return columns, mask, frames, asdict(vp)
 
 
-def factory(name, seed=0):
+def factory(name, seed=0, names=None):
     if name == 'logreg':
         return validator.model_zoo(seed)['logreg']()
+    if name == 'logreg_blend':
+        if names is None:
+            raise ValueError('feature names are required for the blended classifier')
+        from sklearn.compose import ColumnTransformer
+        from sklearn.ensemble import VotingClassifier
+        from sklearn.pipeline import make_pipeline
+        indices = [i for i, column in enumerate(names) if column not in HARD_CONTEXT]
+        if not indices:
+            raise ValueError('the blended classifier needs continuous or video features')
+        build = validator.model_zoo(seed)['logreg']
+        soft = make_pipeline(ColumnTransformer([('soft', 'passthrough', indices)]), build())
+        return VotingClassifier([('original', build()), ('soft', soft)],
+                                voting='soft', weights=[1., 3.])
     if name == 'hist_gbm':
         from sklearn.ensemble import HistGradientBoostingClassifier
         return HistGradientBoostingClassifier(max_iter=150, max_leaf_nodes=7,
@@ -109,10 +126,10 @@ def fit(columns, sample_frames, gt_codes, names, model_name, kind, legacy_params
             from sklearn.dummy import DummyClassifier
             model = DummyClassifier(strategy='prior')
         else:
-            model = factory(model_name)
+            model = factory(model_name, names=names)
         model.fit(x[train], y[train])
         heads.append(model)
-    full = factory(model_name).fit(x, y)
+    full = factory(model_name, names=names).fit(x, y)
     return dict(version=VERSION, names=names, model_name=model_name, kind=kind,
         legacy_params=legacy_params, full=full, heads=heads, edges=edges,
         public_start=int(public.min()), public_stop=int(public.max()) + 1,

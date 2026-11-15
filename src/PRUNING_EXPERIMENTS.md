@@ -1,5 +1,8 @@
 # Confidence-based possession pruning, November 15
 
+This records the improvement at d0b6ec2, now frozen in `configs/pre_blend.json`.
+The subsequent classifier blend is documented in [BLEND_EXPERIMENTS.md](BLEND_EXPERIMENTS.md).
+
 The current tracking, contact and FILM pipeline sometimes emits a short possession even
 when its held-out hybrid classifier favours the surrounding team. Merging these unsupported
 islands improves both public metrics without retraining a classifier or changing video inputs.

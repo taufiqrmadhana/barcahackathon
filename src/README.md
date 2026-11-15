@@ -4,10 +4,15 @@ Own pipeline for More than a Hack 2027, Phase 1. Everything outside `src/` is th
 repository (remote `upstream`), kept as is so `git pull upstream main` keeps working. The method,
 the possession rules and what was tried and dropped are in [TECHNICAL.md](TECHNICAL.md).
 
-Latest (November 15): confidence-based pruning of short possession islands raises public
-spellF1 to **0.7444**, macroF1 to **0.9292**. No classifier retraining is needed. The
-previous default is preserved in `configs/pre_pruning.json`. Paired fold checks and rejected
-ideas: [PRUNING_EXPERIMENTS.md](PRUNING_EXPERIMENTS.md).
+Latest (November 15): blending the original video classifier with a classifier that omits
+discrete decoder labels raises public spellF1 to **0.7529**, macroF1 to **0.9353**.
+The previous 0.7444 / 0.9292 default is preserved in `configs/pre_blend.json`.
+SpellF1 gains vary with the time partition: [BLEND_EXPERIMENTS.md](BLEND_EXPERIMENTS.md)
+records the paired checks, fitting command and rejected ideas.
+
+Confidence pruning remains enabled; its earlier improvement and the configuration before
+pruning (`configs/pre_pruning.json`) are documented in
+[PRUNING_EXPERIMENTS.md](PRUNING_EXPERIMENTS.md).
 
 The default combines Taufiq's tracking/audio/shape, Neo's contact ownership, and Valdi's FILM
 video validator. Public CSV rows are independently decoded out-of-fold predictions. Exact video

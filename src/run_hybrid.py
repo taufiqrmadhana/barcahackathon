@@ -26,7 +26,7 @@ def main():
     ap.add_argument('--set', nargs='+')
     ap.add_argument('--interp', default='film')
     ap.add_argument('--sets', nargs='+', choices=list(hybrid.FEATURE_SETS), default=['context','flow','film'])
-    ap.add_argument('--models', nargs='+', choices=['logreg','hist_gbm'], default=['logreg','hist_gbm'])
+    ap.add_argument('--models', nargs='+', choices=['logreg','hist_gbm','logreg_blend'], default=['logreg','hist_gbm'])
     ap.add_argument('--weights', nargs='+', type=float, default=[.25,.5,1.])
     ap.add_argument('--lock-dead', nargs='+', type=int, default=[1,0])
     ap.add_argument('--out', default=str(Path(ROOT,'cache/valdi_hybrid')))

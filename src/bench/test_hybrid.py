@@ -79,6 +79,49 @@ class HybridContracts(unittest.TestCase):
         new=hybrid.refine(inputs,pp,labels,emit,bonus,None,b,prepared)
         np.testing.assert_array_equal(old[:100],new[:100])
 
+    def test_blended_head_excludes_heldout_labels_from_both_members(self):
+        n = 500
+        frames = np.arange(n)
+        columns = {'current_H':(frames // 31) % 2,
+                   'film_near_diff':np.sin(frames / 13.),
+                   'current_team':np.cos(frames / 29.)}
+        gt = ((frames // 17) % 3).astype(np.int8)
+        changed = gt.copy(); changed[:100] = (changed[:100] + 1) % 3
+        names = tuple(columns)
+        a = hybrid.fit(columns, frames, gt, names, 'logreg_blend', 'film', {},
+                       gap=5, train_stride=1)
+        b = hybrid.fit(columns, frames, changed, names, 'logreg_blend', 'film', {},
+                       gap=5, train_stride=1)
+        x = np.column_stack(list(columns.values()))
+        np.testing.assert_array_equal(a['heads'][0].predict_proba(x),
+                                      b['heads'][0].predict_proba(x))
+        class Inputs:
+            pass
+        inputs = Inputs(); inputs.n = n; inputs.blocks = [(1, 0, n - 1)]
+        p = Params(dead_min_frames=1, switch_cost=0, dead_entry_cost=0,
+                   dead_exit_cost=0, hybrid_lock_dead=0, hybrid_prune_max_frames=25)
+        baseline = np.full(n, 'H'); emit = np.zeros((n, 5)); bonus = emit.copy()
+        prepared = (columns, np.ones(n, dtype=bool), frames, {})
+        first = hybrid.refine(inputs, p, baseline, emit, bonus, None, a, prepared)
+        second = hybrid.refine(inputs, p, baseline, emit, bonus, None, b, prepared)
+        np.testing.assert_array_equal(first[:100], second[:100])
+
+    def test_soft_member_ignores_hard_context_and_keeps_class_alignment(self):
+        rng = np.random.default_rng(43)
+        names = ('current_H', 'v2_since_change', 'film_near_diff', 'current_team')
+        x = rng.normal(size=(300, len(names)))
+        # Non-contiguous classes exercise sklearn voting's label encoding.
+        y = np.where(x[:, 2] > 0, 2, 0)
+        model = hybrid.factory('logreg_blend', names=names).fit(x, y)
+        changed = x.copy(); changed[:, :2] += 100
+        soft = model.named_estimators_['soft']
+        np.testing.assert_array_equal(soft.predict_proba(x), soft.predict_proba(changed))
+        from possession.validator import _proba3
+        q = _proba3(model, x)
+        np.testing.assert_array_equal(q[:, 1], 0)
+        np.testing.assert_allclose(q.sum(axis=1), 1.)
+        self.assertGreater(q[x[:, 2] > 1, 2].mean(), q[x[:, 2] < -1, 2].mean())
+
     def test_weak_island_is_removed_but_confident_short_possession_is_kept(self):
         labels=np.array(list('AAAHHAAA'))
         proba=np.tile([.2,.6,.2],(len(labels),1))
