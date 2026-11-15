@@ -66,10 +66,14 @@ def decode_with(inputs, params, q):
 
 def full_stats(labels, inputs):
     graded = labels[inputs.graded]
-    change = np.flatnonzero(graded[1:] != graded[:-1]) + 1
-    starts = np.r_[0, change]
-    kinds = graded[starts]
-    return int((kinds != "D").sum()), float((graded == "D").mean()), int((kinds == "D").sum())
+    possessions, dead_spells = 0, 0
+    for _, first, last in inputs.blocks:
+        segment = labels[first:last+1]
+        starts = np.r_[0, np.flatnonzero(segment[1:] != segment[:-1])+1]
+        kinds = segment[starts]
+        possessions += int(np.isin(kinds, ['H', 'A']).sum())
+        dead_spells += int((kinds == 'D').sum())
+    return possessions, float((graded == 'D').mean()), dead_spells
 
 
 def main():

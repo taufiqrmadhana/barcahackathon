@@ -14,7 +14,7 @@ import joblib
 import numpy as np
 
 sys.path.insert(0, str(Path(__file__).resolve().parent))
-from possession import hybrid, pipeline
+from possession import hybrid, pipeline, video_provenance
 from possession.config import Params
 from possession.paths import ROOT
 from run import parse_overrides, report
@@ -47,6 +47,7 @@ def main():
     prepared = hybrid.features(inputs, p, baseline, dbg['emit'], dbg['shape'], args.interp,
                                feature_names=names)
     columns, mask, frames, legacy_params = prepared
+    provenance = video_provenance.describe(inputs, p, args.interp, legacy_params)
     print('video samples',len(frames),'covered frames',int(mask.sum()),flush=True)
     out = Path(args.out); out.mkdir(parents=True, exist_ok=True)
     rows = []; best = None
@@ -57,6 +58,10 @@ def main():
                 logreg_c=args.logreg_c)
             artifact['base_params'] = asdict(p)
             artifact['tracking_ball_sha256'] = hashlib.sha256(inputs.atd['ball'].tobytes()).hexdigest()
+            if video_provenance.describe(inputs, p, args.interp, legacy_params) != provenance:
+                raise ValueError('video cache changed during fitting; wait for extraction to finish and refit')
+            if provenance is not None:
+                artifact['video_provenance'] = provenance
             path = out/f'{feature_set}_{model}.joblib'
             joblib.dump(artifact,path)
             for weight in args.weights:

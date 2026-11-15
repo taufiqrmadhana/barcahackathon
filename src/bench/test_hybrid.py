@@ -261,10 +261,36 @@ class HybridContracts(unittest.TestCase):
         views[2]=(columns,np.zeros(n,dtype=bool),frames,{})
         np.testing.assert_array_equal(hybrid.refine(
             inputs,p,baseline,emit,bonus,None,first,views),without)
+        routers=[router,dict(router,expert=3)]
+        multi=hybrid.combine_artifacts(members+[members[1]],[.75,.25,0.,0.],team_routers=routers)
+        changed_multi=hybrid.combine_artifacts(modified+[modified[1]],[.75,.25,0.,0.],team_routers=routers)
+        self.assertEqual(multi['version'],hybrid.MULTI_ROUTED_ENSEMBLE_VERSION)
+        many_views=views[:2]+[(columns,other,frames,{}),(columns,mask,frames,{})]
+        multi_out=hybrid.refine(inputs,p,baseline,emit,bonus,None,multi,many_views)
+        changed_out=hybrid.refine(inputs,p,baseline,emit,bonus,None,changed_multi,many_views)
+        np.testing.assert_array_equal(multi_out[:100],changed_out[:100])
+        many_views[2]=views[2]
+        fallback=hybrid.combine_artifacts(members+[members[1]],[.75,.25,0.,0.],dict(router,expert=3))
+        np.testing.assert_array_equal(
+            hybrid.refine(inputs,p,baseline,emit,bonus,None,multi,many_views),
+            hybrid.refine(inputs,p,baseline,emit,bonus,None,fallback,many_views))
+        with self.assertRaises(ValueError):
+            hybrid.combine_artifacts(members+[members[1]],[.75,.25,0.,0.],team_routers=[router,router])
         for invalid in [dict(router,expert=0), dict(router,expert=3),
                         dict(router,primary_max=.95), dict(router,expert_min=float('nan'))]:
             with self.assertRaises(ValueError):
                 hybrid.combine_artifacts(members,[.75,.25,0.],invalid)
+
+    def test_ordered_team_experts_keep_a_confident_earlier_choice(self):
+        primary=np.tile([.4,.4,.2],(3,1));mask=np.ones(3,dtype=bool)
+        first=np.array([[.01,.98,.01],[.3,.3,.4],[np.nan,np.nan,np.nan]])
+        second=np.array([[.98,.01,.01],[.98,.01,.01],[.3,.3,.4]])
+        intermediate=hybrid.route_teams(primary,first,mask)
+        out=hybrid.route_teams(intermediate,second,mask)
+        self.assertGreater(out[0,1],.79)
+        self.assertGreater(out[1,0],.79)
+        np.testing.assert_array_equal(out[2],primary[2])
+        np.testing.assert_array_equal(out[:,2],primary[:,2])
 
     def test_weak_island_is_removed_but_confident_short_possession_is_kept(self):
         labels=np.array(list('AAAHHAAA'))

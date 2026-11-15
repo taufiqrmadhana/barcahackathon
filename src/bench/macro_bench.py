@@ -44,7 +44,8 @@ def main():
             def refit(source,view):
                 if source['version'] in hybrid.ENSEMBLE_VERSIONS:
                     return hybrid.combine_artifacts([refit(m,v) for m,v in zip(source['members'],view)],
-                                                    source['weights'],source.get('team_router'))
+                                                    source['weights'],source.get('team_router'),
+                                                    source.get('team_routers'))
                 if folds==source['folds']:
                     return source
                 columns,mask,frames,legacy=view
