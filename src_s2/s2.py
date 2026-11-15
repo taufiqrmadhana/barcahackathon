@@ -398,7 +398,7 @@ def predict(inp, p, debug=False):
     cruns = contact_runs(con["c"], con["kick"], p)
     own = shift(owner_from_runs(cruns, inp["n"], p, con["gap_kick"]), p.lag)
     if inp.get("shape") is not None and p.get("shape_gap", 0) > 0 and p.on("use_shape_gap"):
-        own = shape_gaps(own, valid, inp["shape"], cruns, p, con["gap_kick"])
+        own = shape_gaps(own, valid, inp["shape"], cruns, p)
     dead, dd = dead_mask(inp, x, y, valid, seen, vx, vy, con["kick_raw"], p, con["gap_kick"])
     lab = assemble(own, dead, cruns, p)
     if debug:
@@ -417,17 +417,13 @@ def shift(arr, lag, fill=-1):
     return out
 
 
-def shape_gaps(own, valid, proba, cruns, p, gap_kick=None):
-    """Owner inside ball-missing gaps (>= shape_gap frames) from the team-shape model.
-
-    Inside a gap the contact logic has nothing to say: it holds the last owner X and, if the next
-    contact run belongs to the other team Y, cuts at alpha between release and that contact. With
-    r_Y = smoothed P(Y) / (P(H) + P(A)) from the shape model (players only):
-      X != Y  the switch goes to the start of the final stretch of the gap where r_Y > 0.5 (the
-              moment the teams' shapes turned); if the shapes still favour X at the end, keep alpha.
-      X == Y  an other-team spell is inserted only where r_other > shape_hi for >= shape_min frames
-              (strong, sustained evidence: an A-B-A inside one gap is the over-switching pattern).
-    """
+def shape_gaps(own, valid, proba, cruns, p):
+    """Owner inside ball-missing gaps (>= shape_gap frames) from the team-shape model: when the owner
+    before and after the gap is the same team X, an other-team spell is inserted only where the
+    smoothed r_other = P(other) / (P(H) + P(A)) stays above shape_hi for >= shape_min frames
+    (strong, sustained evidence; an A-B-A inside one gap is the over-switching pattern).
+    (S8: the former "X != Y" half, which moved the switch to where the shapes turned, had no effect
+    on public, pooled, hidden-ball or full-match counts and was removed.)"""
     from scipy.ndimage import uniform_filter1d
     q = uniform_filter1d(proba[:, :2].astype(np.float64), p.get("shape_win", 75), axis=0)
     r = q[:, 1] / np.maximum(q.sum(1), 1e-9)
@@ -440,21 +436,11 @@ def shape_gaps(own, valid, proba, cruns, p, gap_kick=None):
             continue
         X = own[a - 1]
         j = np.searchsorted(starts, b)
-        nxt, Y = (starts[j], teams[j]) if j < len(starts) else (n, X)
-        if X < 0 or Y < 0:
+        Y = teams[j] if j < len(starts) else X
+        if X < 0 or Y < 0 or X != Y:
             continue
         rY = r if Y == 1 else 1 - r
-        if X != Y and gap_kick is not None and p.on("use_gap_cut") and j < len(starts) and gap_kick[starts[j]]:
-            continue  # S8: regain after the gap, handled by owner_from_runs
-        if X != Y and p.on("use_shape_gap_switch"):
-            fav = rY[a:b] > 0.5
-            if fav[-1]:
-                k = np.flatnonzero(~fav)
-                cut = a + (k[-1] + 1 if len(k) else 0)
-                out[a:cut] = X
-                out[cut:nxt] = Y
-        elif X == Y and p.on("use_shape_gap_insert"):
-            for s, e in runs(1 - rY[a:b] > p.get("shape_hi", 1.01)):
-                if e - s >= p.get("shape_min", 75):
-                    out[a + s:a + e] = 1 - X
+        for s_, e in runs(1 - rY[a:b] > p.get("shape_hi", 1.01)):
+            if e - s_ >= p.get("shape_min", 75):
+                out[a + s_:a + e] = 1 - X
     return out

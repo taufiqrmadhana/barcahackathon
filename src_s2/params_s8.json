@@ -39,8 +39,6 @@
  "use_first_contact": 1,
  "use_shape": 1,
  "use_shape_gap": 1,
- "use_shape_gap_switch": 1,
- "use_shape_gap_insert": 1,
  "use_still_long": 1,
  "still_long": 1.2,
  "still_long_win": 250,
