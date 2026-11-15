@@ -1,5 +1,5 @@
 base                   sigma 0.00 | public 0.6486 (min 0.6486) | pooled 0.5803 | full poss 322 dead 0.455
-base                   sigma 0.05 | public 0.5707 (min 0.5257) | pooled 0.5418 | full poss 380 dead 0.438
-base                   sigma 0.10 | public 0.5660 (min 0.5032) | pooled 0.5328 | full poss 385 dead 0.435
-base                   sigma 0.20 | public 0.5337 (min 0.5222) | pooled 0.5520 | full poss 347 dead 0.439
-base                   sigma 0.30 | public 0.5690 (min 0.5222) | pooled 0.5525 | full poss 347 dead 0.439
+base                   sigma 0.05 | public 0.5707 (min 0.5257) | pooled 0.5418 | full poss 379 dead 0.438
+base                   sigma 0.10 | public 0.5660 (min 0.5032) | pooled 0.5261 | full poss 385 dead 0.435
+base                   sigma 0.20 | public 0.5337 (min 0.5222) | pooled 0.5451 | full poss 347 dead 0.439
+base                   sigma 0.30 | public 0.5690 (min 0.5222) | pooled 0.5456 | full poss 347 dead 0.439
