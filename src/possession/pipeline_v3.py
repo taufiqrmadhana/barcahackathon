@@ -1,30 +1,26 @@
-"""v3 glue: v2 predictions, validated by a FILM frame-interpolation layer on selected batches.
-
-    v2 (TXT + XML + homography + Smart Tagging) ──► evidence, labels
-            │
-            ▼
-    batches (transitions, doubt, per-label anchors, public window)
-            │
-            ▼
-    tactical video ──► FILM(t-2, t+2) vs real t, ball-centred crops ──► residual features (5 Hz)
-            │
-            ▼
-    model zoo, contiguous-block CV on the public labels ──► best model ──► p(H, A, D)
-            │
-            ▼
-    v2 evidence + w * log p on batch frames ──► Viterbi per half ──► v3 labels
-"""
-
+import os
 import numpy as np
 
 from . import batches as batch_sel
-from . import film_features, model_v2, validator
-from .pipeline_v2 import Inputs as InputsV2, match_summary, public_gt, score, write  # noqa: F401
+from . import film_features, hsmm, model_v2, pipeline as loop_pipeline, validator
+from .config import Params
+from .paths import SRC
+from .pipeline_v2 import Inputs as InputsV2, match_summary, public_gt, score, write
+from games import GAME, source_frames
 import possession_metrics as pm
 
+LOOP_PARAMS_PATH = os.path.join(SRC, "params.json")
 
-class Inputs(InputsV2):
-    """v2 inputs plus the v2 state the validation layer reads."""
+
+class Inputs(InputsV2, loop_pipeline.Inputs):
+    def __init__(self, game=GAME, data_dir=None, refresh=False):
+        InputsV2.__init__(self, game=game, data_dir=data_dir, refresh=refresh)
+        self.n = source_frames("tactical", game)
+        self.graded = np.zeros(self.n, dtype=bool)
+        for _, first, last in self.blocks:
+            self.graded[first:last + 1] = True
+        self._cache = {}
+        self._loop_state = {}
 
     def v2_state(self, params):
         feat = self.features(params)
@@ -33,40 +29,66 @@ class Inputs(InputsV2):
         memory = model_v2.dead_memory(feat, self.blocks, params)
         return feat, evidence, labels, memory
 
+    def loop_state(self, loop_params=None):
+        p = loop_params or Params.load(LOOP_PARAMS_PATH if os.path.isfile(LOOP_PARAMS_PATH) else None)
+        key = repr(p)
+        if key not in self._loop_state:
+            labels, dbg = loop_pipeline.predict(self, p, debug=True)
+            model = hsmm.Model(p)
+            _, _, margin = model.decode(dbg["emit"], dbg["bonus"], self.blocks, self.n, margins=True)
+            emit = dbg["emit"]
+            score3 = np.column_stack([
+                np.maximum(emit[:, 0], emit[:, 1]),
+                np.maximum(emit[:, 2], emit[:, 3]),
+                emit[:, 4],
+            ])
+            dbg["labels"] = labels
+            dbg["margin"] = margin
+            dbg["score3"] = score3
+            dbg["params"] = p
+            self._loop_state[key] = dbg
+        return self._loop_state[key]
+
 
 def public_mask(gt_codes):
-    return gt_codes <= 2  # H, A, D; X (and anything else) is not a training label
+    return gt_codes <= 2
 
 
-def select_batches(inputs, params, gt_codes, cfg=batch_sel.BatchConfig()):
-    _, evidence, labels, _ = inputs.v2_state(params)
-    mask, reasons = batch_sel.select(labels, evidence, inputs.blocks, public_mask(gt_codes), cfg)
-    return mask, reasons, labels
+def select_batches(inputs, params, gt_codes, cfg=batch_sel.BatchConfig(), loop_params=None):
+    _, v2_ev, v2_lab, _ = inputs.v2_state(params)
+    loop = inputs.loop_state(loop_params)
+    mask_v2, reasons_v2 = batch_sel.select(v2_lab, v2_ev, inputs.blocks, public_mask(gt_codes), cfg)
+    mask_loop, reasons_loop = batch_sel.select(loop["labels"], loop["score3"], inputs.blocks,
+                                               public_mask(gt_codes), cfg)
+    mask = mask_v2 | mask_loop
+    reasons = {k: reasons_v2[k] | reasons_loop[k] for k in reasons_v2}
+    return mask, reasons, loop["labels"]
 
 
-def make_extractor(inputs, params, kind="film"):
+def make_extractor(inputs, params, kind="film", **film_kwargs):
     from . import film
     feat = inputs.features(params)
     cam = inputs.camera(params.err_scale, params.pan_window)
-    return film_features.Extractor(inputs.atd, feat, cam, film.load(kind), film.load("naive"))
+    return film_features.Extractor(inputs.atd, feat, cam, film.load(kind, **film_kwargs), film.load("naive"))
 
 
 class Layer:
-    """Everything the validation layer needs, built once and reused by the ablation."""
-
     def __init__(self, inputs, params, gt_codes, store, batch_cfg=batch_sel.BatchConfig(),
-                 fusion=validator.FusionConfig()):
+                 fusion=validator.FusionConfig(), loop_params=None):
         self.inputs, self.params, self.fusion = inputs, params, fusion
-        self.feat, self.evidence, self.labels, memory = inputs.v2_state(params)
+        self.feat, self.v2_evidence, self.v2_labels, memory = inputs.v2_state(params)
+        self.loop = inputs.loop_state(loop_params)
+        self.loop_params = self.loop["params"]
+        self.hsmm_model = hsmm.Model(self.loop_params)
+        self.evidence = self.loop["score3"]
+        self.labels = self.loop["labels"]
         self.n = len(self.labels)
         self.gt = gt_codes
-        mask, self.reasons = batch_sel.select(self.labels, self.evidence, inputs.blocks,
-                                              public_mask(gt_codes), batch_cfg)
+        mask, self.reasons, _ = select_batches(inputs, params, gt_codes, batch_cfg, self.loop_params)
         frames, values = store.table()
         keep = mask[frames] if len(frames) else np.zeros(0, dtype=bool)
         self.sample_frames = frames[keep]
         values = {k: v[keep] for k, v in values.items()}
-        # only frames whose batch actually has FILM samples take part
         covered = np.zeros(self.n, dtype=bool)
         intervals = batch_sel.intervals(mask)
         self.intervals = []
@@ -80,17 +102,18 @@ class Layer:
         self.batch_mask = mask
         cols = validator.sample_table(self.sample_frames, values, self.intervals, fusion)
         video = validator.frame_video_features(self.sample_frames, cols, self.intervals, self.n)
-        context = validator.v2_context(self.feat, self.evidence, self.labels, inputs.blocks, memory)
-        self.columns = dict(context, **video)
+        context_v2 = validator.v2_context(self.feat, self.v2_evidence, self.v2_labels, inputs.blocks, memory)
+        context_loop = validator.loop_context(self.loop)
+        self.columns = {}
+        self.columns.update(context_v2)
+        self.columns.update(context_loop)
+        self.columns.update(video)
 
         train_frames = self.sample_frames[public_mask(gt_codes)[self.sample_frames]]
         self.train_frames = train_frames
         self.y = gt_codes[train_frames].astype(int)
 
-    # ------------------------------------------------------------------ fitting
-
     def proba(self, names, factory, n_folds=5, oof=True):
-        """p(H, A, D) on every covered frame: out-of-fold inside the public window if oof."""
         x_train = validator.matrix(self.columns, names, self.train_frames)
         rows = np.flatnonzero(self.mask)
         x_all = validator.matrix(self.columns, names, rows)
@@ -112,11 +135,15 @@ class Layer:
                     proba[sel] = validator._proba3(m, validator.matrix(self.columns, names, sel))
         return proba
 
-    def decode(self, proba, weight=None):
+    def decode(self, proba, weight=None, decoder="loop"):
         cfg = self.fusion if weight is None else validator.FusionConfig(
             weight=weight, p_floor=self.fusion.p_floor, peak_window=self.fusion.peak_window)
-        fused = validator.fuse(self.evidence, proba, self.mask, cfg)
-        return model_v2.decode(fused, self.inputs.blocks, self.params)
+        if decoder == "v2":
+            fused = validator.fuse(self.v2_evidence, proba, self.mask, cfg)
+            return model_v2.decode(fused, self.inputs.blocks, self.params)
+        fused_emit = validator.fuse_hsmm(self.loop["emit"], proba, self.mask, cfg)
+        labels, _ = self.hsmm_model.decode(fused_emit, self.loop["bonus"], self.inputs.blocks, self.n)
+        return labels
 
     def evaluate(self, labels, bootstrap=0):
         return pm.evaluate(self.gt, pm.label_codes(labels), bootstrap_n=bootstrap)

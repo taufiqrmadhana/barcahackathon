@@ -1,9 +1,3 @@
-"""Build a submission from the match data and score it on the public five minutes.
-
-    python src/run.py                          # params from src/params.json
-    python src/run.py --name try1 --set switch_cost=60 w_tag=0.5
-"""
-
 import argparse
 import os
 import sys
@@ -11,9 +5,9 @@ import time
 
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 
-from possession.config import Params  # noqa: E402
-from possession.paths import RESULTS_DIR, SRC  # noqa: E402
-from possession import pipeline  # noqa: E402
+from possession.config import Params
+from possession.paths import RESULTS_DIR, SRC
+from possession import pipeline
 
 DEFAULT_PARAMS = os.path.join(SRC, "params.json")
 
@@ -22,7 +16,10 @@ def parse_overrides(pairs):
     out = {}
     for pair in pairs or []:
         key, _, value = pair.partition("=")
-        out[key] = int(value) if value.lstrip("-").isdigit() else float(value)
+        try:
+            out[key] = int(value) if value.lstrip("-").isdigit() else float(value)
+        except ValueError:
+            out[key] = value
     return out
 
 
@@ -36,7 +33,7 @@ def report(result):
 
 
 def main():
-    parser = argparse.ArgumentParser(description=__doc__.splitlines()[0])
+    parser = argparse.ArgumentParser()
     parser.add_argument("--params", default=DEFAULT_PARAMS)
     parser.add_argument("--set", nargs="+", metavar="KEY=VALUE", help="override params")
     parser.add_argument("--name", default="barca")

@@ -1,28 +1,10 @@
-"""Frame interpolation: Google Research FILM (Reda et al., ECCV 2022), plus a naive reference.
-
-    https://github.com/google-research/frame-interpolation
-    SavedModel: https://tfhub.dev/google/film/1  (the `film_net` style checkpoint, Apache-2.0)
-
-FILM synthesises the frame half way between two frames. In v3 it is not used to make slow
-motion: it is used as a *motion predictor*. Given frames t-k and t+k, FILM predicts frame t as if
-everything moved smoothly; the real frame t is then compared with that prediction. Where the play
-is smooth (a carried ball, players jogging, a panning camera) the prediction is near perfect;
-where something happens that smooth motion cannot explain -- a kick, a touch that turns the ball,
-a tackle, a sudden stop -- the interpolation residual spikes, and it spikes *where* it happened.
-
-`NaiveInterpolator` (a 50/50 blend) is the no-motion-model reference: residual(naive) -
-residual(FILM) measures how much of the change FILM could explain as motion.
-
-Everything works on float32 RGB in [0, 1], shape (B, H, W, 3).
-"""
-
 import os
 import time as _time
 
 import numpy as np
 
 FILM_HUB_URL = os.environ.get("FILM_HUB_URL", "https://tfhub.dev/google/film/1")
-ALIGN = 64  # FILM's pyramid needs sides divisible by 64 (same as interpolator.py in the repo)
+ALIGN = 64
 
 
 def _pad(images, align=ALIGN):
@@ -34,25 +16,34 @@ def _pad(images, align=ALIGN):
 
 
 class FilmInterpolator:
-    """Thin wrapper around the FILM SavedModel: mid-frames for batches of frame pairs."""
-
     name = "film"
 
-    def __init__(self, url=FILM_HUB_URL, batch_size=2):
+    def __init__(self, url=FILM_HUB_URL, batch_size=1, gpu_sleep_s=0.08):
         os.environ.setdefault("TF_CPP_MIN_LOG_LEVEL", "2")
         import tensorflow as tf
         import tensorflow_hub as hub
 
         self.tf = tf
+        try:
+            tf.config.threading.set_intra_op_parallelism_threads(2)
+            tf.config.threading.set_inter_op_parallelism_threads(1)
+        except RuntimeError:
+            pass
         gpus = tf.config.list_physical_devices("GPU")
+        for gpu in gpus:
+            try:
+                tf.config.experimental.set_memory_growth(gpu, True)
+            except RuntimeError:
+                pass
         self.device = "/GPU:0" if gpus else "/CPU:0"
-        print("FILM interpolator device: {} ({})".format(self.device, gpus or "CPU"), flush=True)
+        self.gpu_sleep_s = gpu_sleep_s
+        print("FILM interpolator device: {} ({}, throttled batch_size={}, sleep={}s)".format(
+            self.device, gpus or "CPU", batch_size, gpu_sleep_s), flush=True)
         with tf.device(self.device):
             self.model = hub.load(url)
         self.batch_size = batch_size
 
     def __call__(self, x0, x1, t=0.5):
-        """x0, x1: (B, H, W, 3) float32 in [0, 1] -> (B, H, W, 3) frame at time t in (0, 1)."""
         x0 = np.asarray(x0, dtype=np.float32)
         x1 = np.asarray(x1, dtype=np.float32)
         out = np.empty_like(x0)
@@ -65,14 +56,12 @@ class FilmInterpolator:
                 result = self.model({"x0": self.tf.constant(a), "x1": self.tf.constant(b),
                                      "time": self.tf.constant(time)}, training=False)
                 out[start:stop] = np.clip(result["image"].numpy()[:, :h, :w], 0.0, 1.0)
-                if self.device == "/GPU:0":
-                    _time.sleep(0.015)  # yield to Windows DWM to prevent TDR timeout on Radeon GPU
+                if self.device == "/GPU:0" and self.gpu_sleep_s > 0:
+                    _time.sleep(self.gpu_sleep_s)
         return out
 
 
 class NaiveInterpolator:
-    """Linear cross-fade: what interpolation looks like with no motion model at all."""
-
     name = "naive"
 
     def __call__(self, x0, x1, t=0.5):

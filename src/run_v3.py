@@ -1,19 +1,3 @@
-"""v3: v2 predictions validated by a FILM frame-interpolation layer.
-
-    python src/run_v3.py batches                        # show which video batches v3 looks at
-    python src/run_v3.py extract --scope public         # FILM pass on the public window (resumable)
-    python src/run_v3.py extract --scope all --budget-min 120   # then the rest of the batches
-    python src/run_v3.py run                            # model zoo + ablation + write barca_v3.csv
-    python src/run_v3.py run --weight 0.5 --bootstrap 1000
-
-Needs the v3 environment (TensorFlow + tensorflow-hub for FILM, OpenCV, scikit-learn, LightGBM):
-    python3.11 -m venv .venv-v3 && .venv-v3/bin/pip install -r requirements-v3.txt
-
-FILM is only needed by `extract`; `run` reads the cached features (cache/*_v3_film_features.npz),
-so a submission is regenerated exactly from the cache, or re-extracted from the video.
-Everything scored on the public window is out of fold (see possession/validator.py).
-"""
-
 import argparse
 import os
 import sys
@@ -23,14 +7,13 @@ import warnings
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 warnings.filterwarnings("ignore")
 
-import numpy as np  # noqa: E402
+import numpy as np
 
-from possession.paths import RESULTS_DIR, SRC  # noqa: E402
-from possession import batches as batch_sel  # noqa: E402
-from possession import film_features, validator  # noqa: E402
-from possession import pipeline_v3 as pipeline  # noqa: E402
-from run_v2 import load_params, V2_PARAMS  # noqa: E402
-import possession_metrics as pm  # noqa: E402
+from possession.paths import RESULTS_DIR
+from possession import batches as batch_sel
+from possession import film_features, validator
+from possession import pipeline_v3 as pipeline
+from run_v2 import load_params, V2_PARAMS
 
 
 def headline(result):
@@ -64,10 +47,12 @@ def cmd_extract(inputs, params, gt, args):
         len(frames), args.scope, len(frames) - len(todo), len(todo)), flush=True)
     if len(todo) == 0:
         return
-    if args.scope == "all":  # spread a partial budget over the match instead of filling the start
+    if args.scope == "all":
         order = np.random.default_rng(0).permutation(len(todo))
         frames = np.sort(todo[order])
-    extractor = pipeline.make_extractor(inputs, params, args.interp)
+    extractor = pipeline.make_extractor(
+        inputs, params, args.interp,
+        batch_size=args.gpu_batch_size, gpu_sleep_s=args.gpu_sleep)
     budget = args.budget_min * 60 if args.budget_min else None
     film_features.extract(extractor, store, frames, chunk=args.chunk, budget_s=budget)
 
@@ -83,8 +68,10 @@ def cmd_run(inputs, params, gt, args):
     if len(layer.train_frames) < 100:
         raise SystemExit("not enough FILM samples in the public window: run `extract --scope public`")
 
-    base = layer.evaluate(layer.labels, args.bootstrap)
-    print("\nv2 (no validation)          " + headline(base))
+    base_v2 = layer.evaluate(layer.v2_labels, args.bootstrap)
+    base_loop = layer.evaluate(layer.labels, args.bootstrap)
+    print("\nv2 (no validation)          " + headline(base_v2))
+    print("loop-pipeline (no val)      " + headline(base_loop))
 
     zoo = validator.model_zoo()
     folds = validator.contiguous_folds(layer.train_frames, args.folds)
@@ -100,50 +87,55 @@ def cmd_run(inputs, params, gt, args):
             print("    {:<14} log-loss {:.3f}  frame macroF1 {:.3f}{}".format(
                 name, r["log_loss"], r["macro_f1"], "   <- best" if name == best else ""))
         proba = layer.proba(names, zoo[best], args.folds, oof=True)
-        labels = layer.decode(proba)
+        labels = layer.decode(proba, decoder=args.decoder)
         results[set_name] = (best, proba, labels, layer.evaluate(labels))
 
-    print("\nout-of-fold result on the public window, fusion weight {}".format(args.weight))
-    print("  {:<26} {}".format("v2", headline(base)))
+    print("\nout-of-fold result on the public window, fusion weight {} (decoder: {})".format(
+        args.weight, args.decoder))
+    print("  {:<28} {}".format("v2", headline(base_v2)))
+    print("  {:<28} {}".format("loop-pipeline", headline(base_loop)))
     for set_name, (best, _, _, r) in results.items():
-        print("  {:<26} {}".format("v3 " + set_name + " / " + best, headline(r)))
+        print("  {:<28} {}".format("v3 " + set_name + " / " + best, headline(r)))
 
     final = args.final if args.final in results else list(results)[-1]
     best, proba, _, _ = results[final]
     print("\nfusion weight sensitivity ({} / {}):".format(final, best))
     for w in (0.25, 0.5, 1.0, 2.0):
-        print("  w={:<5} {}".format(w, headline(layer.evaluate(layer.decode(proba, w)))))
+        print("  w={:<5} {}".format(
+            w, headline(layer.evaluate(layer.decode(proba, w, decoder=args.decoder)))))
 
-    # submission: model refit on every public sample, applied to every covered frame
     names = validator.FEATURE_SETS[final]
     full = layer.proba(names, zoo[best], oof=False)
-    labels = layer.decode(full)
+    labels = layer.decode(full, decoder=args.decoder)
     path = pipeline.write(os.path.join(args.out, args.name + ".csv"), labels)
     changed = (labels != layer.labels) & (layer.labels != "X")
-    print("\nwrote {}  ({} / {}; {} frames changed vs v2, {:.2%} of graded)".format(
+    print("\nwrote {}  ({} / {}; {} frames changed vs loop-pipeline, {:.2%} of graded)".format(
         os.path.relpath(path), final, best, int(changed.sum()),
         changed.sum() / max(1, (layer.labels != "X").sum())))
     if args.bootstrap:
         r = layer.evaluate(results[final][2], args.bootstrap)
         for key in ("spell_f1_ci", "macro_f1_ci"):
-            print("  v2 {} {}   v3 (oof) {} {}".format(key, base.get(key), key, r.get(key)))
+            print("  loop {} {}   v3 (oof) {} {}".format(key, base_loop.get(key), key, r.get(key)))
     print("\nwhole match (no ground truth needed):")
-    for tag, lab in (("v2", layer.labels), ("v3", labels)):
+    for tag, lab in (("v2", layer.v2_labels), ("loop", layer.labels), ("v3", labels)):
         for row in pipeline.match_summary(lab, inputs.blocks):
-            print("  {} half {half}: {possessions} possessions, mean {mean_s:.1f}s, "
+            print("  {:<4} half {half}: {possessions} possessions, mean {mean_s:.1f}s, "
                   "H {share_H:.1%}  A {share_A:.1%}  D {share_D:.1%}".format(tag, **row))
 
 
 def main():
-    parser = argparse.ArgumentParser(description=__doc__.splitlines()[0])
+    parser = argparse.ArgumentParser()
     parser.add_argument("command", choices=("batches", "extract", "run"))
     parser.add_argument("--params", default=V2_PARAMS)
     parser.add_argument("--interp", default="film", choices=("film",))
     parser.add_argument("--scope", default="public", choices=("public", "all"))
     parser.add_argument("--stride", type=int, default=batch_sel.BatchConfig.stride)
-    parser.add_argument("--chunk", type=int, default=32)
+    parser.add_argument("--chunk", type=int, default=8)
+    parser.add_argument("--gpu-batch-size", type=int, default=1)
+    parser.add_argument("--gpu-sleep", type=float, default=0.08)
     parser.add_argument("--budget-min", type=float, default=0)
     parser.add_argument("--weight", type=float, default=validator.FusionConfig.weight)
+    parser.add_argument("--decoder", default="loop", choices=("loop", "v2"))
     parser.add_argument("--folds", type=int, default=5)
     parser.add_argument("--sets", nargs="+", default=list(validator.FEATURE_SETS),
                         choices=list(validator.FEATURE_SETS))

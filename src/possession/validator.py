@@ -1,18 +1,3 @@
-"""v3 validation layer: a learned model reads FILM evidence + v2 context and re-scores the batches.
-
-    FILM samples (5 Hz) ──► per-frame video features ──┐
-    v2 evidence, features, labels ─────────────────────┼──► model zoo ──► p(H, A, D) per frame
-                                                        │    (grouped CV picks the best fit)
-                                                        ▼
-         v2 evidence + w * centred log p  (inside batches only) ──► same Viterbi ──► v3 labels
-
-Training labels are the public ground truth, which RULES.md allows for training and validation
-("small amounts of hand-labelled data used to train or validate a model are fine"). Because the
-same 5 minutes are also the only place we can measure anything, every number reported on them is
-*out of fold*: the window is cut into contiguous blocks, and each block is scored by a model that
-never saw it.
-"""
-
 from dataclasses import dataclass
 
 import numpy as np
@@ -22,11 +7,14 @@ from .model import H, A, D
 
 LABEL_CODE = {"H": H, "A": A, "D": D}
 
-# feature groups, so the ablation can switch the video evidence on and off
 V2_COLS = ("v2_team", "v2_dead", "v2_is_H", "v2_is_A", "v2_is_D", "v2_since_change",
            "v2_until_change", "dist_home", "dist_away", "ball_seen", "ball_filled", "since_seen",
            "last_edge_m", "z_player_speed", "pan_speed", "dead_memory", "quality",
            "players_in_view")
+LOOP_COLS = ("ctrl_home", "ctrl_away", "rel_home", "rel_away", "second_home", "second_away",
+             "crowd_home", "crowd_away", "shape_H", "shape_A", "shape_D",
+             "ball_speed_smooth", "player_speed_smooth", "still_run", "missing_run",
+             "bonus_to_H", "bonus_to_A", "bonus_dead_in", "bonus_H_out", "bonus_A_out")
 FLOW_COLS = ("flow_cam", "flow_act", "diff_global")
 NAIVE_COLS = ("naive_res_mean", "naive_res_p99", "naive_res_ball", "naive_res_home",
               "naive_res_away", "naive_near_home", "naive_near_away", "naive_team_diff",
@@ -38,20 +26,19 @@ FILM_COLS = ("film_res_mean", "film_res_p99", "film_explained", "film_res_ball",
 
 FEATURE_SETS = {
     "v2": V2_COLS,
-    "v2+flow+naive": V2_COLS + FLOW_COLS + NAIVE_COLS,
-    "v2+flow+film": V2_COLS + FLOW_COLS + FILM_COLS,
-    "v2+all": V2_COLS + FLOW_COLS + NAIVE_COLS + FILM_COLS,
+    "loop": V2_COLS + LOOP_COLS,
+    "v2+flow+naive": V2_COLS + LOOP_COLS + FLOW_COLS + NAIVE_COLS,
+    "v2+flow+film": V2_COLS + LOOP_COLS + FLOW_COLS + FILM_COLS,
+    "v2+all": V2_COLS + LOOP_COLS + FLOW_COLS + NAIVE_COLS + FILM_COLS,
 }
 
 
 @dataclass
 class FusionConfig:
-    weight: float = 0.5          # evidence per frame per nat of model log-probability
-    p_floor: float = 0.02        # probabilities clipped to [floor, 1 - floor] before the log
-    peak_window: int = 2         # samples either side for the rolling peaks (2 samples = 0.4 s)
+    weight: float = 1.0
+    p_floor: float = 0.02
+    peak_window: int = 2
 
-
-# ---------------------------------------------------------------- features
 
 def _rolling_max(x, w):
     out = x.copy()
@@ -62,7 +49,6 @@ def _rolling_max(x, w):
 
 
 def sample_table(frames, values, intervals, cfg=FusionConfig()):
-    """Per-sample FILM columns plus derived contrasts and short rolling peaks within each batch."""
     cols = {k: np.asarray(values[k], dtype=np.float64) for k in RAW_FILM}
     cols["film_team_diff"] = cols["film_res_home"] - cols["film_res_away"]
     cols["film_near_diff"] = cols["film_near_home"] - cols["film_near_away"]
@@ -84,7 +70,6 @@ def sample_table(frames, values, intervals, cfg=FusionConfig()):
 
 
 def frame_video_features(frames, cols, intervals, n):
-    """Linear interpolation of sample columns onto every frame of each batch interval."""
     out = {k: np.full(n, np.nan) for k in cols}
     for first, last in intervals:
         sel = np.flatnonzero((frames >= first) & (frames <= last))
@@ -114,7 +99,7 @@ def v2_context(feat, score, labels, blocks, dead_mem):
     dist = np.clip(np.nan_to_num(feat["dist"], posinf=40.0), 0, 40.0)
     return {
         "v2_team": score[:, H] - score[:, A],
-        "v2_dead": score[:, D] - np.maximum(score[:, H], score[:, A]),
+        "v2_dead": score[:, D] - np.maximum(score[:, H], score[:, A], dtype=np.float64),
         "v2_is_H": (codes == H).astype(float), "v2_is_A": (codes == A).astype(float),
         "v2_is_D": (codes == D).astype(float),
         "v2_since_change": np.minimum(since, 500), "v2_until_change": np.minimum(until, 500),
@@ -129,11 +114,57 @@ def v2_context(feat, score, labels, blocks, dead_mem):
     }
 
 
+def loop_context(loop_state):
+    ev = loop_state["ev"]
+    emit = loop_state["emit"]
+    bonus = loop_state["bonus"]
+    shape_q = loop_state["shape"]
+    labels = loop_state["labels"]
+    margin = loop_state["margin"]
+    codes = np.array([LABEL_CODE.get(l, -1) for l in labels])
+
+    emit_h = np.maximum(emit[:, 0], emit[:, 1])
+    emit_a = np.maximum(emit[:, 2], emit[:, 3])
+    emit_d = emit[:, 4]
+    ctrl = np.nan_to_num(ev["ctrl"], nan=0.0)
+    rel = np.clip(np.nan_to_num(ev["rel"], nan=15.0, posinf=15.0), 0.0, 15.0)
+    second = np.clip(np.nan_to_num(ev["second"], nan=40.0, posinf=40.0), 0.0, 40.0)
+    crowd = ev["crowd"].astype(float)
+
+    return {
+        "loop_team": emit_h - emit_a,
+        "loop_dead": emit_d - np.maximum(emit_h, emit_a),
+        "loop_is_H": (codes == H).astype(float),
+        "loop_is_A": (codes == A).astype(float),
+        "loop_is_D": (codes == D).astype(float),
+        "loop_margin": np.clip(np.nan_to_num(margin, nan=0.0), 0.0, 50.0),
+        "ctrl_home": ctrl[:, 0],
+        "ctrl_away": ctrl[:, 1],
+        "rel_home": rel[:, 0],
+        "rel_away": rel[:, 1],
+        "second_home": second[:, 0],
+        "second_away": second[:, 1],
+        "crowd_home": crowd[:, 0],
+        "crowd_away": crowd[:, 1],
+        "shape_H": np.nan_to_num(shape_q[:, 0], nan=1.0 / 3),
+        "shape_A": np.nan_to_num(shape_q[:, 1], nan=1.0 / 3),
+        "shape_D": np.nan_to_num(shape_q[:, 2], nan=1.0 / 3),
+        "loop_p_dead": np.nan_to_num(loop_state["p_dead"], nan=0.5),
+        "ball_speed_smooth": np.nan_to_num(ev["ball_speed_smooth"], nan=0.0),
+        "player_speed_smooth": np.nan_to_num(ev["player_speed_smooth"], nan=0.0),
+        "still_run": np.minimum(ev["still_run"], 500).astype(float),
+        "missing_run": np.minimum(ev["missing_run"], 500).astype(float),
+        "bonus_to_H": bonus[:, 0],
+        "bonus_to_A": bonus[:, 1],
+        "bonus_dead_in": bonus[:, 2],
+        "bonus_H_out": bonus[:, 3],
+        "bonus_A_out": bonus[:, 4],
+    }
+
+
 def matrix(columns, names, rows):
     return np.column_stack([columns[k][rows] for k in names]).astype(np.float64)
 
-
-# ---------------------------------------------------------------- models
 
 def model_zoo(seed=0):
     from sklearn.ensemble import (ExtraTreesClassifier, HistGradientBoostingClassifier,
@@ -176,20 +207,17 @@ def _proba3(model, x):
 
 
 def contiguous_folds(frames, n_folds):
-    """Fold id per row: the training window cut into n contiguous time blocks."""
     edges = np.quantile(frames, np.linspace(0, 1, n_folds + 1))
     return np.clip(np.searchsorted(edges, frames, side="right") - 1, 0, n_folds - 1)
 
 
 def purged_train(frames, folds, f, gap=50):
-    """Training rows for fold f: other folds, minus anything within `gap` frames of fold f."""
     test = frames[folds == f]
     near = (frames >= test.min() - gap) & (frames <= test.max() + gap)
     return (folds != f) & ~near
 
 
 def cross_validate(x, y, folds, factory, frames=None, gap=50):
-    """Out-of-fold probabilities for every training row."""
     oof = np.zeros((len(y), 3))
     for f in np.unique(folds):
         test = folds == f
@@ -217,7 +245,6 @@ def macro_f1(y, p):
 
 
 def select_model(x, y, folds, zoo, frames=None):
-    """CV every candidate; best = lowest out-of-fold log-loss (calibration matters for fusion)."""
     report = {}
     for name, factory in zoo.items():
         oof = cross_validate(x, y, folds, factory, frames)
@@ -226,14 +253,25 @@ def select_model(x, y, folds, zoo, frames=None):
     return best, report
 
 
-# ---------------------------------------------------------------- fusion
-
 def fuse(score, proba, mask, cfg=FusionConfig()):
-    """v2 evidence + weight * centred log-probability on batch frames; elsewhere v2 untouched."""
     p = np.clip(proba, cfg.p_floor, 1.0 - cfg.p_floor)
     logp = np.log(p)
     logp -= logp.mean(axis=1, keepdims=True)
     out = score.copy()
     ok = mask & np.isfinite(logp).all(axis=1)
     out[ok] += cfg.weight * logp[ok]
+    return out
+
+
+def fuse_hsmm(emit, proba, mask, cfg=FusionConfig()):
+    p = np.clip(proba, cfg.p_floor, 1.0 - cfg.p_floor)
+    logp = np.log(p)
+    logp -= logp.mean(axis=1, keepdims=True)
+    out = emit.copy()
+    ok = mask & np.isfinite(logp).all(axis=1)
+    out[ok, 0] += cfg.weight * logp[ok, 0]
+    out[ok, 1] += cfg.weight * logp[ok, 0]
+    out[ok, 2] += cfg.weight * logp[ok, 1]
+    out[ok, 3] += cfg.weight * logp[ok, 1]
+    out[ok, 4] += cfg.weight * logp[ok, 2]
     return out

@@ -1,28 +1,3 @@
-"""FILM features: interpolation residuals around the action, per sampled frame.
-
-For a sample frame t (inside a v3 batch) the frames t-k and t+k are interpolated by FILM to a
-predicted frame t, which is compared to the real one. The comparison is done on a full-resolution
-crop centred on the ball (tracked, interpolated or last seen, projected with the homography), so
-the ball keeps its ~7 px instead of vanishing in a downscale.
-
-Per sample:
-    film_res_mean / film_res_p99     residual over the crop: how much un-smooth motion there is
-    naive_res_mean                   same with a 50/50 cross-fade (no motion model)
-    film_explained                   1 - film / naive: share of the change FILM explains as motion
-    film_res_ball                    residual in a disk around the ball pixel (a touch, a kick)
-    film_res_home / film_res_away    max residual over each team's player boxes in the crop
-    film_near_home / film_near_away  residual of each team's player nearest the ball
-    film_cnt_home / film_cnt_away    players of each team inside the crop
-    naive_res_ball/home/away/near_*  the same localised residuals for the cross-fade, so an ablation
-                                     can separate FILM's motion model from plain frame differencing
-    flow_cam                         median optical flow of the whole (downscaled) frame: camera pan
-    flow_act                         90th pct of flow minus the camera: how much the players move
-    diff_global                      mean absolute frame difference t-k -> t+k
-
-Player boxes come from the ATD positions projected with the homography (feet point, body above it,
-height scaled with the camera zoom), which is what makes the residual *team-specific*.
-"""
-
 import os
 import time
 
@@ -40,17 +15,15 @@ FEATURES = ("film_res_mean", "film_res_p99", "naive_res_mean", "film_explained",
             "naive_near_home", "naive_near_away",
             "flow_cam", "flow_act", "diff_global")
 
-CROP = (256, 192)       # pixels at native 1920x1080 (~8 x 6 m around the ball), multiples of 64
-                        # 512x384 costs ~4 s per sample on an M2 CPU, this ~0.9 s
-K = 2                   # neighbour offset in frames: interpolate t from t-2 and t+2
-GLOBAL = (480, 270)     # downscale for the whole-frame flow
-PLAYER_H_M = 1.9        # body box height (m) above the projected feet point
+CROP = (256, 192)
+K = 2
+GLOBAL = (480, 270)
+PLAYER_H_M = 1.9
 PLAYER_W_M = 0.9
 BALL_R_M = 0.6
 
 
 def action_points(atd, feat, pitch):
-    """Normalised pitch point to centre the crop on, per frame: ball, else last ball, else players."""
     scale = np.asarray(pitch, dtype=np.float64)
     ball = feat["ball_xy"] / scale
     last = feat["last_ball"]
@@ -81,7 +54,6 @@ class Extractor:
         return px
 
     def _team_residual(self, maps, t, origin, ball_px):
-        """maps: {prefix: residual map}. Max / nearest-to-ball residual over each team's boxes."""
         ppm = self._ppm(t)
         bw, bh = PLAYER_W_M * ppm / 2.0, PLAYER_H_M * ppm
         xy = self.atd["players"][t, :, :2]
@@ -121,7 +93,6 @@ class Extractor:
                 "diff_global": float(np.abs(ga.astype(np.float32) - gb).mean() / 255.0)}
 
     def run(self, frames):
-        """Feature rows (dict of arrays) for sample frames; frames must be sorted."""
         frames = np.asarray(frames, dtype=np.int64)
         need = np.unique(np.concatenate([frames - K, frames, frames + K]))
         images = self.video.frames(need)
@@ -166,8 +137,6 @@ class Extractor:
 
 
 class Store:
-    """Per-sample feature cache, appended in chunks so a long extraction can stop and resume."""
-
     def __init__(self, kind="film", game="BAR-ATH"):
         self.path = os.path.join(CACHE_DIR, "{}_v3_{}_features.npz".format(game, kind))
         self.frames = np.zeros(0, dtype=np.int64)
@@ -202,7 +171,6 @@ class Store:
 
 
 def extract(extractor, store, frames, chunk=32, log_every=4, budget_s=None):
-    """Fill the store for `frames` (skipping cached ones). Returns number of new samples."""
     todo = store.missing(frames)
     started, done = time.time(), 0
     for c, start in enumerate(range(0, len(todo), chunk)):

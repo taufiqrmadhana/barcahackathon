@@ -1,44 +1,110 @@
-"""Every tunable number in the pipeline, in one place.
-
-Evidence is in "frames": a weight of 1 means one frame of full-strength evidence, so a switch cost
-of 40 needs roughly 1.6 s of uncontested evidence for the other state before the decoder moves.
-"""
-
 import json
 from dataclasses import asdict, dataclass, fields
 
 
 @dataclass
 class Params:
-    # ball interpolation
-    max_gap: int = 25                # fill missing ball across gaps up to this many frames
+    player_margin: float = 5.0
+    max_player_speed: float = 12.0
+    vel_k: int = 2
+    ball_spike_speed: float = 45.0
+    ball_island_len: int = 3
+    ball_island_gap: int = 50
+    max_gap: int = 12
 
-    # who is closest to the ball
-    w_ball: float = 1.0              # weight of the nearest-player evidence on observed frames
-    w_filled: float = 0.5            # multiplier when the ball position was interpolated
-    control_radius: float = 2.5      # metres; evidence fades as exp(-nearest / radius)
-    margin_scale: float = 2.0        # metres of distance gap for full-strength evidence
+    ctrl_radius: float = 1.3
+    ctrl_softness: float = 0.35
+    sync_free: float = 2.5
+    sync_scale: float = 3.0
+    filled_trust: float = 0.6
+    corner_zone: float = 3.0
+    still_speed: float = 1.2
+    slow_window: int = 50
+    ball_smooth: int = 9
 
-    # Smart Tagging
-    w_tag: float = 0.3               # per-frame weight of the attacking-team prior
-    w_sp_dead: float = 0.6           # dead-ball evidence at the start of a tagged set piece
-    sp_dead_frames: int = 50         # how long into a set piece interval the ball is still dead
-    w_sp_team: float = 0.6           # restarting-team evidence after the restart
+    touch_k: int = 3
+    touch_dv: float = 3.5
+    touch_spacing: int = 6
+    touch_radius: float = 2.0
+    touch_margin: float = 1.5
+    duel_radius: float = 1.5
+    seq_max_gap: int = 100
+    pass_min_travel: float = 5.0
+    shot_speed: float = 18.0
+    shot_range: float = 35.0
+    out_margin: float = 0.5
+    out_min_frames: int = 3
+    vanish_min_frames: int = 50
+    vanish_horizon: float = 0.4
+    decel_window: int = 25
+    decel_drop: float = 1.2
+    decel_to: float = 1.6
+    decel_lead: int = 20
+    rest_speed: float = 1.8
+    placed_min_frames: int = 25
+    placed_calm_speed: float = 1.8
+    restart_kick_speed: float = 5.0
+    kick_within: int = 20
+    reappear_min_frames: int = 75
+    dead_min_gap: int = 50
+    dead_max_gap: int = 2250
+    hold_kinds: str = "goal_line,touchline,vanish"
+    hold_goal_line: int = 200
+    hold_touchline: int = 75
 
-    # dead ball
-    w_outside: float = 2.0           # ball tracked outside the pitch
-    dead_gap: int = 75               # missing-ball runs longer than this count as dead evidence
-    w_missing: float = 0.3           # long missing run on its own
-    slow_speed: float = 1.5          # m/s, mean player speed below which play looks stopped
-    w_slow: float = 0.6              # slow players
-    w_missing_slow: float = 0.8      # long missing run and slow players together
-    alive_ball_speed: float = 4.0    # m/s, an observed ball moving this fast is in play
-    w_alive: float = 0.5             # evidence against D from a moving ball
-    d_bias: float = 0.0              # constant added to D everywhere
+    shape_folds: int = 8
+    shape_guard: int = 250
+    shape_stride: int = 3
+    shape_iter: int = 150
+    shape_eps: float = 0.05
+    shape_rounds: int = 1
+    shape_conf: float = 0.0
 
-    # decoder
-    switch_cost: float = 40.0        # H <-> A
-    dead_cost: float = 30.0          # alive <-> D
+    ctrl_eps: float = 0.05
+    w_ball: float = 1.0
+    w_shape: float = 1.0
+    w_shape_known: float = 0.0
+    w_tag: float = 0.0
+    w_dead: float = 1.0
+    d_bias: float = 0.0
+    w_out: float = 6.0
+    w_out_carry: float = 3.0
+    slow_speed: float = 1.3
+    slow_scale: float = 0.3
+    w_slow: float = 1.0
+    dead_gap: int = 75
+    w_missing: float = 0.0
+    w_missing_slow: float = 0.5
+    w_still: float = 2.0
+    w_shape_dead: float = 0.5
+    alive_ball_speed: float = 6.0
+    w_alive: float = 1.0
+    w_hold: float = 5.0
+    w_post_restart: float = 2.0
+    post_restart_frames: int = 50
+    w_tag_dead: float = 1.0
+    tag_dead_frames: int = 25
+    z_max: float = 4.0
+
+    loose_cost: float = 1.0
+    switch_cost: float = 20.0
+    tackle_extra: float = 5.0
+    dead_entry_cost: float = 20.0
+    dead_exit_cost: float = 20.0
+    dead_min_frames: int = 50
+    w_turnover: float = 8.0
+    w_touch: float = 4.0
+    w_duel: float = 2.0
+    touch_before: int = 2
+    touch_after: int = 10
+    w_stoppage: float = 8.0
+    stop_before: int = 10
+    stop_after: int = 25
+    w_shot_dead: float = 3.0
+    shot_window: int = 75
+    w_restart: float = 8.0
+    restart_before: int = 10
+    restart_after: int = 10
 
     @classmethod
     def load(cls, path=None, **overrides):
@@ -61,26 +127,29 @@ class Params:
 
 @dataclass
 class ParamsV2(Params):
-    """v1 plus camera (homography), per-half normalised speeds and a dead-ball memory."""
+    w_filled: float = 0.5
+    control_radius: float = 2.5
+    margin_scale: float = 2.0
+    w_sp_dead: float = 0.6
+    sp_dead_frames: int = 50
+    w_sp_team: float = 0.6
+    w_outside: float = 2.0
+    dead_cost: float = 30.0
 
-    # homography
-    err_scale: float = 1.0           # quality = exp(-reprojection_error / err_scale)
-    pan_window: int = 25             # frames, smoothing of camera pan speed
+    err_scale: float = 1.0
+    pan_window: int = 25
 
-    # normalised slowness: slow = sigmoid(-(z_player_speed - z_slow) / z_temp)
     z_slow: float = -0.3
     z_temp: float = 0.3
-    w_slow_z: float = 0.4            # D evidence from normalised slowness
-    team_gate: float = 0.5           # team evidence shrinks by team_gate * slow
-    w_cam_still: float = 0.2         # extra D when slow players and the camera is still
-    cam_still_speed: float = 0.5     # m/s of camera aim below which the camera is "still"
+    w_slow_z: float = 0.4
+    team_gate: float = 0.5
+    w_cam_still: float = 0.2
+    cam_still_speed: float = 0.5
 
-    # dead memory: after the ball leaves play, stay dead until a fast restart kick
     w_memory: float = 0.6
-    edge_margin: float = 2.0         # m; a ball lost within this of a line counts as leaving
-    restart_speed: float = 8.0       # m/s; observed ball faster than this restarts play
-    restart_min_delay: int = 50      # frames after the exit before a restart can count
-    memory_max: int = 1500           # frames; memory gives up after this long
+    edge_margin: float = 2.0
+    restart_speed: float = 8.0
+    restart_min_delay: int = 50
+    memory_max: int = 1500
 
-    # Smart Tagging set-piece window around the tagged start (restart is near the tag start)
     sp_pre_frames: int = 50
