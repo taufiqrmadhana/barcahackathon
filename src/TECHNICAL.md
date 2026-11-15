@@ -1,6 +1,10 @@
 # Ball possession from tracking evidence, events and a semi-Markov decoder
 
-**Latest update:** the Valdi merge raises public spellF1 / macroF1 to **0.7053 / 0.9231**.
+**Latest update (November 15):** confidence-based short-spell pruning raises public
+spellF1 / macroF1 to **0.7444 / 0.9292**. The classifier and feature cache are unchanged;
+see [PRUNING_EXPERIMENTS.md](PRUNING_EXPERIMENTS.md) for paired checks and selection limits.
+
+**November 12:** the Valdi merge raised public spellF1 / macroF1 to **0.7053 / 0.9231**.
 See [VALDI_INTEGRATION.md](VALDI_INTEGRATION.md) for the video validator, held-out decoding,
 reproduction commands and evaluation limits.
 

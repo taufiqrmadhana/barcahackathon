@@ -1,5 +1,9 @@
 # Valdi merge and FILM fusion
 
+This records the November 12 merge at 3d641db; its exact configuration is now
+`configs/pre_pruning.json`. The November 15 default adds the confidence rule documented in
+[PRUNING_EXPERIMENTS.md](PRUNING_EXPERIMENTS.md).
+
 `origin/valdi` at 6511c13 is merged into `taufiq`, including its metadata, homography,
 video reader, FILM extractor, batch selection, validator and v2/v3 command-line tools.
 Its original parameter classes live in `possession/config_valdi.py`, so their defaults

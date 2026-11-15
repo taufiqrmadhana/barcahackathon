@@ -4,9 +4,13 @@ Own pipeline for More than a Hack 2027, Phase 1. Everything outside `src/` is th
 repository (remote `upstream`), kept as is so `git pull upstream main` keeps working. The method,
 the possession rules and what was tried and dropped are in [TECHNICAL.md](TECHNICAL.md).
 
-Latest: `valdi` is merged into `taufiq`. The default combines Taufiq's tracking/audio/shape,
-Neo's contact ownership, and Valdi's FILM video validator: public spellF1 **0.7053**, macroF1
-**0.9231**. Public CSV rows are independently decoded out-of-fold predictions. Exact video
+Latest (November 15): confidence-based pruning of short possession islands raises public
+spellF1 to **0.7444**, macroF1 to **0.9292**. No classifier retraining is needed. The
+previous default is preserved in `configs/pre_pruning.json`. Paired fold checks and rejected
+ideas: [PRUNING_EXPERIMENTS.md](PRUNING_EXPERIMENTS.md).
+
+The default combines Taufiq's tracking/audio/shape, Neo's contact ownership, and Valdi's FILM
+video validator. Public CSV rows are independently decoded out-of-fold predictions. Exact video
 frame plan, setup, model fitting and limits: [VALDI_INTEGRATION.md](VALDI_INTEGRATION.md).
 The previous contact-only configuration is preserved in `configs/contact_default.json`;
 its experiments are documented in [CONTACT_EXPERIMENTS.md](CONTACT_EXPERIMENTS.md).

@@ -137,7 +137,41 @@ def decode(inputs, p, baseline, emit, bonus, proba, mask):
             updated[baseline != 'D', 4] = -1e6
         labels = hsmm.Model(p).decode(updated, bonus, inputs.blocks, inputs.n)[0]
     labels[~mask] = baseline[~mask]
+    if p.hybrid_prune_max_frames > 0:
+        labels = prune_unconfirmed(labels, proba, mask, inputs.blocks,
+                                   p.hybrid_prune_max_frames,
+                                   p.hybrid_prune_min_confidence)
     return labels
+
+
+def prune_unconfirmed(labels, proba, mask, blocks, maximum=100, minimum=.5):
+    """Merge a short H/A/H or A/H/A island when the classifier prefers its neighbours.
+
+    Confidence is conditional on the ball being alive. D, X, uncovered frames and
+    half boundaries are never changed. This runs inside each independently decoded
+    fold, before splicing: its confidence cannot come from another fold's model.
+    """
+    if maximum <= 0:
+        return labels
+    if not 0 <= minimum <= 1:
+        raise ValueError('minimum spell confidence must be between zero and one')
+    out = labels.copy()
+    for _, first, last in blocks:
+        changes = np.r_[first, np.flatnonzero(
+            out[first + 1:last + 1] != out[first:last]) + first + 1, last + 1]
+        for a, b in zip(changes[:-1], changes[1:]):
+            if (a == first or b > last or b - a > maximum
+                    or out[a] not in ('H', 'A') or out[a - 1] != out[b]
+                    or out[b] not in ('H', 'A') or not mask[a:b].all()):
+                continue
+            alive = proba[a:b, :2].sum(axis=1)
+            if not (np.isfinite(proba[a:b, :2]).all() and (alive > 0).all()):
+                continue
+            side = 0 if out[a] == 'H' else 1
+            confidence = proba[a:b, side] / alive
+            if confidence.mean() < minimum:
+                out[a:b] = out[b]
+    return out
 
 
 def refine(inputs, p, baseline, emit, bonus, shape, artifact, prepared=None):

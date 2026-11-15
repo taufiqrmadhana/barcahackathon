@@ -90,6 +90,8 @@ class Params:
     hybrid_model: str = ''         # optional local Valdi video/context classifier checkpoint
     hybrid_weight: float = .5
     hybrid_lock_dead: int = 1
+    hybrid_prune_max_frames: int = 0  # > 0: merge short team islands unsupported by the video head
+    hybrid_prune_min_confidence: float = .5
 
     # step 4: emissions
     ctrl_eps: float = 0.05

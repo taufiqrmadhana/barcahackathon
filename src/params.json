@@ -117,5 +117,7 @@
   "contact_local_switch": 0,
   "hybrid_model": "pretrain_data/valdi_hybrid_public/film_logreg.joblib",
   "hybrid_weight": 1.0,
-  "hybrid_lock_dead": 1
+  "hybrid_lock_dead": 1,
+  "hybrid_prune_max_frames": 100,
+  "hybrid_prune_min_confidence": 0.5
 }

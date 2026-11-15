@@ -2,6 +2,7 @@
 import sys
 import unittest
 from pathlib import Path
+from dataclasses import replace
 
 import numpy as np
 
@@ -73,6 +74,55 @@ class HybridContracts(unittest.TestCase):
         old = hybrid.refine(inputs,p,labels,emit,bonus,None,a,prepared)
         new = hybrid.refine(inputs,p,labels,emit,bonus,None,b,prepared)
         np.testing.assert_array_equal(old[:100],new[:100])
+        pp=replace(p,hybrid_prune_max_frames=25)
+        old=hybrid.refine(inputs,pp,labels,emit,bonus,None,a,prepared)
+        new=hybrid.refine(inputs,pp,labels,emit,bonus,None,b,prepared)
+        np.testing.assert_array_equal(old[:100],new[:100])
+
+    def test_weak_island_is_removed_but_confident_short_possession_is_kept(self):
+        labels=np.array(list('AAAHHAAA'))
+        proba=np.tile([.2,.6,.2],(len(labels),1))
+        mask=np.ones(len(labels),dtype=bool)
+        out=hybrid.prune_unconfirmed(labels,proba,mask,[(1,0,7)],maximum=2)
+        np.testing.assert_array_equal(out,np.array(list('AAAAAAAA')))
+        proba[3:5]=[.8,.1,.1]
+        np.testing.assert_array_equal(hybrid.prune_unconfirmed(
+            labels,proba,mask,[(1,0,7)],maximum=2),labels)
+        np.testing.assert_array_equal(labels,np.array(list('AAAHHAAA')))
+
+    def test_pruning_never_crosses_dead_halftime_or_missing_video(self):
+        proba=np.tile([.1,.7,.2],(9,1))
+        mask=np.ones(9,dtype=bool)
+        for text,blocks,maximum in [('AAHHHAAA',[(1,0,7)],2),
+            ('DDHHAAA',[(1,0,6)],3),('AAHHAAA',[(1,0,3),(2,4,6)],3),
+            ('AAHHXXAA',[(1,0,7)],3)]:
+            labels=np.array(list(text));n=len(labels)
+            np.testing.assert_array_equal(hybrid.prune_unconfirmed(
+                labels,proba[:n],mask[:n],blocks,maximum),labels)
+        labels=np.array(list('AAHHAAA'));mask[2]=False
+        np.testing.assert_array_equal(hybrid.prune_unconfirmed(
+            labels,proba[:7],mask[:7],[(1,0,6)],maximum=3),labels)
+
+    def test_no_team_evidence_and_tied_votes_retain_the_prediction(self):
+        labels=np.array(list('AAHHAAA'));mask=np.ones(7,dtype=bool)
+        for probs in ([0.,0.,1.],[.3,.3,.4],[np.nan,.3,.7]):
+            q=np.tile(probs,(7,1))
+            np.testing.assert_array_equal(hybrid.prune_unconfirmed(
+                labels,q,mask,[(1,0,6)],maximum=3),labels)
+        q=np.tile([.49,.01,.5],(7,1))
+        # Conditional alive confidence favours H even though its joint probability is below .5.
+        np.testing.assert_array_equal(hybrid.prune_unconfirmed(
+            labels,q,mask,[(1,0,6)],maximum=3),labels)
+
+    def test_pruning_is_equivariant_to_exchanging_home_and_away(self):
+        labels=np.array(list('DAAHHAAAAXAAHAAD'))
+        q=np.tile([.1,.7,.2],(len(labels),1))
+        mask=np.ones(len(labels),dtype=bool);blocks=[(1,0,len(labels)-1)]
+        def exchange(values):
+            return np.where(values=='H','A',np.where(values=='A','H',values))
+        first=hybrid.prune_unconfirmed(labels,q,mask,blocks,maximum=3)
+        swapped=hybrid.prune_unconfirmed(exchange(labels),q[:,[1,0,2]],mask,blocks,maximum=3)
+        np.testing.assert_array_equal(swapped,exchange(first))
 
 
 if __name__ == '__main__':
