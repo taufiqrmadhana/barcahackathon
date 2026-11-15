@@ -1,5 +1,9 @@
 # Kevinza-Valdi branch audit
 
+**November 16 update:** the complete 5 Hz cache now reproduces the README's
+0.9125 training-window spellF1. See [the new reproduction](KEVINZA_2026_11_16.md).
+The results below retain the sparse cache used on November 15.
+
 Reviewed `origin/feat/kevinza-valdi` at
 `81e220d6ec81aa30fe72f4e36c4d8a3465dcb482` on 2026-11-15, while staying on `taufiq`.
 The commit changes two files: HSMM fusion and tree/model selection settings.

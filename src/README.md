@@ -4,11 +4,13 @@ Own pipeline for More than a Hack 2027, Phase 1. Everything outside `src/` is th
 repository (remote `upstream`), kept as is so `git pull upstream main` keeps working. The method,
 the possession rules and what was tried and dropped are in [TECHNICAL.md](TECHNICAL.md).
 
-Latest (November 15): the default prioritises **macroF1**, as requested. Two video-cadence
-heads plus ordered motion and aligned-crop experts reach public macroF1 **0.95000**,
-spellF1 **0.7529**. Approach, statistics and validation: [MACRO_V4.md](MACRO_V4.md),
-`configs/macro_v4.json`. The previous **0.94955** checkpoint is in `configs/macro_v3.json`.
-A new spell alternative reaches **0.8000** spellF1 / **0.9423** macroF1 in
+Latest (November 16): the default prioritises **macroF1**, as requested. Two video-cadence
+heads, ordered motion/aligned-crop experts and temporal agreement reach public macroF1
+**0.95613**, spellF1 **0.8750**. Approach, statistics and validation:
+[MACRO_V5.md](MACRO_V5.md), `configs/macro_v5.json`. The previous **0.95000 / 0.7529**
+checkpoint is retained in `configs/macro_v4.json`; its method is in [MACRO_V4.md](MACRO_V4.md).
+The **0.94955** checkpoint remains in `configs/macro_v3.json`.
+The earlier spell alternative reaches **0.8000** spellF1 / **0.9423** macroF1 in
 `configs/balanced_v1.json`. All scores reuse the public slice; private scores are unknown.
 Macro v2 (**0.9491** / **0.7529**) remains in `configs/macro_v2.json`.
 The previous macro checkpoint (**0.9473** / **0.7647**) is in `configs/macro_v1.json`;
@@ -36,8 +38,10 @@ frame plan, setup, model fitting and limits: [VALDI_INTEGRATION.md](VALDI_INTEGR
 The previous contact-only configuration is preserved in `configs/contact_default.json`;
 its experiments are documented in [CONTACT_EXPERIMENTS.md](CONTACT_EXPERIMENTS.md).
 
-[Kevinza-Valdi's latest branch was audited](KEVINZA_VALDI_AUDIT.md); its fusion and
-ExtraTrees changes did not improve the held-out macro checkpoint here.
+[Kevinza and Kevinza-Valdi were rechecked on November 16](KEVINZA_2026_11_16.md).
+Kevinza's README scores reproduce: **0.9125** spellF1 on its all-public refit CSV,
+versus **0.6118** on its printed OOF check. The earlier adaptation audit is retained in
+[KEVINZA_VALDI_AUDIT.md](KEVINZA_VALDI_AUDIT.md).
 
 ## Setup
 

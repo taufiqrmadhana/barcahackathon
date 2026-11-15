@@ -27,6 +27,13 @@ def main():
                     help='zero-weight H/A expert index; repeat in priority order')
     ap.add_argument('--primary-max',type=float,default=.8)
     ap.add_argument('--expert-min',type=float,default=.9)
+    ap.add_argument('--consensus-weights',nargs='+',type=float,
+                    help='auxiliary mixture for agreeing short spells, using the same held-out heads')
+    ap.add_argument('--consensus-max-frames',type=int,default=100)
+    ap.add_argument('--consensus-min-iou',type=float,default=.5)
+    ap.add_argument('--consensus-dead-weight',type=float,default=0.,
+                    help='blend auxiliary P(D) without changing primary conditional H/A odds')
+    ap.add_argument('--oscillation-max-frames',type=int,default=0)
     ap.add_argument('--params',default=str(Path(ROOT,'src/params.json')))
     ap.add_argument('--set',nargs='+')
     ap.add_argument('--out',required=True)
@@ -39,7 +46,15 @@ def main():
                for i in (args.team_expert or [])]
     router = routers[0] if len(routers)==1 else None
     multiple = routers if len(routers)>1 else None
-    artifact=hybrid.combine_artifacts(members,args.weights,router,multiple)
+    temporal = (dict(consensus_weights=args.consensus_weights,
+                     consensus_max_frames=args.consensus_max_frames,
+                     consensus_min_iou=args.consensus_min_iou,
+                     consensus_dead_weight=args.consensus_dead_weight,
+                     oscillation_max_frames=args.oscillation_max_frames)
+                if args.consensus_weights is not None else None)
+    if (args.oscillation_max_frames or args.consensus_dead_weight) and temporal is None:
+        raise ValueError('temporal processing requires --consensus-weights')
+    artifact=hybrid.combine_artifacts(members,args.weights,router,multiple,temporal)
     p=Params.load(args.params,**parse_overrides(args.set))
     physical=lambda value:{k:v for k,v in value.items() if not k.startswith('hybrid_')}
     if physical(artifact['base_params'])!=physical(asdict(p)):
@@ -55,7 +70,7 @@ def main():
     joblib.dump(artifact,path)
     pipeline.write(str(Path(ROOT,'evaluation/results',args.name+'.csv')),labels)
     (path.parent/'result.json').write_text(json.dumps(dict(objective='macroF1',selected_on_public=True,
-        models=args.models,weights=args.weights,team_router=router,team_routers=multiple,
+        models=args.models,weights=args.weights,team_router=router,team_routers=multiple,temporal=temporal,
         macroF1=result['macro_f1'],
         spellF1=result['spell_f1_mean'],params=asdict(p)),indent=2)+'\n')
     report(result)

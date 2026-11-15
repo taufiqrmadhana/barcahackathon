@@ -12,7 +12,7 @@ from pathlib import Path
 import joblib
 import numpy as np
 
-from . import batches, contact, hsmm, model_v2, pipeline_v2, validator, video_provenance
+from . import batches, contact, hsmm, model_v2, pipeline_v2, spell_consensus, validator, video_provenance
 from .config_valdi import ParamsV2
 from .film_features import Store
 from .paths import SRC
@@ -21,7 +21,9 @@ VERSION = 1
 ENSEMBLE_VERSION = 2
 ROUTED_ENSEMBLE_VERSION = 3
 MULTI_ROUTED_ENSEMBLE_VERSION = 4
-ENSEMBLE_VERSIONS = (ENSEMBLE_VERSION, ROUTED_ENSEMBLE_VERSION, MULTI_ROUTED_ENSEMBLE_VERSION)
+TEMPORAL_ENSEMBLE_VERSION = 5
+ENSEMBLE_VERSIONS = (ENSEMBLE_VERSION, ROUTED_ENSEMBLE_VERSION,
+                     MULTI_ROUTED_ENSEMBLE_VERSION, TEMPORAL_ENSEMBLE_VERSION)
 CURRENT = ('current_team', 'current_dead', 'current_H', 'current_A', 'current_D',
            'current_shape_H', 'current_shape_D')
 # Discrete decoder outputs and durations can make the video head repeat an early
@@ -281,7 +283,7 @@ def prune_unconfirmed(labels, proba, mask, blocks, maximum=100, minimum=.5):
     return out
 
 
-def combine_artifacts(members, weights, team_router=None, team_routers=None):
+def combine_artifacts(members, weights, team_router=None, team_routers=None, temporal=None):
     """Combine aligned held-out heads; a member cannot borrow another fold's labels."""
     weights = np.asarray(weights, dtype=float)
     if (len(members) < 2 or weights.shape != (len(members),)
@@ -323,6 +325,28 @@ def combine_artifacts(members, weights, team_router=None, team_routers=None):
     elif team_routers is not None:
         out['team_routers'] = [dict(router) for router in routers]
         out['version'] = MULTI_ROUTED_ENSEMBLE_VERSION
+    if temporal is not None:
+        required = {'oscillation_max_frames', 'consensus_weights',
+                    'consensus_max_frames', 'consensus_min_iou'}
+        if set(temporal) not in (required, required | {'consensus_dead_weight'}):
+            raise ValueError('temporal consensus metadata differs')
+        for key, minimum in [('oscillation_max_frames', 0), ('consensus_max_frames', 1)]:
+            value = temporal[key]
+            if (not isinstance(value, (int, np.integer)) or isinstance(value, bool)
+                    or value < minimum):
+                raise ValueError('temporal spell lengths must be nonnegative integers')
+        auxiliary = np.asarray(temporal['consensus_weights'], dtype=float)
+        if (auxiliary.shape != weights.shape or not np.isfinite(auxiliary).all()
+                or (auxiliary < 0).any() or auxiliary.sum() <= 0):
+            raise ValueError('supply finite nonnegative consensus weights for every member')
+        if not 0 < temporal['consensus_min_iou'] <= 1:
+            raise ValueError('consensus IoU must be in (0, 1]')
+        dead_weight = temporal.get('consensus_dead_weight', 0.)
+        if not 0 <= dead_weight <= 1:
+            raise ValueError('consensus dead probability weight must be in [0, 1]')
+        out['temporal'] = dict(temporal, consensus_weights=auxiliary / auxiliary.sum(),
+                               consensus_dead_weight=dead_weight)
+        out['version'] = TEMPORAL_ENSEMBLE_VERSION
     for key in ('tracking_ball_sha256','base_params'):
         if any(key in member for member in members):
             if not all(key in member for member in members):
@@ -367,8 +391,31 @@ def route_teams(primary, expert, mask, primary_max=.8, expert_min=.9):
     return out
 
 
+def blend_dead_probability(primary, auxiliary, mask, weight):
+    """Average only P(D), preserving primary conditional H/A odds exactly.
+
+    The auxiliary is another same-fold prediction. Missing evidence, all-dead
+    primary rows with undefined H/A odds, and uncovered frames abstain.
+    """
+    if not 0 <= weight <= 1:
+        raise ValueError('auxiliary dead probability weight must be in [0, 1]')
+    out = primary.copy()
+    if weight == 0:
+        return out
+    alive = primary[:, :2].sum(axis=1)
+    valid = (mask & np.isfinite(primary).all(axis=1) & np.isfinite(auxiliary).all(axis=1)
+             & (alive > 0) & (primary[:, 2] >= 0) & (primary[:, 2] <= 1)
+             & (auxiliary[:, 2] >= 0) & (auxiliary[:, 2] <= 1))
+    dead = (1 - weight) * primary[valid, 2] + weight * auxiliary[valid, 2]
+    out[valid, :2] *= ((1 - dead) / alive[valid])[:, None]
+    out[valid, 2] = dead
+    return out
+
+
 def refine(inputs, p, baseline, emit, bonus, shape, artifact, prepared=None):
     experts = []
+    auxiliary_members, auxiliary_weights, auxiliary_views = [], [], []
+    temporal = None
     if artifact['version'] == VERSION:
         members, weights = [artifact], np.array([1.])
         views = [prepared if prepared is not None else prepare_features(
@@ -376,23 +423,34 @@ def refine(inputs, p, baseline, emit, bonus, shape, artifact, prepared=None):
     elif artifact['version'] in ENSEMBLE_VERSIONS:
         all_members = artifact['members']
         checked = combine_artifacts(all_members, artifact['weights'], artifact.get('team_router'),
-                                    artifact.get('team_routers'))
+                                    artifact.get('team_routers'), artifact.get('temporal'))
         if checked['version'] != artifact['version']:
-            raise ValueError('ensemble schema and team router metadata differ')
+            raise ValueError('ensemble schema and routing/temporal metadata differ')
         all_weights = checked['weights']
         routers = checked.get('team_routers', [checked['team_router']] if 'team_router' in checked else [])
         if prepared is not None and (not isinstance(prepared,list) or len(prepared) != len(all_members)):
             raise ValueError('ensemble inference needs one prepared feature view per member')
+        feature_views = {}
+        def view_for(i):
+            if i not in feature_views:
+                feature_views[i] = (prepared[i] if prepared is not None else
+                                    prepare_features(inputs,p,baseline,emit,shape,all_members[i]))
+            return feature_views[i]
         active = np.flatnonzero(all_weights > 0)
         members = [all_members[i] for i in active]
         weights = all_weights[active]
-        views = ([prepared[i] for i in active] if prepared is not None else
-                 [prepare_features(inputs,p,baseline,emit,shape,m) for m in members])
+        views = [view_for(i) for i in active]
         for router in routers:
             expert = all_members[router['expert']]
-            expert_view = (prepared[router['expert']] if prepared is not None else
-                           prepare_features(inputs,p,baseline,emit,shape,expert))
+            expert_view = view_for(router['expert'])
             experts.append((router, expert, expert_view))
+        temporal = checked.get('temporal')
+        if temporal is not None:
+            auxiliary_weights = temporal['consensus_weights']
+            active_auxiliary = np.flatnonzero(auxiliary_weights > 0)
+            auxiliary_members = [all_members[i] for i in active_auxiliary]
+            auxiliary_weights = auxiliary_weights[active_auxiliary]
+            auxiliary_views = [view_for(i) for i in active_auxiliary]
     else:
         raise ValueError('hybrid checkpoint schema differs')
     mask = np.logical_and.reduce([view[1] for view in views])
@@ -407,7 +465,12 @@ def refine(inputs, p, baseline, emit, bonus, shape, artifact, prepared=None):
         expert_rows = np.flatnonzero(expert_mask)
         expert_x = validator.matrix(expert_view[0], expert['names'], expert_rows)
         expert_data.append((router, expert_mask, expert_rows, expert_x))
-    def predict(models, expert_models):
+    if temporal is not None:
+        auxiliary_mask = np.logical_and.reduce([view[1] for view in auxiliary_views])
+        auxiliary_rows = np.flatnonzero(auxiliary_mask)
+        auxiliary_matrices = [validator.matrix(view[0], member['names'], auxiliary_rows)
+                              for view, member in zip(auxiliary_views, auxiliary_members)]
+    def predict(models, expert_models, auxiliary_models):
         q = np.full((inputs.n, 3), np.nan)
         if len(models) == 1:
             q[rows] = validator._proba3(models[0],matrices[0])
@@ -420,8 +483,24 @@ def refine(inputs, p, baseline, emit, bonus, shape, artifact, prepared=None):
             other = np.full((inputs.n, 3), np.nan)
             other[expert_rows] = validator._proba3(expert_model, expert_x)
             q = route_teams(q, other, expert_mask, router['primary_max'], router['expert_min'])
-        return decode(inputs,p,baseline,emit,bonus,q,mask)
-    output = predict([member['full'] for member in members], [expert['full'] for _,expert,_ in experts])
+        if temporal is not None:
+            auxiliary_q = np.full((inputs.n, 3), np.nan)
+            if len(auxiliary_rows):
+                auxiliary_q[auxiliary_rows] = sum(weight * validator._proba3(model,x)
+                    for weight,model,x in zip(auxiliary_weights,auxiliary_models,auxiliary_matrices))
+            q = blend_dead_probability(q, auxiliary_q, mask & auxiliary_mask,
+                                       temporal['consensus_dead_weight'])
+        labels = decode(inputs,p,baseline,emit,bonus,q,mask)
+        if temporal is not None:
+            labels = spell_consensus.remove_oscillations(
+                labels, q, mask, inputs.blocks, temporal['oscillation_max_frames'])
+            auxiliary_labels = decode(inputs,p,baseline,emit,bonus,auxiliary_q,auxiliary_mask)
+            labels = spell_consensus.extend_agreed_spells(
+                labels, auxiliary_labels, mask & auxiliary_mask, inputs.blocks,
+                temporal['consensus_max_frames'], temporal['consensus_min_iou'])
+        return labels
+    output = predict([member['full'] for member in members], [expert['full'] for _,expert,_ in experts],
+                     [member['full'] for member in auxiliary_members])
     # Independent whole-half decoding per held-out model prevents decoding neighbours
     # with a model trained on the held-out labels and bleeding those labels back in.
     reference = members[0]
@@ -430,7 +509,8 @@ def refine(inputs, p, baseline, emit, bonus, shape, artifact, prepared=None):
                   0, reference['folds'] - 1)
     for f in range(reference['folds']):
         labels = predict([member['heads'][f] for member in members],
-                         [expert['heads'][f] for _,expert,_ in experts])
+                         [expert['heads'][f] for _,expert,_ in experts],
+                         [member['heads'][f] for member in auxiliary_members])
         held = public[ids == f]
         output[held] = labels[held]
     return output
