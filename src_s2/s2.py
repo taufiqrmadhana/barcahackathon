@@ -82,23 +82,6 @@ def kick_span(sigma, p):
     return m
 
 
-def noise_floors(sigma, p):
-    """Quantiles of |v| and of the velocity change |v(t+k)-v(t-k)| that pure iid position noise of
-    std `sigma` produces after the SAME smoothing + velocity pipeline (seeded simulation).
-    Returns (v_floor, dv_floor) for the quantile p.noise_q."""
-    n = 6000
-    rng = np.random.default_rng(12345)
-    nx, ny = rng.normal(0, sigma, n), rng.normal(0, sigma, n)
-    ones = np.ones(n, bool)
-    nx, ny = smooth(nx, ny, ones, p)
-    vx, vy = velocity(nx, ny)
-    k = p.kick_k
-    dv = np.hypot(vx[2 * k:] - vx[:-2 * k], vy[2 * k:] - vy[:-2 * k])
-    v = np.hypot(vx[2:-2], vy[2:-2])
-    q = p.noise_q
-    return float(np.quantile(v, q)), float(np.nanquantile(dv, q))
-
-
 def clean_ball(bx, by, p, info=None):
     """Drop teleports (points far from a 5-frame running median), interpolate gaps <= max_gap."""
     seen = ~np.isnan(bx)
@@ -137,7 +120,7 @@ def clean_ball(bx, by, p, info=None):
 
 
 # --------------------------------------------------------------------------------------- contacts
-def contacts(inp, x, y, vx, vy, p, floors=None, m=None):
+def contacts(inp, x, y, vx, vy, p, m=None):
     """Per-frame contact team (H/A, -1 none) and per-team nearest distances."""
     teams = inp["teams"]
     px, py = inp["px"], inp["py"]
@@ -161,28 +144,34 @@ def contacts(inp, x, y, vx, vy, p, floors=None, m=None):
     dv = np.zeros(len(x))
     dv[k:-k] = np.hypot(vx[2 * k:] - vx[:-2 * k], vy[2 * k:] - vy[:-2 * k])
     dv = np.nan_to_num(dv)
-    kick_dv, carry_rel = p.kick_dv, p.carry_rel
-    if floors is not None:
-        # S8: a velocity change / relative speed that iid noise of the measured level produces at
-        # quantile noise_q after the same smoothing is not evidence of a touch
-        if p.on("kick_noise", 0):
-            kick_dv = max(kick_dv, floors[1])
-        if p.on("carry_noise", 0):
-            carry_rel = max(carry_rel, floors[0])
     # second-closest opponent margin: ambiguous if both teams equally close
     other = np.where(team == 0, dA, dH)
     with np.errstate(invalid="ignore"):
         clear = np.nan_to_num(other - dmin, nan=0.0, posinf=99.0) >= p.clear_margin
 
-    kick = (dv >= kick_dv) & (dmin <= p.r_touch)
+    kick = (dv >= p.kick_dv) & (dmin <= p.r_touch)
     # local maximum of dv within +-k
     from scipy.ndimage import maximum_filter1d
     if p.on("use_kick_localmax"):
         kick &= dv >= maximum_filter1d(dv, 2 * k + 1)
     kick_raw = kick.copy()  # restart detection in dead_mask uses this one
+    gap_kick = np.zeros(len(x), bool)
+    if p.on("use_gap_kick", 0):
+        # S8: the kick detector needs the ball velocity BEFORE the strike, which a ball-less gap
+        # hides. A ball that reappears (after >= mem_gap_before missing frames) within r_touch of a
+        # player and leaves at > restart_speed is that player's touch (a regain or a restart).
+        g = int(p.get("mem_gap_before", 25))
+        ok = ~np.isnan(x)
+        for r0, r1 in runs(ok):
+            if r0 < g or ok[r0 - g:r0].any() or r1 - r0 < 6:
+                continue
+            fwd = np.hypot(x[r0 + 5] - x[r0], y[r0 + 5] - y[r0]) / 5 * FPS
+            if fwd >= p.restart_speed and dmin[r0] <= p.r_touch:
+                gap_kick[r0] = True
+        kick = kick | gap_kick
     if not p.on("use_kick"):
         kick &= False
-    carry = (dmin <= p.r_carry) & (np.nan_to_num(rel, nan=99) <= carry_rel)
+    carry = (dmin <= p.r_carry) & (np.nan_to_num(rel, nan=99) <= p.carry_rel)
     if not p.on("use_carry"):
         carry &= False
     if not p.on("use_clear"):
@@ -190,7 +179,7 @@ def contacts(inp, x, y, vx, vy, p, floors=None, m=None):
     c = np.full(len(x), -1, np.int8)
     c[(carry | kick) & clear] = team[(carry | kick) & clear]
     c[np.isinf(dmin)] = -1
-    return {"c": c, "kick": kick, "kick_raw": kick_raw, "carry": carry, "dH": dH, "dA": dA, "dmin": dmin,
+    return {"c": c, "kick": kick, "kick_raw": kick_raw, "gap_kick": gap_kick, "carry": carry, "dH": dH, "dA": dA, "dmin": dmin,
             "team": team, "dv": dv, "near": near}
 
 
@@ -238,7 +227,7 @@ def contact_runs(c, kick, p):
     return out
 
 
-def owner_from_runs(cruns, n, p):
+def owner_from_runs(cruns, n, p, gap_kick=None):
     """Owner = team of the contact runs; across a flight from team X (released at r) to team Y
     (first contact s) the switch is placed at r + alpha * (s - r): alpha 0 = the receiver owns the
     ball from the release (next-touch convention), alpha 1 = last-touch convention."""
@@ -254,6 +243,8 @@ def owner_from_runs(cruns, n, p):
             else:
                 s = max(a, pb)
                 cut = int(round(pb + p.alpha * (s - pb)))
+                if gap_kick is not None and gap_kick[a] and p.on("use_gap_cut"):
+                    cut = s  # S8: a regain after a ball-less gap: the old owner holds until that touch
                 own[pb:cut] = pt
                 own[cut:b] = team
         # overlapping runs: later start wins from its start
@@ -265,7 +256,7 @@ def owner_from_runs(cruns, n, p):
 
 
 # ------------------------------------------------------------------------------------------- dead
-def dead_mask(inp, x, y, valid, seen, vx, vy, kick, p):
+def dead_mask(inp, x, y, valid, seen, vx, vy, kick, p, gap_kick=None):
     """Frame-level dead ball from three mechanical signals, then min-duration cleanup.
 
     out    the (cleaned, seen) ball is beyond a pitch line by > out_margin metres; the stoppage
@@ -384,6 +375,8 @@ def dead_mask(inp, x, y, valid, seen, vx, vy, kick, p):
     if p.on("use_min_alive"):
         for a, b in runs(~dead):
             if 0 < a and b < n and b - a < p.min_alive:
+                if gap_kick is not None and gap_kick[a:b].any() and not out[a:b].any():
+                    continue  # S8: an island that starts with a touch after a ball-less gap is a regain
                 dead[a:b] = True
     if p.on("use_min_dead"):
         for a, b in runs(dead):
@@ -437,15 +430,14 @@ def predict(inp, p, debug=False):
         by = by + rng.normal(0, p.noise_sigma, by.shape)
     info = {}
     x, y, valid, seen, vx, vy = clean_ball(bx, by, p, info)
-    floors = noise_floors(info["sigma"], p) if p.get("noise_q", 0) > 0 else None
     m = kick_span(info["sigma"], p)
     info["span"] = m
-    con = contacts(inp, x, y, vx, vy, p, floors, m)
+    con = contacts(inp, x, y, vx, vy, p, m)
     cruns = contact_runs(con["c"], con["kick"], p)
-    own = shift(owner_from_runs(cruns, inp["n"], p), p.lag)
+    own = shift(owner_from_runs(cruns, inp["n"], p, con["gap_kick"]), p.lag)
     if inp.get("shape") is not None and p.get("shape_gap", 0) > 0 and p.on("use_shape_gap"):
-        own = shape_gaps(own, valid, inp["shape"], cruns, p)
-    dead, dd = dead_mask(inp, x, y, valid, seen, vx, vy, con["kick_raw"], p)
+        own = shape_gaps(own, valid, inp["shape"], cruns, p, con["gap_kick"])
+    dead, dd = dead_mask(inp, x, y, valid, seen, vx, vy, con["kick_raw"], p, con["gap_kick"])
     lab = assemble(own, dead, cruns, p, inp.get("shape") if p.get("shape_gap", 0) > 0 else None)
     if debug:
         return lab, {"con": con, "cruns": cruns, "own": own, "dead": dead, **dd, "seen": seen}
@@ -463,7 +455,7 @@ def shift(arr, lag, fill=-1):
     return out
 
 
-def shape_gaps(own, valid, proba, cruns, p):
+def shape_gaps(own, valid, proba, cruns, p, gap_kick=None):
     """Owner inside ball-missing gaps (>= shape_gap frames) from the team-shape model.
 
     Inside a gap the contact logic has nothing to say: it holds the last owner X and, if the next
@@ -490,6 +482,8 @@ def shape_gaps(own, valid, proba, cruns, p):
         if X < 0 or Y < 0:
             continue
         rY = r if Y == 1 else 1 - r
+        if X != Y and gap_kick is not None and p.on("use_gap_cut") and j < len(starts) and gap_kick[starts[j]]:
+            continue  # S8: regain after the gap, handled by owner_from_runs
         if X != Y and p.on("use_shape_gap_switch"):
             fav = rY[a:b] > 0.5
             if fav[-1]:
