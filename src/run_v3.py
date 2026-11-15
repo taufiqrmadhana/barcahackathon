@@ -69,7 +69,7 @@ def cmd_extract(inputs, params, gt, args):
         chosen = rng.choice(len(chunks), min(len(chunks),
                             max(1,args.max_samples // args.chunk)), replace=False)
         frames = np.sort(np.concatenate([chunks[j] for j in chosen]))
-    store = film_features.Store(args.interp)
+    store = film_features.Store(args.cache_kind or args.interp)
     todo = store.missing(frames)
     print("{} samples in scope '{}', {} cached, {} to extract".format(
         len(frames), 'frame plan' if args.frames else args.scope,
@@ -82,7 +82,7 @@ def cmd_extract(inputs, params, gt, args):
 
 
 def cmd_run(inputs, params, gt, args):
-    store = film_features.Store(args.interp)
+    store = film_features.Store(args.cache_kind or args.interp)
     layer = pipeline.Layer(inputs, params, gt, store,
                            fusion=validator.FusionConfig(weight=args.weight),
                            train_stride=args.train_stride)
@@ -151,6 +151,7 @@ def main():
     parser.add_argument("command", choices=("batches", "extract", "run"))
     parser.add_argument("--params", default=V2_PARAMS)
     parser.add_argument("--interp", default="film", choices=("film",))
+    parser.add_argument("--cache-kind", help="separate feature cache name; keeps earlier extraction reproducible")
     parser.add_argument("--scope", default="public", choices=("public", "all"))
     parser.add_argument("--stride", type=int, default=batch_sel.BatchConfig.stride)
     parser.add_argument("--chunk", type=int, default=32)

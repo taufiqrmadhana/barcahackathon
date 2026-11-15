@@ -3,8 +3,9 @@
 This records the November 12 merge at 3d641db; its exact configuration is now
 `configs/pre_pruning.json`. The November 15 default adds the confidence rule documented in
 [PRUNING_EXPERIMENTS.md](PRUNING_EXPERIMENTS.md), followed by the classifier blend in
-[BLEND_EXPERIMENTS.md](BLEND_EXPERIMENTS.md). The fitting commands below reproduce the
-original single classifier; the blend document has the current fitting command.
+[BLEND_EXPERIMENTS.md](BLEND_EXPERIMENTS.md). The current video-density configuration is in
+[DENSE_VIDEO_EXPERIMENTS.md](DENSE_VIDEO_EXPERIMENTS.md). The fitting commands below reproduce
+the original single classifier; the density document has the current fitting command.
 
 `origin/valdi` at 6511c13 is merged into `taufiq`, including its metadata, homography,
 video reader, FILM extractor, batch selection, validator and v2/v3 command-line tools.

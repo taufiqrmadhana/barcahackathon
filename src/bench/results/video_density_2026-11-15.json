@@ -1,0 +1,649 @@
+{
+  "date": "2026-11-15",
+  "baseline_commit": "de7cd5b",
+  "selected_on_public": true,
+  "private_score_known": false,
+  "public_gt_possessions": 17,
+  "method": "Add 482 FILM samples on a uniform public 2.5 Hz grid, retain 1 Hz training and the same 1:3 logistic blend",
+  "selection": "Official spellF1 priority; +0.035294 spellF1 with -0.000764 macroF1 relative to intermediate blend",
+  "params": {
+    "player_margin": 5.0,
+    "max_player_speed": 12.0,
+    "vel_k": 2,
+    "ball_spike_speed": 45.0,
+    "ball_island_len": 3,
+    "ball_island_gap": 50,
+    "max_gap": 12,
+    "ctrl_radius": 1.3,
+    "ctrl_softness": 0.35,
+    "sync_free": 2.5,
+    "sync_scale": 3.0,
+    "filled_trust": 0.6,
+    "corner_zone": 3.0,
+    "still_speed": 1.2,
+    "slow_window": 50,
+    "ball_smooth": 9,
+    "touch_k": 3,
+    "touch_dv": 3.5,
+    "touch_spacing": 6,
+    "touch_radius": 2.0,
+    "touch_margin": 1.5,
+    "duel_radius": 1.5,
+    "seq_max_gap": 100,
+    "pass_min_travel": 5.0,
+    "shot_speed": 18.0,
+    "shot_range": 35.0,
+    "out_margin": 0.5,
+    "out_min_frames": 3,
+    "vanish_min_frames": 50,
+    "vanish_horizon": 0.4,
+    "decel_window": 25,
+    "decel_drop": 1.2,
+    "decel_to": 1.6,
+    "decel_lead": 20,
+    "rest_speed": 1.8,
+    "placed_min_frames": 25,
+    "placed_calm_speed": 1.8,
+    "restart_kick_speed": 5.0,
+    "kick_within": 20,
+    "reappear_min_frames": 75,
+    "dead_min_gap": 50,
+    "dead_max_gap": 2250,
+    "hold_kinds": "goal_line,touchline,vanish",
+    "hold_goal_line": 200,
+    "hold_touchline": 75,
+    "shape_folds": 8,
+    "shape_guard": 250,
+    "shape_stride": 3,
+    "shape_iter": 150,
+    "shape_eps": 0.05,
+    "shape_rounds": 2,
+    "shape_conf": 0.0,
+    "ctrl_eps": 0.05,
+    "w_ball": 1.0,
+    "w_shape": 1.0,
+    "w_shape_known": 0.0,
+    "w_tag": 0.0,
+    "w_dead": 1.0,
+    "d_bias": 0.0,
+    "w_out": 6.0,
+    "w_out_carry": 3.0,
+    "slow_speed": 1.3,
+    "slow_scale": 0.3,
+    "w_slow": 1.0,
+    "dead_gap": 75,
+    "w_missing": 0.0,
+    "w_missing_slow": 0.5,
+    "w_still": 2.0,
+    "w_shape_dead": 0.5,
+    "alive_ball_speed": 6.0,
+    "w_alive": 3.0,
+    "w_hold": 5.0,
+    "w_post_restart": 2.0,
+    "post_restart_frames": 50,
+    "w_tag_dead": 1.0,
+    "tag_dead_frames": 25,
+    "z_max": 4.0,
+    "loose_cost": 1.0,
+    "switch_cost": 16.0,
+    "tackle_extra": 5.0,
+    "dead_entry_cost": 20.0,
+    "dead_exit_cost": 30.0,
+    "dead_min_frames": 100,
+    "w_turnover": 8.0,
+    "w_touch": 4.0,
+    "w_duel": 2.0,
+    "touch_before": 2,
+    "touch_after": 10,
+    "w_stoppage": 8.0,
+    "stop_before": 10,
+    "stop_after": 25,
+    "w_shot_dead": 3.0,
+    "shot_window": 75,
+    "w_restart": 8.0,
+    "restart_before": 10,
+    "restart_after": 10,
+    "ownership_model": "pretrain_data/ownership_v2/ownership_all.joblib",
+    "supervised_shape_model": "pretrain_data/ownership_v2/shape_all.joblib",
+    "pre_kickoff_dead": 1,
+    "goal_dead": 1,
+    "whistle_thresh": 24.0,
+    "w_whistle": 10.0,
+    "w_whistle_confirmed": 16.0,
+    "whistle_lag": 10,
+    "ball_source": "fused_full",
+    "whistle_min_speed": 1.8,
+    "w_whistle_dead": 2.0,
+    "whistle_hold": 150,
+    "inner_restarts": 0,
+    "w_contact": 1.0,
+    "contact_alpha": 0.5,
+    "contact_window": 125,
+    "contact_lock_dead": 1,
+    "contact_min_frames": 12,
+    "contact_switch_cost": 4.0,
+    "contact_local_switch": 0,
+    "hybrid_model": "pretrain_data/valdi_hybrid_dense/film_logreg_blend.joblib",
+    "hybrid_weight": 1.0,
+    "hybrid_lock_dead": 1,
+    "hybrid_prune_max_frames": 100,
+    "hybrid_prune_min_confidence": 0.5
+  },
+  "frame_plan": {
+    "path": "src/cv/frames/valdi_film_dense.txt",
+    "sha256": "b255f986e47bf0217d756441c6f1dc12f5926568e58a00f8c4fa626562bed038",
+    "samples": 1739,
+    "new_samples": 482,
+    "first_half_samples": 1332,
+    "second_half_samples": 407
+  },
+  "extraction": {
+    "runtime_seconds": 599,
+    "device": "CPU",
+    "new_mean_residual_finite": 482,
+    "preserves_original_values": true,
+    "isolated_cache_kind": "film_dense",
+    "repeated_extraction_missing": 0
+  },
+  "verification": {
+    "before_csv_sha256": "ada979ed66fd04aa2f67841e8461827cb5cd87d0acae685e5a570002c67617a8",
+    "fit_cli_csv_sha256": "aed71af7e7877eca53973a197ce25ad9be88666624c3dbed3afa1d743d3d1593",
+    "classifier_sha256": "67735d79f0679e3158c92e9246119f7721176cd1b9b7d3f85bcb046b97b925bd",
+    "feature_cache_sha256": {
+      "film": "c73d94a957e7965d2a2a5ea7d685436e9b4d68691cbae65289a41f7183dd0e60",
+      "film_dense": "3e1e431ceb65342ac3ea3d7ff5bf10e8eaadfeb19a84df64f64f75b8498130c8"
+    },
+    "changed_frames": 148,
+    "public_changed_frames": 138,
+    "D_frames_changed": 0,
+    "outside_video_frames_changed": 0,
+    "frozen_shape_parity": true,
+    "old_default_exact": true,
+    "cached_probe_parity": true,
+    "results": [
+      {
+        "name": "before",
+        "spellF1": 0.7529411764705882,
+        "macroF1": 0.9353475547448816,
+        "public_possessions": 17,
+        "per_class": {
+          "H": {
+            "precision": 0.9610630407911002,
+            "recall": 0.9004053271569196,
+            "f1": 0.9297458893871451,
+            "support": 3454
+          },
+          "A": {
+            "precision": 0.9075292397660819,
+            "recall": 0.9635234769111369,
+            "f1": 0.9346884999058912,
+            "support": 2577
+          },
+          "D": {
+            "precision": 0.9234293193717278,
+            "recall": 0.9605173587474473,
+            "f1": 0.9416082749416084,
+            "support": 1469
+          }
+        },
+        "transition_f1_1s": 0.65,
+        "full_match": [
+          404,
+          0.4612764939536816,
+          129
+        ]
+      },
+      {
+        "name": "selected",
+        "spellF1": 0.788235294117647,
+        "macroF1": 0.934583918191877,
+        "public_possessions": 17,
+        "per_class": {
+          "H": {
+            "precision": 0.9444776119402986,
+            "recall": 0.9160393746381007,
+            "f1": 0.9300411522633745,
+            "support": 3454
+          },
+          "A": {
+            "precision": 0.9241037376048817,
+            "recall": 0.9402405898331393,
+            "f1": 0.9321023273706481,
+            "support": 2577
+          },
+          "D": {
+            "precision": 0.9234293193717278,
+            "recall": 0.9605173587474473,
+            "f1": 0.9416082749416084,
+            "support": 1469
+          }
+        },
+        "transition_f1_1s": 0.65,
+        "full_match": [
+          404,
+          0.4612764939536816,
+          129
+        ]
+      }
+    ],
+    "selected_csv_sha256": "aed71af7e7877eca53973a197ce25ad9be88666624c3dbed3afa1d743d3d1593",
+    "submission_rows": 199319,
+    "official_format_valid": true,
+    "fit_and_inference_csv_byte_identical": true,
+    "hybrid_contract_tests_passed": 28,
+    "original_samples_preserved_exactly": true,
+    "original_cache_unchanged": true,
+    "extraction_idempotent": true
+  },
+  "fold_audit": [
+    {
+      "folds": 3,
+      "kind": "film",
+      "samples": 1257,
+      "training_rows": 301,
+      "spellF1": 0.6947368421052631,
+      "macroF1": 0.9248419639571771,
+      "public_possessions": 21,
+      "transition_f1_1s": 0.5909090909090908,
+      "changed_frames": 0,
+      "public_changed_frames": 0
+    },
+    {
+      "folds": 3,
+      "kind": "film_dense",
+      "samples": 1739,
+      "training_rows": 301,
+      "spellF1": 0.6736842105263157,
+      "macroF1": 0.924743528703269,
+      "public_possessions": 21,
+      "transition_f1_1s": 0.5909090909090908,
+      "changed_frames": 31,
+      "public_changed_frames": 21
+    },
+    {
+      "folds": 4,
+      "kind": "film",
+      "samples": 1257,
+      "training_rows": 301,
+      "spellF1": 0.5894736842105264,
+      "macroF1": 0.9159216505003623,
+      "public_possessions": 21,
+      "transition_f1_1s": 0.5,
+      "changed_frames": 0,
+      "public_changed_frames": 0
+    },
+    {
+      "folds": 4,
+      "kind": "film_dense",
+      "samples": 1739,
+      "training_rows": 301,
+      "spellF1": 0.725,
+      "macroF1": 0.9272526078629783,
+      "public_possessions": 15,
+      "transition_f1_1s": 0.5789473684210527,
+      "changed_frames": 160,
+      "public_changed_frames": 150
+    },
+    {
+      "folds": 5,
+      "kind": "film",
+      "samples": 1257,
+      "training_rows": 301,
+      "spellF1": 0.7529411764705882,
+      "macroF1": 0.9353475547448816,
+      "public_possessions": 17,
+      "transition_f1_1s": 0.65,
+      "changed_frames": 0,
+      "public_changed_frames": 0
+    },
+    {
+      "folds": 5,
+      "kind": "film_dense",
+      "samples": 1739,
+      "training_rows": 301,
+      "spellF1": 0.788235294117647,
+      "macroF1": 0.934583918191877,
+      "public_possessions": 17,
+      "transition_f1_1s": 0.65,
+      "changed_frames": 148,
+      "public_changed_frames": 138
+    },
+    {
+      "folds": 6,
+      "kind": "film",
+      "samples": 1257,
+      "training_rows": 301,
+      "spellF1": 0.6842105263157895,
+      "macroF1": 0.9292267253020624,
+      "public_possessions": 21,
+      "transition_f1_1s": 0.5909090909090908,
+      "changed_frames": 0,
+      "public_changed_frames": 0
+    },
+    {
+      "folds": 6,
+      "kind": "film_dense",
+      "samples": 1739,
+      "training_rows": 301,
+      "spellF1": 0.7333333333333332,
+      "macroF1": 0.9390351194896235,
+      "public_possessions": 19,
+      "transition_f1_1s": 0.6666666666666666,
+      "changed_frames": 99,
+      "public_changed_frames": 89
+    }
+  ],
+  "public_explorations": {
+    "boundary": [
+      {
+        "radius": 0,
+        "penalty": 0,
+        "spellF1": 0.7529411764705882,
+        "macroF1": 0.9353475547448816,
+        "possessions": 17
+      },
+      {
+        "radius": 12,
+        "penalty": 0,
+        "spellF1": 0.7411764705882352,
+        "macroF1": 0.937587037673119,
+        "possessions": 17
+      },
+      {
+        "radius": 25,
+        "penalty": 0,
+        "spellF1": 0.6705882352941177,
+        "macroF1": 0.9340666320315076,
+        "possessions": 17
+      },
+      {
+        "radius": 50,
+        "penalty": 0,
+        "spellF1": 0.6705882352941177,
+        "macroF1": 0.93383933418959,
+        "possessions": 17
+      },
+      {
+        "radius": 25,
+        "penalty": 0.25,
+        "spellF1": 0.6941176470588235,
+        "macroF1": 0.9332809427604838,
+        "possessions": 17
+      },
+      {
+        "radius": 50,
+        "penalty": 0.25,
+        "spellF1": 0.6941176470588235,
+        "macroF1": 0.9331673040381627,
+        "possessions": 17
+      }
+    ],
+    "tag": [
+      {
+        "features": "tag_team",
+        "model": "logreg",
+        "spellF1": 0.7444444444444445,
+        "macroF1": 0.923573643000139,
+        "possessions": 19
+      },
+      {
+        "features": "tag_team",
+        "model": "logreg_blend",
+        "spellF1": 0.7411764705882353,
+        "macroF1": 0.9341377639415599,
+        "possessions": 17
+      },
+      {
+        "features": "tags",
+        "model": "logreg",
+        "spellF1": 0.6631578947368422,
+        "macroF1": 0.9199629691640213,
+        "possessions": 21
+      },
+      {
+        "features": "tags",
+        "model": "logreg_blend",
+        "spellF1": 0.7000000000000001,
+        "macroF1": 0.9353350849881785,
+        "possessions": 19
+      }
+    ],
+    "spellweight": [
+      {
+        "power": 0.25,
+        "blend": false,
+        "spellF1": 0.6666666666666667,
+        "macroF1": 0.932085333727481,
+        "possessions": 19
+      },
+      {
+        "power": 0.25,
+        "blend": true,
+        "spellF1": 0.7250000000000001,
+        "macroF1": 0.9352661116582824,
+        "possessions": 15
+      },
+      {
+        "power": 0.5,
+        "blend": false,
+        "spellF1": 0.6666666666666667,
+        "macroF1": 0.9309505070717602,
+        "possessions": 19
+      },
+      {
+        "power": 0.5,
+        "blend": true,
+        "spellF1": 0.7250000000000001,
+        "macroF1": 0.9350399412362407,
+        "possessions": 15
+      },
+      {
+        "power": 1.0,
+        "blend": false,
+        "spellF1": 0.6555555555555557,
+        "macroF1": 0.9274531886472829,
+        "possessions": 19
+      },
+      {
+        "power": 1.0,
+        "blend": true,
+        "spellF1": 0.6875,
+        "macroF1": 0.9316346041026439,
+        "possessions": 15
+      }
+    ],
+    "video_scale": [
+      {
+        "features": "ratio",
+        "model": "logreg",
+        "spellF1": 0.7444444444444445,
+        "macroF1": 0.9241288991893878,
+        "possessions": 19
+      },
+      {
+        "features": "ratio",
+        "model": "logreg_blend",
+        "spellF1": 0.7222222222222221,
+        "macroF1": 0.9237615282906638,
+        "possessions": 19
+      },
+      {
+        "features": "log",
+        "model": "logreg",
+        "spellF1": 0.6631578947368422,
+        "macroF1": 0.9205354855462721,
+        "possessions": 21
+      },
+      {
+        "features": "log",
+        "model": "logreg_blend",
+        "spellF1": 0.7111111111111111,
+        "macroF1": 0.9350067766166403,
+        "possessions": 19
+      }
+    ],
+    "svm": [
+      {
+        "features": "full",
+        "svm_weight": 1.0,
+        "spellF1": 0.7333333333333333,
+        "macroF1": 0.9233604953389204,
+        "possessions": 19
+      },
+      {
+        "features": "full",
+        "svm_weight": 0.25,
+        "spellF1": 0.7444444444444445,
+        "macroF1": 0.9264633106636929,
+        "possessions": 19
+      },
+      {
+        "features": "soft",
+        "svm_weight": 1.0,
+        "spellF1": 0.6333333333333332,
+        "macroF1": 0.9379199711511689,
+        "possessions": 19
+      },
+      {
+        "features": "soft",
+        "svm_weight": 0.25,
+        "spellF1": 0.7294117647058823,
+        "macroF1": 0.9346758584284164,
+        "possessions": 17
+      }
+    ],
+    "regularization": [
+      {
+        "C": 0.1,
+        "l1_ratio": 0,
+        "spellF1": 0.7444444444444445,
+        "macroF1": 0.9253506897037026,
+        "possessions": 19
+      },
+      {
+        "C": 1.0,
+        "l1_ratio": 0,
+        "spellF1": 0.7111111111111112,
+        "macroF1": 0.9435055850246298,
+        "possessions": 19
+      },
+      {
+        "C": 0.3,
+        "l1_ratio": 0.5,
+        "spellF1": 0.7333333333333333,
+        "macroF1": 0.9330600439457332,
+        "possessions": 19
+      },
+      {
+        "C": 0.3,
+        "l1_ratio": 1.0,
+        "spellF1": 0.7157894736842104,
+        "macroF1": 0.9343076337580456,
+        "possessions": 21
+      }
+    ],
+    "contact_scale": [
+      {
+        "final_contact_weight": 0.0,
+        "spellF1": 0.6000000000000001,
+        "macroF1": 0.9295630661471309,
+        "possessions": 17
+      },
+      {
+        "final_contact_weight": 0.5,
+        "spellF1": 0.6777777777777777,
+        "macroF1": 0.9302435041091037,
+        "possessions": 19
+      },
+      {
+        "final_contact_weight": 2.0,
+        "spellF1": 0.6875,
+        "macroF1": 0.9283181353165594,
+        "possessions": 15
+      }
+    ],
+    "dense_film": [
+      {
+        "stride": 25,
+        "model": "logreg",
+        "C": 0.3,
+        "training_rows": 301,
+        "spellF1": 0.711111111111111,
+        "macroF1": 0.9234423561255216,
+        "possessions": 19
+      },
+      {
+        "stride": 25,
+        "model": "logreg_blend",
+        "C": 0.3,
+        "training_rows": 301,
+        "spellF1": 0.788235294117647,
+        "macroF1": 0.934583918191877,
+        "possessions": 17
+      },
+      {
+        "stride": 10,
+        "model": "logreg",
+        "C": 0.12,
+        "training_rows": 751,
+        "spellF1": 0.6526315789473685,
+        "macroF1": 0.9226275662949063,
+        "possessions": 21
+      },
+      {
+        "stride": 10,
+        "model": "logreg_blend",
+        "C": 0.12,
+        "training_rows": 751,
+        "spellF1": 0.7058823529411764,
+        "macroF1": 0.9299172495515743,
+        "possessions": 17
+      },
+      {
+        "stride": 10,
+        "model": "logreg",
+        "C": 0.3,
+        "training_rows": 751,
+        "spellF1": 0.6105263157894736,
+        "macroF1": 0.925502751262715,
+        "possessions": 21
+      },
+      {
+        "stride": 10,
+        "model": "logreg_blend",
+        "C": 0.3,
+        "training_rows": 751,
+        "spellF1": 0.6888888888888889,
+        "macroF1": 0.9339276365386437,
+        "possessions": 19
+      }
+    ],
+    "dense_peak": [
+      {
+        "peak_window": 11,
+        "spellF1": 0.7444444444444444,
+        "macroF1": 0.9288783166938384,
+        "possessions": 19
+      },
+      {
+        "peak_window": 41,
+        "spellF1": 0.6823529411764706,
+        "macroF1": 0.9354640116236664,
+        "possessions": 17
+      }
+    ]
+  },
+  "limits": [
+    "All selection and alternate time partitions reuse the same 17 public possessions",
+    "SpellF1 improves in three tested time partitions and decreases in one",
+    "MacroF1 is slightly lower than the intermediate default; that checkpoint and its original cache are preserved",
+    "No corrected private labels or unseen-match validation of this fixture-trained video head"
+  ],
+  "source_sha256": {
+    "src/run_v3.py": "5d4d02004770628019e71eccdeb3ef4ebc3c7249ff3ff217876964d78cf95f87",
+    "src/bench/video_density_bench.py": "e79c5a7f50b2b5ebc1c2c8c1fcb8b9f4d213aa0bcb07aa2fc771216626cd85fb",
+    "src/params.json": "6182d4c1028278754ff9ec00ed3657fb9436d9409b5a263d2de8ce9f2c6aa57a",
+    "src/possession/hybrid.py": "10253b449424947bba98ea9ed612cd6fcb89163d71b4c163ccff376ce44b94f3",
+    "src/bench/test_hybrid.py": "29fe5f3fcaab1ac8af1d2f14328b80e98eb76cf2edd7c1ee04f252b89081dd9a"
+  }
+}

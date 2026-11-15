@@ -1,5 +1,8 @@
 # Complementary video classifiers, November 15
 
+This records de7cd5b, now frozen in `configs/pre_dense.json`. The following video-density
+experiment and its small macroF1 tradeoff are in [DENSE_VIDEO_EXPERIMENTS.md](DENSE_VIDEO_EXPERIMENTS.md).
+
 The video head receives both continuous evidence and the earlier decoders' discrete labels.
 Those labels help on stable play but can repeat an earlier incorrect team assignment. A second
 classifier omits those labels and their derived durations. Averaging the two classifiers'

@@ -115,7 +115,7 @@
   "contact_min_frames": 12,
   "contact_switch_cost": 4.0,
   "contact_local_switch": 0,
-  "hybrid_model": "pretrain_data/valdi_hybrid_blend/film_logreg_blend.joblib",
+  "hybrid_model": "pretrain_data/valdi_hybrid_dense/film_logreg_blend.joblib",
   "hybrid_weight": 1.0,
   "hybrid_lock_dead": 1,
   "hybrid_prune_max_frames": 100,

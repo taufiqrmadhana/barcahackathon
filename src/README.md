@@ -4,11 +4,15 @@ Own pipeline for More than a Hack 2027, Phase 1. Everything outside `src/` is th
 repository (remote `upstream`), kept as is so `git pull upstream main` keeps working. The method,
 the possession rules and what was tried and dropped are in [TECHNICAL.md](TECHNICAL.md).
 
-Latest (November 15): blending the original video classifier with a classifier that omits
-discrete decoder labels raises public spellF1 to **0.7529**, macroF1 to **0.9353**.
-The previous 0.7444 / 0.9292 default is preserved in `configs/pre_blend.json`.
-SpellF1 gains vary with the time partition: [BLEND_EXPERIMENTS.md](BLEND_EXPERIMENTS.md)
-records the paired checks, fitting command and rejected ideas.
+Latest (November 15): denser FILM video raises public spellF1 to **0.7882**, with
+macroF1 **0.9346**. The previous 0.7529 / 0.9353 checkpoint is preserved in
+`configs/pre_dense.json`. This favours the official spellF1 ranking metric, with a
+0.0008 macroF1 tradeoff. Frame plan, fitting and paired time-fold checks:
+[DENSE_VIDEO_EXPERIMENTS.md](DENSE_VIDEO_EXPERIMENTS.md).
+
+The classifier blends the original video head with a head that omits discrete decoder
+labels. Its earlier 0.7444 / 0.9292 predecessor is preserved in `configs/pre_blend.json`;
+[BLEND_EXPERIMENTS.md](BLEND_EXPERIMENTS.md) records that experiment.
 
 Confidence pruning remains enabled; its earlier improvement and the configuration before
 pruning (`configs/pre_pruning.json`) are documented in
