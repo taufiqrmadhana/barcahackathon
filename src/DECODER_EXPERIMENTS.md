@@ -1,5 +1,8 @@
 # Video-gated decoder adjustments, November 15
 
+This records a808c06, retained in `configs/spell_best.json`. The subsequent macro-focused
+configuration is documented in [MACRO_EXPERIMENTS.md](MACRO_EXPERIMENTS.md).
+
 The same dense-video classifier now supplies limited flexibility to the final decoder.
 Public macroF1 rises from 0.9346 to 0.9355 while spellF1 stays 0.7882. No classifier
 retraining or further video extraction is needed. The previous configuration is frozen

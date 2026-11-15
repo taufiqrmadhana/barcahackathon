@@ -4,10 +4,15 @@ Own pipeline for More than a Hack 2027, Phase 1. Everything outside `src/` is th
 repository (remote `upstream`), kept as is so `git pull upstream main` keeps working. The method,
 the possession rules and what was tried and dropped are in [TECHNICAL.md](TECHNICAL.md).
 
-Latest (November 15): video-gated loose-ball switches and bounded dead-ball edge
-adjustments retain public spellF1 **0.7882** and raise macroF1 to **0.9355**.
-The preceding 0.7882 / 0.9346 configuration is frozen in `configs/pre_loose.json`.
-The gain is small and public-selected: [DECODER_EXPERIMENTS.md](DECODER_EXPERIMENTS.md).
+Latest (November 15): the default now prioritises **macroF1**, as requested. A 34-feature
+logistic head reaches public macroF1 **0.9473**, spellF1 **0.7647**. Its configuration is
+frozen in `configs/macro_v1.json`. The spell-focused alternative (**0.7882** spellF1,
+0.9355 macroF1) remains in `configs/spell_best.json`.
+[MACRO_EXPERIMENTS.md](MACRO_EXPERIMENTS.md) records the tradeoff, fitting and validation.
+
+The earlier video-gated decoder and bounded dead-ball edges are documented in
+[DECODER_EXPERIMENTS.md](DECODER_EXPERIMENTS.md). Its predecessor is in
+`configs/pre_loose.json`.
 
 Denser FILM video produced the earlier spell gain. Its frame plan and paired checks
 are in [DENSE_VIDEO_EXPERIMENTS.md](DENSE_VIDEO_EXPERIMENTS.md). The intermediate

@@ -30,6 +30,7 @@ FEATURE_SETS = {
     'film': validator.V2_COLS + CURRENT + validator.FLOW_COLS + validator.FILM_COLS,
     'all': validator.V2_COLS + CURRENT + validator.FLOW_COLS + validator.NAIVE_COLS + validator.FILM_COLS,
 }
+FEATURE_SETS['film_soft'] = tuple(name for name in FEATURE_SETS['film'] if name not in HARD_CONTEXT)
 
 
 def covered_intervals(frames, mask, max_gap=25):
@@ -81,9 +82,13 @@ def features(inputs, p, labels, emit, shape, kind='film', legacy_params=None):
     return columns, mask, frames, asdict(vp)
 
 
-def factory(name, seed=0, names=None):
+def factory(name, seed=0, names=None, logreg_c=.3):
+    def build_logreg():
+        return validator.model_zoo(seed)['logreg']().set_params(logisticregression__C=logreg_c)
+    if name in ('logreg', 'logreg_blend') and (not np.isfinite(logreg_c) or logreg_c <= 0):
+        raise ValueError('logistic C must be finite and positive')
     if name == 'logreg':
-        return validator.model_zoo(seed)['logreg']()
+        return build_logreg()
     if name == 'logreg_blend':
         if names is None:
             raise ValueError('feature names are required for the blended classifier')
@@ -93,9 +98,8 @@ def factory(name, seed=0, names=None):
         indices = [i for i, column in enumerate(names) if column not in HARD_CONTEXT]
         if not indices:
             raise ValueError('the blended classifier needs continuous or video features')
-        build = validator.model_zoo(seed)['logreg']
-        soft = make_pipeline(ColumnTransformer([('soft', 'passthrough', indices)]), build())
-        return VotingClassifier([('original', build()), ('soft', soft)],
+        soft = make_pipeline(ColumnTransformer([('soft', 'passthrough', indices)]), build_logreg())
+        return VotingClassifier([('original', build_logreg()), ('soft', soft)],
                                 voting='soft', weights=[1., 3.])
     if name == 'hist_gbm':
         from sklearn.ensemble import HistGradientBoostingClassifier
@@ -106,7 +110,7 @@ def factory(name, seed=0, names=None):
 
 
 def fit(columns, sample_frames, gt_codes, names, model_name, kind, legacy_params,
-        n_folds=5, gap=125, train_stride=25):
+        n_folds=5, gap=125, train_stride=25, logreg_c=.3):
     public = np.flatnonzero(gt_codes < 3)
     if not len(public) or train_stride < 1:
         raise ValueError('supply public labels and a positive training stride')
@@ -126,14 +130,15 @@ def fit(columns, sample_frames, gt_codes, names, model_name, kind, legacy_params
             from sklearn.dummy import DummyClassifier
             model = DummyClassifier(strategy='prior')
         else:
-            model = factory(model_name, names=names)
+            model = factory(model_name, names=names, logreg_c=logreg_c)
         model.fit(x[train], y[train])
         heads.append(model)
-    full = factory(model_name, names=names).fit(x, y)
+    full = factory(model_name, names=names, logreg_c=logreg_c).fit(x, y)
     return dict(version=VERSION, names=names, model_name=model_name, kind=kind,
         legacy_params=legacy_params, full=full, heads=heads, edges=edges,
         public_start=int(public.min()), public_stop=int(public.max()) + 1,
-        purge_frames=gap, training_rows=len(rows), folds=n_folds, train_stride=train_stride)
+        purge_frames=gap, training_rows=len(rows), folds=n_folds, train_stride=train_stride,
+        logreg_c=logreg_c if model_name in ('logreg', 'logreg_blend') else None)
 
 
 def decode(inputs, p, baseline, emit, bonus, proba, mask):

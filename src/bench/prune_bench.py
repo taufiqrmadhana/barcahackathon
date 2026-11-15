@@ -40,7 +40,8 @@ def main():
     for folds in args.folds:
         artifact=original if folds==original['folds'] else hybrid.fit(columns,frames,gt,
             original['names'],original['model_name'],original['kind'],legacy,
-            n_folds=folds,gap=original['purge_frames'],train_stride=original['train_stride'])
+            n_folds=folds,gap=original['purge_frames'],train_stride=original['train_stride'],
+            logreg_c=original.get('logreg_c',.3))
         before=None
         for maximum in sorted(set([0]+args.maximum)):
             pp=replace(p,hybrid_prune_max_frames=maximum,

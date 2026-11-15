@@ -42,7 +42,8 @@ def main():
             artifact = (original if folds == original['folds'] and name == 'logreg'
                         else hybrid.fit(columns, frames, gt, original['names'], name,
                             original['kind'], legacy, n_folds=folds,
-                            gap=original['purge_frames'], train_stride=original['train_stride']))
+                            gap=original['purge_frames'], train_stride=original['train_stride'],
+                            logreg_c=original.get('logreg_c', .3)))
             labels = hybrid.refine(inputs, p, base, dbg['emit'], dbg['bonus'],
                                    dbg['shape'], artifact, prepared)
             if before is None:

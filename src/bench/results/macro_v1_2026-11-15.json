@@ -1,0 +1,857 @@
+{
+  "date": "2026-11-15",
+  "baseline_commit": "a808c06",
+  "objective": "macroF1",
+  "selected_on_public": true,
+  "private_score_known": false,
+  "params": {
+    "player_margin": 5.0,
+    "max_player_speed": 12.0,
+    "vel_k": 2,
+    "ball_spike_speed": 45.0,
+    "ball_island_len": 3,
+    "ball_island_gap": 50,
+    "max_gap": 12,
+    "ctrl_radius": 1.3,
+    "ctrl_softness": 0.35,
+    "sync_free": 2.5,
+    "sync_scale": 3.0,
+    "filled_trust": 0.6,
+    "corner_zone": 3.0,
+    "still_speed": 1.2,
+    "slow_window": 50,
+    "ball_smooth": 9,
+    "touch_k": 3,
+    "touch_dv": 3.5,
+    "touch_spacing": 6,
+    "touch_radius": 2.0,
+    "touch_margin": 1.5,
+    "duel_radius": 1.5,
+    "seq_max_gap": 100,
+    "pass_min_travel": 5.0,
+    "shot_speed": 18.0,
+    "shot_range": 35.0,
+    "out_margin": 0.5,
+    "out_min_frames": 3,
+    "vanish_min_frames": 50,
+    "vanish_horizon": 0.4,
+    "decel_window": 25,
+    "decel_drop": 1.2,
+    "decel_to": 1.6,
+    "decel_lead": 20,
+    "rest_speed": 1.8,
+    "placed_min_frames": 25,
+    "placed_calm_speed": 1.8,
+    "restart_kick_speed": 5.0,
+    "kick_within": 20,
+    "reappear_min_frames": 75,
+    "dead_min_gap": 50,
+    "dead_max_gap": 2250,
+    "hold_kinds": "goal_line,touchline,vanish",
+    "hold_goal_line": 200,
+    "hold_touchline": 75,
+    "shape_folds": 8,
+    "shape_guard": 250,
+    "shape_stride": 3,
+    "shape_iter": 150,
+    "shape_eps": 0.05,
+    "shape_rounds": 2,
+    "shape_conf": 0.0,
+    "ctrl_eps": 0.05,
+    "w_ball": 1.0,
+    "w_shape": 1.0,
+    "w_shape_known": 0.0,
+    "w_tag": 0.0,
+    "w_dead": 1.0,
+    "d_bias": 0.0,
+    "w_out": 6.0,
+    "w_out_carry": 3.0,
+    "slow_speed": 1.3,
+    "slow_scale": 0.3,
+    "w_slow": 1.0,
+    "dead_gap": 75,
+    "w_missing": 0.0,
+    "w_missing_slow": 0.5,
+    "w_still": 2.0,
+    "w_shape_dead": 0.5,
+    "alive_ball_speed": 6.0,
+    "w_alive": 3.0,
+    "w_hold": 5.0,
+    "w_post_restart": 2.0,
+    "post_restart_frames": 50,
+    "w_tag_dead": 1.0,
+    "tag_dead_frames": 25,
+    "z_max": 4.0,
+    "loose_cost": 1.0,
+    "switch_cost": 16.0,
+    "tackle_extra": 5.0,
+    "dead_entry_cost": 20.0,
+    "dead_exit_cost": 30.0,
+    "dead_min_frames": 100,
+    "w_turnover": 8.0,
+    "w_touch": 4.0,
+    "w_duel": 2.0,
+    "touch_before": 2,
+    "touch_after": 10,
+    "w_stoppage": 8.0,
+    "stop_before": 10,
+    "stop_after": 25,
+    "w_shot_dead": 3.0,
+    "shot_window": 75,
+    "w_restart": 8.0,
+    "restart_before": 10,
+    "restart_after": 10,
+    "ownership_model": "pretrain_data/ownership_v2/ownership_all.joblib",
+    "supervised_shape_model": "pretrain_data/ownership_v2/shape_all.joblib",
+    "pre_kickoff_dead": 1,
+    "goal_dead": 1,
+    "whistle_thresh": 24.0,
+    "w_whistle": 10.0,
+    "w_whistle_confirmed": 16.0,
+    "whistle_lag": 10,
+    "ball_source": "fused_full",
+    "whistle_min_speed": 1.8,
+    "w_whistle_dead": 2.0,
+    "whistle_hold": 150,
+    "inner_restarts": 0,
+    "w_contact": 1.0,
+    "contact_alpha": 0.5,
+    "contact_window": 125,
+    "contact_lock_dead": 1,
+    "contact_min_frames": 12,
+    "contact_switch_cost": 4.0,
+    "contact_local_switch": 0,
+    "hybrid_model": "pretrain_data/macro_v1/film_soft_logreg.joblib",
+    "hybrid_weight": 0.5,
+    "hybrid_lock_dead": 1,
+    "hybrid_prune_max_frames": 100,
+    "hybrid_prune_min_confidence": 0.5,
+    "hybrid_loose_threshold": 0.0,
+    "hybrid_dead_margin": 12
+  },
+  "verification": {
+    "before_csv_sha256": "290d65146d6b5099c372745ddce61d9ec4e112ad8bc19d7ad23256b6b0e610f3",
+    "selected_csv_sha256": "ec897c91e4ec67172c26950b6f9fa278517877e44a8dbd02118cdf2cb619353d",
+    "classifier_sha256": "4928105fbe69c5462bdf24dfd10103c972068f3a3dfa07648ad8c2fe8b72c5e3",
+    "feature_cache_sha256": "3e1e431ceb65342ac3ea3d7ff5bf10e8eaadfeb19a84df64f64f75b8498130c8",
+    "frozen_shape_parity": true,
+    "fit_cli_parity": true,
+    "old_spell_checkpoint_exact": true,
+    "changed_frames": 275,
+    "public_changed_frames": 157,
+    "outside_video_frames_changed": 0,
+    "results": [
+      {
+        "name": "spell_best",
+        "macroF1": 0.9355125335006115,
+        "spellF1": 0.788235294117647,
+        "per_class": {
+          "H": {
+            "precision": 0.9471947194719472,
+            "recall": 0.9140127388535032,
+            "f1": 0.9303079416531606,
+            "support": 3454
+          },
+          "A": {
+            "precision": 0.9243920972644377,
+            "recall": 0.9441210710128056,
+            "f1": 0.9341524284891535,
+            "support": 2577
+          },
+          "D": {
+            "precision": 0.9218241042345277,
+            "recall": 0.9632402995234853,
+            "f1": 0.9420772303595206,
+            "support": 1469
+          }
+        },
+        "public_possessions": 17,
+        "transition_f1_1s": 0.65,
+        "full_match": [
+          407,
+          0.4611757744386461,
+          129
+        ]
+      },
+      {
+        "name": "macro_best",
+        "macroF1": 0.9473195842044279,
+        "spellF1": 0.7647058823529412,
+        "per_class": {
+          "H": {
+            "precision": 0.9673123486682809,
+            "recall": 0.9253039953676896,
+            "f1": 0.9458419650784256,
+            "support": 3454
+          },
+          "A": {
+            "precision": 0.940910801656003,
+            "recall": 0.9701202949165697,
+            "f1": 0.9552923194497517,
+            "support": 2577
+          },
+          "D": {
+            "precision": 0.9194282001299545,
+            "recall": 0.9632402995234853,
+            "f1": 0.9408244680851064,
+            "support": 1469
+          }
+        },
+        "public_possessions": 17,
+        "transition_f1_1s": 0.7,
+        "full_match": [
+          404,
+          0.46112541468112833,
+          129
+        ]
+      }
+    ],
+    "official_format_valid": true,
+    "submission_rows": 199319,
+    "unit_tests_passed": 33,
+    "inference_cli_byte_identical": true
+  },
+  "fold_audit": [
+    {
+      "folds": 3,
+      "objective": "spell",
+      "macroF1": 0.9275087623075294,
+      "spellF1": 0.6736842105263157,
+      "possessions": 21,
+      "per_class": {
+        "H": {
+          "precision": 0.9447344181762358,
+          "recall": 0.890851187029531,
+          "f1": 0.9170019371181642,
+          "support": 3454
+        },
+        "A": {
+          "precision": 0.8942731277533039,
+          "recall": 0.9452852153667055,
+          "f1": 0.9190718732314657,
+          "support": 2577
+        },
+        "D": {
+          "precision": 0.9308755760368663,
+          "recall": 0.9625595643294759,
+          "f1": 0.9464524765729584,
+          "support": 1469
+        }
+      }
+    },
+    {
+      "folds": 3,
+      "objective": "macro",
+      "macroF1": 0.9271695102509291,
+      "spellF1": 0.6842105263157894,
+      "possessions": 21,
+      "per_class": {
+        "H": {
+          "precision": 0.9455552137803752,
+          "recall": 0.889982628836132,
+          "f1": 0.9169276659209545,
+          "support": 3454
+        },
+        "A": {
+          "precision": 0.8936170212765957,
+          "recall": 0.9452852153667055,
+          "f1": 0.9187252498585706,
+          "support": 2577
+        },
+        "D": {
+          "precision": 0.9290873276428102,
+          "recall": 0.9632402995234853,
+          "f1": 0.945855614973262,
+          "support": 1469
+        }
+      }
+    },
+    {
+      "folds": 4,
+      "objective": "spell",
+      "macroF1": 0.927561777132888,
+      "spellF1": 0.725,
+      "possessions": 15,
+      "per_class": {
+        "H": {
+          "precision": 0.9269366197183099,
+          "recall": 0.9145917776491025,
+          "f1": 0.9207228213348878,
+          "support": 3454
+        },
+        "A": {
+          "precision": 0.9229867083659109,
+          "recall": 0.9161816065192084,
+          "f1": 0.9195715676728337,
+          "support": 2577
+        },
+        "D": {
+          "precision": 0.9224250325945241,
+          "recall": 0.9632402995234853,
+          "f1": 0.9423909423909425,
+          "support": 1469
+        }
+      }
+    },
+    {
+      "folds": 4,
+      "objective": "macro",
+      "macroF1": 0.9276550768005901,
+      "spellF1": 0.6888888888888889,
+      "possessions": 19,
+      "per_class": {
+        "H": {
+          "precision": 0.9252173913043479,
+          "recall": 0.924145917776491,
+          "f1": 0.9246813441483197,
+          "support": 3454
+        },
+        "A": {
+          "precision": 0.9355742296918768,
+          "recall": 0.9072564998059759,
+          "f1": 0.9211977935382191,
+          "support": 2577
+        },
+        "D": {
+          "precision": 0.912314635718891,
+          "recall": 0.9632402995234853,
+          "f1": 0.9370860927152318,
+          "support": 1469
+        }
+      }
+    },
+    {
+      "folds": 5,
+      "objective": "spell",
+      "macroF1": 0.9355125335006115,
+      "spellF1": 0.788235294117647,
+      "possessions": 17,
+      "per_class": {
+        "H": {
+          "precision": 0.9471947194719472,
+          "recall": 0.9140127388535032,
+          "f1": 0.9303079416531606,
+          "support": 3454
+        },
+        "A": {
+          "precision": 0.9243920972644377,
+          "recall": 0.9441210710128056,
+          "f1": 0.9341524284891535,
+          "support": 2577
+        },
+        "D": {
+          "precision": 0.9218241042345277,
+          "recall": 0.9632402995234853,
+          "f1": 0.9420772303595206,
+          "support": 1469
+        }
+      }
+    },
+    {
+      "folds": 5,
+      "objective": "macro",
+      "macroF1": 0.9473195842044279,
+      "spellF1": 0.7647058823529412,
+      "possessions": 17,
+      "per_class": {
+        "H": {
+          "precision": 0.9673123486682809,
+          "recall": 0.9253039953676896,
+          "f1": 0.9458419650784256,
+          "support": 3454
+        },
+        "A": {
+          "precision": 0.940910801656003,
+          "recall": 0.9701202949165697,
+          "f1": 0.9552923194497517,
+          "support": 2577
+        },
+        "D": {
+          "precision": 0.9194282001299545,
+          "recall": 0.9632402995234853,
+          "f1": 0.9408244680851064,
+          "support": 1469
+        }
+      }
+    },
+    {
+      "folds": 6,
+      "objective": "spell",
+      "macroF1": 0.9395755854627817,
+      "spellF1": 0.7333333333333332,
+      "possessions": 19,
+      "per_class": {
+        "H": {
+          "precision": 0.9442970822281167,
+          "recall": 0.9276201505500868,
+          "f1": 0.9358843289031692,
+          "support": 3454
+        },
+        "A": {
+          "precision": 0.9416796267496111,
+          "recall": 0.9398525417151726,
+          "f1": 0.9407651971256553,
+          "support": 2577
+        },
+        "D": {
+          "precision": 0.9218241042345277,
+          "recall": 0.9632402995234853,
+          "f1": 0.9420772303595206,
+          "support": 1469
+        }
+      }
+    },
+    {
+      "folds": 6,
+      "objective": "macro",
+      "macroF1": 0.940955798866959,
+      "spellF1": 0.7444444444444445,
+      "possessions": 19,
+      "per_class": {
+        "H": {
+          "precision": 0.9465761511216056,
+          "recall": 0.9284887087434858,
+          "f1": 0.937445191464484,
+          "support": 3454
+        },
+        "A": {
+          "precision": 0.9433449747768723,
+          "recall": 0.9433449747768723,
+          "f1": 0.9433449747768723,
+          "support": 2577
+        },
+        "D": {
+          "precision": 0.9218241042345277,
+          "recall": 0.9632402995234853,
+          "f1": 0.9420772303595206,
+          "support": 1469
+        }
+      }
+    }
+  ],
+  "public_explorations": {
+    "results": [
+      {
+        "kind": "film",
+        "features": "film",
+        "model": "logreg_blend",
+        "C": 0.3,
+        "spellF1": 0.7529411764705882,
+        "macroF1": 0.9359714315016957,
+        "possessions": 17,
+        "tag": "film_film_0.3"
+      },
+      {
+        "kind": "film",
+        "features": "film",
+        "model": "logreg_blend",
+        "C": 1.0,
+        "spellF1": 0.7111111111111112,
+        "macroF1": 0.9424587438921969,
+        "possessions": 19,
+        "tag": "film_film_1.0"
+      },
+      {
+        "kind": "film",
+        "features": "film",
+        "model": "logreg_blend",
+        "C": 3.0,
+        "spellF1": 0.6666666666666667,
+        "macroF1": 0.9415598970554587,
+        "possessions": 19,
+        "tag": "film_film_3.0"
+      },
+      {
+        "kind": "film",
+        "features": "film_soft",
+        "model": "logreg",
+        "C": 0.3,
+        "spellF1": 0.6842105263157894,
+        "macroF1": 0.9376697728707325,
+        "possessions": 21,
+        "tag": "film_film_soft_0.3"
+      },
+      {
+        "kind": "film",
+        "features": "film_soft",
+        "model": "logreg",
+        "C": 1.0,
+        "spellF1": 0.7058823529411764,
+        "macroF1": 0.9419076235377727,
+        "possessions": 17,
+        "tag": "film_film_soft_1.0"
+      },
+      {
+        "kind": "film",
+        "features": "film_soft",
+        "model": "logreg",
+        "C": 3.0,
+        "spellF1": 0.6941176470588235,
+        "macroF1": 0.9426408215214149,
+        "possessions": 17,
+        "tag": "film_film_soft_3.0"
+      },
+      {
+        "kind": "film_dense",
+        "features": "film",
+        "model": "logreg_blend",
+        "C": 0.3,
+        "spellF1": 0.788235294117647,
+        "macroF1": 0.9355125335006115,
+        "possessions": 17,
+        "tag": "film_dense_film_0.3"
+      },
+      {
+        "kind": "film_dense",
+        "features": "film",
+        "model": "logreg_blend",
+        "C": 1.0,
+        "spellF1": 0.7111111111111112,
+        "macroF1": 0.9434433016106062,
+        "possessions": 19,
+        "tag": "film_dense_film_1.0"
+      },
+      {
+        "kind": "film_dense",
+        "features": "film",
+        "model": "logreg_blend",
+        "C": 3.0,
+        "spellF1": 0.6526315789473685,
+        "macroF1": 0.9384154405972726,
+        "possessions": 21,
+        "tag": "film_dense_film_3.0"
+      },
+      {
+        "kind": "film_dense",
+        "features": "film_soft",
+        "model": "logreg",
+        "C": 0.3,
+        "spellF1": 0.7222222222222222,
+        "macroF1": 0.9363305662866829,
+        "possessions": 19,
+        "tag": "film_dense_film_soft_0.3"
+      },
+      {
+        "kind": "film_dense",
+        "features": "film_soft",
+        "model": "logreg",
+        "C": 1.0,
+        "spellF1": 0.688888888888889,
+        "macroF1": 0.9441324027260133,
+        "possessions": 19,
+        "tag": "film_dense_film_soft_1.0"
+      },
+      {
+        "kind": "film_dense",
+        "features": "film_soft",
+        "model": "logreg",
+        "C": 3.0,
+        "spellF1": 0.6666666666666667,
+        "macroF1": 0.9429893385944602,
+        "possessions": 19,
+        "tag": "film_dense_film_soft_3.0"
+      }
+    ],
+    "decode_results": [
+      {
+        "tag": "film_dense_film_soft_1.0",
+        "loose": 0,
+        "margin": 12,
+        "weight": 1.0,
+        "spellF1": 0.7294117647058824,
+        "macroF1": 0.9465111651732122,
+        "possessions": 17
+      },
+      {
+        "tag": "film_dense_film_soft_1.0",
+        "loose": 0.8,
+        "margin": 0,
+        "weight": 1.0,
+        "spellF1": 0.688888888888889,
+        "macroF1": 0.944196422740054,
+        "possessions": 19
+      },
+      {
+        "tag": "film_dense_film_soft_1.0",
+        "loose": 0,
+        "margin": 0,
+        "weight": 1.0,
+        "spellF1": 0.7294117647058824,
+        "macroF1": 0.9465761136079512,
+        "possessions": 17
+      },
+      {
+        "tag": "film_dense_film_soft_1.0",
+        "loose": 0,
+        "margin": 12,
+        "weight": 2.0,
+        "spellF1": 0.6588235294117648,
+        "macroF1": 0.9421549531221444,
+        "possessions": 17
+      },
+      {
+        "tag": "film_dense_film_soft_1.0",
+        "loose": 0.8,
+        "margin": 12,
+        "weight": 2.0,
+        "spellF1": 0.6222222222222221,
+        "macroF1": 0.9412452752855721,
+        "possessions": 19
+      },
+      {
+        "tag": "film_dense_film_soft_1.0",
+        "loose": 0,
+        "margin": 12,
+        "weight": 0.5,
+        "spellF1": 0.7647058823529412,
+        "macroF1": 0.9473195842044279,
+        "possessions": 17
+      },
+      {
+        "tag": "film_dense_film_1.0",
+        "loose": 0,
+        "margin": 12,
+        "weight": 1.0,
+        "spellF1": 0.7111111111111112,
+        "macroF1": 0.9437841979496021,
+        "possessions": 19
+      },
+      {
+        "tag": "film_dense_film_1.0",
+        "loose": 0.8,
+        "margin": 0,
+        "weight": 1.0,
+        "spellF1": 0.7111111111111112,
+        "macroF1": 0.9441903193950171,
+        "possessions": 19
+      },
+      {
+        "tag": "film_dense_film_1.0",
+        "loose": 0,
+        "margin": 0,
+        "weight": 1.0,
+        "spellF1": 0.7111111111111112,
+        "macroF1": 0.9445313768989744,
+        "possessions": 19
+      },
+      {
+        "tag": "film_dense_film_1.0",
+        "loose": 0,
+        "margin": 12,
+        "weight": 2.0,
+        "spellF1": 0.7000000000000001,
+        "macroF1": 0.944044864616254,
+        "possessions": 19
+      },
+      {
+        "tag": "film_dense_film_1.0",
+        "loose": 0.8,
+        "margin": 12,
+        "weight": 2.0,
+        "spellF1": 0.7000000000000001,
+        "macroF1": 0.9441585040475896,
+        "possessions": 19
+      },
+      {
+        "tag": "film_dense_film_1.0",
+        "loose": 0,
+        "margin": 12,
+        "weight": 0.5,
+        "spellF1": 0.7222222222222223,
+        "macroF1": 0.9455548059049791,
+        "possessions": 19
+      }
+    ],
+    "balance_results": [
+      {
+        "features": "film",
+        "model": "logreg_blend",
+        "spellF1": 0.7529411764705883,
+        "macroF1": 0.9454308494631665,
+        "possessions": 17
+      },
+      {
+        "features": "film_soft",
+        "model": "logreg",
+        "spellF1": 0.65,
+        "macroF1": 0.9457633281895422,
+        "possessions": 15
+      }
+    ],
+    "calibration_results": [
+      {
+        "C": 1.0,
+        "weight": 0.25,
+        "macroF1": 0.9396282602797803,
+        "spellF1": 0.6266666666666666,
+        "possessions": 13
+      },
+      {
+        "C": 1.0,
+        "weight": 0.75,
+        "macroF1": 0.9463399186224645,
+        "spellF1": 0.7294117647058823,
+        "possessions": 17
+      },
+      {
+        "C": 3.0,
+        "weight": 0.25,
+        "macroF1": 0.9421024972731443,
+        "spellF1": 0.6266666666666666,
+        "possessions": 13
+      },
+      {
+        "C": 3.0,
+        "weight": 0.5,
+        "macroF1": 0.9473148196158675,
+        "spellF1": 0.7294117647058823,
+        "possessions": 17
+      },
+      {
+        "C": 0.3,
+        "weight": 0.5,
+        "macroF1": 0.9360335316051386,
+        "spellF1": 0.7444444444444444,
+        "possessions": 19
+      },
+      {
+        "C": 0.3,
+        "weight": 2.0,
+        "macroF1": 0.9370397294939123,
+        "spellF1": 0.6588235294117648,
+        "possessions": 17
+      }
+    ],
+    "tree_results": [
+      {
+        "tag": "tree_extra_trees_1_False",
+        "model": "extra_trees",
+        "leaf": 1,
+        "loop": false,
+        "spellF1": 0.7555555555555555,
+        "macroF1": 0.9233520998474397,
+        "possessions": 19
+      },
+      {
+        "tag": "tree_extra_trees_4_False",
+        "model": "extra_trees",
+        "leaf": 4,
+        "loop": false,
+        "spellF1": 0.7052631578947367,
+        "macroF1": 0.9160531491306294,
+        "possessions": 21
+      },
+      {
+        "tag": "tree_random_forest_1_False",
+        "model": "random_forest",
+        "leaf": 1,
+        "loop": false,
+        "spellF1": 0.6222222222222221,
+        "macroF1": 0.9180324758789823,
+        "possessions": 19
+      },
+      {
+        "tag": "tree_random_forest_4_False",
+        "model": "random_forest",
+        "leaf": 4,
+        "loop": false,
+        "spellF1": 0.7052631578947367,
+        "macroF1": 0.9184640724286454,
+        "possessions": 21
+      },
+      {
+        "tag": "tree_hist_gbm_5_False",
+        "model": "hist_gbm",
+        "leaf": 5,
+        "loop": false,
+        "spellF1": 0.6947368421052631,
+        "macroF1": 0.9303679764936043,
+        "possessions": 21
+      },
+      {
+        "tag": "tree_hist_gbm_5_True",
+        "model": "hist_gbm",
+        "leaf": 5,
+        "loop": true,
+        "spellF1": 0.5882352941176471,
+        "macroF1": 0.935009517903651,
+        "possessions": 17
+      },
+      {
+        "tag": "tree_extra_trees_1_True",
+        "model": "extra_trees",
+        "leaf": 1,
+        "loop": true,
+        "spellF1": 0.6222222222222221,
+        "macroF1": 0.924081883804719,
+        "possessions": 19
+      }
+    ],
+    "temporal_results": [
+      {
+        "group": "video",
+        "features": 40,
+        "macroF1": 0.9386074683628681,
+        "spellF1": 0.6941176470588235,
+        "possessions": 17
+      },
+      {
+        "group": "physical",
+        "features": 38,
+        "macroF1": 0.9461576717445629,
+        "spellF1": 0.7411764705882353,
+        "possessions": 17
+      },
+      {
+        "group": "smooth",
+        "features": 38,
+        "macroF1": 0.9429544952155204,
+        "spellF1": 0.6823529411764706,
+        "possessions": 17
+      },
+      {
+        "group": "both",
+        "features": 44,
+        "macroF1": 0.9399821028021371,
+        "spellF1": 0.6705882352941177,
+        "possessions": 17
+      }
+    ],
+    "spatial_results": [
+      {
+        "group": "geometry",
+        "features": 44,
+        "macroF1": 0.9351648050245979,
+        "spellF1": 0.6705882352941177,
+        "possessions": 17
+      },
+      {
+        "group": "motion",
+        "features": 40,
+        "macroF1": 0.9434335967224912,
+        "spellF1": 0.7875,
+        "possessions": 15
+      },
+      {
+        "group": "both",
+        "features": 50,
+        "macroF1": 0.9294802651046362,
+        "spellF1": 0.675,
+        "possessions": 15
+      }
+    ]
+  },
+  "limits": [
+    "All model, feature and decoder choices reuse the same 17 public possessions",
+    "The macro gain varies across partitions and is slightly negative with three folds",
+    "The spell-focused checkpoint is retained; selected macro optimisation lowers its spellF1",
+    "No independently corrected private labels or unseen-match validation of the video head"
+  ],
+  "source_sha256": {
+    "src/possession/hybrid.py": "751d6b5bea7e83fa8168bd5f7b03a85cef3ba79f5a0d30b0216b66b8db1fb2a4",
+    "src/run_hybrid.py": "cad3fbecaed4a98af2074b78836e9f3b7fb7ddcb9a3e782f26f34328152f9a16",
+    "src/params.json": "87b4931bc338d337c5d4b410bcf125084df809f9e3493dd3cab29b3f0e06f9a7",
+    "src/bench/macro_bench.py": "4c201e8583c0469b22802dae02b664888385c21b4e21c5a0fe94fb760c2b73f8",
+    "src/bench/test_hybrid.py": "9f302188231279b301749c53d2244e48eb525b10241d339e76e4a71f56077c2c"
+  }
+}

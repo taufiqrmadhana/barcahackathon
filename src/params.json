@@ -115,11 +115,11 @@
   "contact_min_frames": 12,
   "contact_switch_cost": 4.0,
   "contact_local_switch": 0,
-  "hybrid_model": "pretrain_data/valdi_hybrid_dense/film_logreg_blend.joblib",
-  "hybrid_weight": 1.0,
+  "hybrid_model": "pretrain_data/macro_v1/film_soft_logreg.joblib",
+  "hybrid_weight": 0.5,
   "hybrid_lock_dead": 1,
   "hybrid_prune_max_frames": 100,
   "hybrid_prune_min_confidence": 0.5,
-  "hybrid_loose_threshold": 0.8,
+  "hybrid_loose_threshold": 0.0,
   "hybrid_dead_margin": 12
 }

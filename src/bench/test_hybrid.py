@@ -90,9 +90,9 @@ class HybridContracts(unittest.TestCase):
         changed = gt.copy(); changed[:100] = (changed[:100] + 1) % 3
         names = tuple(columns)
         a = hybrid.fit(columns, frames, gt, names, 'logreg_blend', 'film', {},
-                       gap=5, train_stride=1)
+                       gap=5, train_stride=1, logreg_c=1.)
         b = hybrid.fit(columns, frames, changed, names, 'logreg_blend', 'film', {},
-                       gap=5, train_stride=1)
+                       gap=5, train_stride=1, logreg_c=1.)
         x = np.column_stack(list(columns.values()))
         np.testing.assert_array_equal(a['heads'][0].predict_proba(x),
                                       b['heads'][0].predict_proba(x))
