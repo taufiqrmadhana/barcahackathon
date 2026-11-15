@@ -94,6 +94,7 @@ class Params:
     hybrid_prune_min_confidence: float = .5
     hybrid_loose_threshold: float = 0.0  # > 0: confident video can switch into a loose-ball state
     hybrid_dead_margin: int = 0    # allow video to adjust locked D edges within this many frames
+    hybrid_dead_weight: float = -1.0  # < 0: use hybrid_weight for both team and dead evidence
 
     # step 4: emissions
     ctrl_eps: float = 0.05

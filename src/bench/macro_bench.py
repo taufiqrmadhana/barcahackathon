@@ -26,7 +26,7 @@ def main():
     ap.add_argument('--folds',nargs='+',type=int,default=[3,4,5,6])
     ap.add_argument('--out',default=str(Path(ROOT,'cache/improve_nov15_macro/fold_audit.json')))
     args=ap.parse_args()
-    specs=[('spell',Params.load(args.baseline)),('macro',Params.load(args.params))]
+    specs=[('baseline',Params.load(args.baseline)),('candidate',Params.load(args.params))]
     physical=lambda p:{k:v for k,v in asdict(p).items() if not k.startswith('hybrid_')}
     if physical(specs[0][1])!=physical(specs[1][1]):
         raise ValueError('this paired audit requires the same physical baseline')
@@ -35,16 +35,25 @@ def main():
     gt=pipeline.public_gt();ready={};rows=[]
     for name,p in specs:
         a=joblib.load(p.hybrid_model)
-        prepared=hybrid.features(inputs,p,base,dbg['emit'],dbg['shape'],a['kind'],a['legacy_params'])
+        prepared=hybrid.prepare_features(inputs,p,base,dbg['emit'],dbg['shape'],a)
         ready[name]=(p,a,prepared)
     path=Path(args.out);path.parent.mkdir(parents=True,exist_ok=True)
     for folds in args.folds:
-        for name in ('spell','macro'):
-            p,original,prepared=ready[name];columns,mask,frames,legacy=prepared
-            a=(original if folds==original['folds'] else hybrid.fit(columns,frames,gt,
-                original['names'],original['model_name'],original['kind'],legacy,n_folds=folds,
-                gap=original['purge_frames'],train_stride=original['train_stride'],
-                logreg_c=original.get('logreg_c',.3)))
+        for name in ('baseline','candidate'):
+            p,original,prepared=ready[name]
+            def refit(source,view):
+                if source['version']==hybrid.ENSEMBLE_VERSION:
+                    return hybrid.combine_artifacts([refit(m,v) for m,v in zip(source['members'],view)],
+                                                    source['weights'])
+                if folds==source['folds']:
+                    return source
+                columns,mask,frames,legacy=view
+                return hybrid.fit(columns,frames,gt,source['names'],source['model_name'],
+                    source['kind'],legacy,n_folds=folds,gap=source['purge_frames'],
+                    train_stride=source['train_stride'],logreg_c=source.get('logreg_c',.3))
+            a=refit(original,prepared)
+            mask=(np.logical_and.reduce([v[1] for v in prepared]) if isinstance(prepared,list)
+                  else prepared[1])
             labels=hybrid.refine(inputs,p,base,dbg['emit'],dbg['bonus'],dbg['shape'],a,prepared)
             np.testing.assert_array_equal(labels[~mask],base[~mask])
             r=pipeline.score(labels,gt)

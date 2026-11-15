@@ -18,6 +18,7 @@ from .film_features import Store
 from .paths import SRC
 
 VERSION = 1
+ENSEMBLE_VERSION = 2
 CURRENT = ('current_team', 'current_dead', 'current_H', 'current_A', 'current_D',
            'current_shape_H', 'current_shape_D')
 # Discrete decoder outputs and durations can make the video head repeat an early
@@ -142,8 +143,7 @@ def fit(columns, sample_frames, gt_codes, names, model_name, kind, legacy_params
 
 
 def decode(inputs, p, baseline, emit, bonus, proba, mask):
-    delta = validator.fuse(np.zeros((inputs.n, 3)), proba, mask,
-                            validator.FusionConfig(weight=p.hybrid_weight))
+    delta = probability_evidence(proba, mask, p.hybrid_weight, p.hybrid_dead_weight)
     updated = emit + delta[:, [0, 0, 1, 1, 2]]
     # Uncovered video cannot cause a label change through a distant Viterbi choice.
     for lab, cols in [('H', (0, 1)), ('A', (2, 3)), ('D', (4,))]:
@@ -177,6 +177,29 @@ def decode(inputs, p, baseline, emit, bonus, proba, mask):
                                    p.hybrid_prune_max_frames,
                                    p.hybrid_prune_min_confidence)
     return labels
+
+
+def probability_evidence(proba, mask, team_weight, dead_weight=-1.):
+    """Separate conditional team odds from alive/dead evidence.
+
+    P(team) = P(alive) * P(team|alive). Separate weights can calibrate those two
+    tasks independently. The shared-weight route retains the original arithmetic.
+    """
+    cfg = validator.FusionConfig(weight=team_weight)
+    zero = np.zeros_like(proba, dtype=float)
+    if dead_weight < 0 or dead_weight == team_weight:
+        return validator.fuse(zero, proba, mask, cfg)
+    if not np.isfinite(dead_weight):
+        raise ValueError('dead evidence weight must be finite')
+    q = np.clip(proba, cfg.p_floor, 1. - cfg.p_floor)
+    alive = q[:, :2].sum(axis=1, keepdims=True)
+    evidence = np.empty_like(zero)
+    evidence[:, :2] = team_weight * np.log(q[:, :2] / alive) + dead_weight * np.log(alive)
+    evidence[:, 2] = dead_weight * np.log(q[:, 2])
+    evidence -= evidence.mean(axis=1, keepdims=True)
+    valid = mask & np.isfinite(evidence).all(axis=1)
+    zero[valid] = evidence[valid]
+    return zero
 
 
 def loose_eligibility(proba, mask, threshold):
@@ -247,27 +270,85 @@ def prune_unconfirmed(labels, proba, mask, blocks, maximum=100, minimum=.5):
     return out
 
 
+def combine_artifacts(members, weights):
+    """Combine aligned held-out heads; a member cannot borrow another fold's labels."""
+    weights = np.asarray(weights, dtype=float)
+    if (len(members) < 2 or weights.shape != (len(members),)
+            or not np.isfinite(weights).all() or (weights < 0).any() or weights.sum() <= 0):
+        raise ValueError('supply at least two models and finite nonnegative weights')
+    reference = members[0]
+    timeline = ('public_start','public_stop','folds','purge_frames','train_stride')
+    for member in members:
+        if member['version'] != VERSION:
+            raise ValueError('ensemble members must be ordinary hybrid checkpoints')
+        if (any(member[k] != reference[k] for k in timeline)
+                or not np.array_equal(member['edges'], reference['edges'])
+                or len(member['heads']) != reference['folds']):
+            raise ValueError('ensemble members must share the same purged time folds')
+    out = dict(version=ENSEMBLE_VERSION, model_name='ensemble', members=members,
+               weights=weights / weights.sum(), edges=reference['edges'],
+               **{k:reference[k] for k in timeline})
+    for key in ('tracking_ball_sha256','base_params'):
+        if any(key in member for member in members):
+            if not all(key in member for member in members):
+                raise ValueError('ensemble provenance is incomplete: ' + key)
+            def comparable(value):
+                return ({k:v for k,v in value.items() if not k.startswith('hybrid_')}
+                        if key == 'base_params' else value)
+            if any(comparable(member[key]) != comparable(reference[key]) for member in members):
+                raise ValueError('ensemble members use different baseline inputs: ' + key)
+            out[key] = reference[key]
+    return out
+
+
+def prepare_features(inputs, p, baseline, emit, shape, artifact):
+    if artifact['version'] == VERSION:
+        return features(inputs,p,baseline,emit,shape,artifact['kind'],artifact['legacy_params'])
+    if artifact['version'] == ENSEMBLE_VERSION:
+        return [prepare_features(inputs,p,baseline,emit,shape,m) for m in artifact['members']]
+    raise ValueError('hybrid checkpoint schema differs')
+
+
 def refine(inputs, p, baseline, emit, bonus, shape, artifact, prepared=None):
-    if artifact['version'] != VERSION:
+    if artifact['version'] == VERSION:
+        members, weights = [artifact], np.array([1.])
+        views = [prepared if prepared is not None else prepare_features(
+            inputs,p,baseline,emit,shape,artifact)]
+    elif artifact['version'] == ENSEMBLE_VERSION:
+        all_members = artifact['members']
+        all_weights = combine_artifacts(all_members,artifact['weights'])['weights']
+        if prepared is not None and (not isinstance(prepared,list) or len(prepared) != len(all_members)):
+            raise ValueError('ensemble inference needs one prepared feature view per member')
+        active = np.flatnonzero(all_weights > 0)
+        members = [all_members[i] for i in active]
+        weights = all_weights[active]
+        views = ([prepared[i] for i in active] if prepared is not None else
+                 [prepare_features(inputs,p,baseline,emit,shape,m) for m in members])
+    else:
         raise ValueError('hybrid checkpoint schema differs')
-    prepared = prepared or features(inputs, p, baseline, emit, shape,
-                                     artifact['kind'], artifact['legacy_params'])
-    columns, mask, _, _ = prepared
+    mask = np.logical_and.reduce([view[1] for view in views])
     rows = np.flatnonzero(mask)
-    names = artifact['names']
-    x = validator.matrix(columns, names, rows)
-    def predict(model):
+    if not len(rows):
+        return baseline.copy()
+    matrices = [validator.matrix(view[0],member['names'],rows)
+                for view,member in zip(views,members)]
+    def predict(models):
         q = np.full((inputs.n, 3), np.nan)
-        q[rows] = validator._proba3(model, x)
-        return decode(inputs, p, baseline, emit, bonus, q, mask)
-    output = predict(artifact['full'])
+        if len(models) == 1:
+            q[rows] = validator._proba3(models[0],matrices[0])
+        else:
+            q[rows] = sum(weight * validator._proba3(model,x)
+                          for weight,model,x in zip(weights,models,matrices))
+        return decode(inputs,p,baseline,emit,bonus,q,mask)
+    output = predict([member['full'] for member in members])
     # Independent whole-half decoding per held-out model prevents decoding neighbours
     # with a model trained on the held-out labels and bleeding those labels back in.
-    public = np.arange(artifact['public_start'], artifact['public_stop'])
-    ids = np.clip(np.searchsorted(artifact['edges'], public, side='right') - 1,
-                  0, artifact['folds'] - 1)
-    for f, model in enumerate(artifact['heads']):
-        labels = predict(model)
+    reference = members[0]
+    public = np.arange(reference['public_start'], reference['public_stop'])
+    ids = np.clip(np.searchsorted(reference['edges'], public, side='right') - 1,
+                  0, reference['folds'] - 1)
+    for f in range(reference['folds']):
+        labels = predict([member['heads'][f] for member in members])
         held = public[ids == f]
         output[held] = labels[held]
     return output

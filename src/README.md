@@ -4,11 +4,11 @@ Own pipeline for More than a Hack 2027, Phase 1. Everything outside `src/` is th
 repository (remote `upstream`), kept as is so `git pull upstream main` keeps working. The method,
 the possession rules and what was tried and dropped are in [TECHNICAL.md](TECHNICAL.md).
 
-Latest (November 15): the default now prioritises **macroF1**, as requested. A 34-feature
-logistic head reaches public macroF1 **0.9473**, spellF1 **0.7647**. Its configuration is
-frozen in `configs/macro_v1.json`. The spell-focused alternative (**0.7882** spellF1,
-0.9355 macroF1) remains in `configs/spell_best.json`.
-[MACRO_EXPERIMENTS.md](MACRO_EXPERIMENTS.md) records the tradeoff, fitting and validation.
+Latest (November 15): the default prioritises **macroF1**, as requested. Two video-cadence
+heads reach public macroF1 **0.9491**, spellF1 **0.7529**. Configuration and validation:
+[MACRO_V2.md](MACRO_V2.md), `configs/macro_v2.json`.
+The previous macro checkpoint (**0.9473** / **0.7647**) is in `configs/macro_v1.json`;
+the retained spell-focused alternative (**0.9355** / **0.7882**) is in `configs/spell_best.json`.
 
 The earlier video-gated decoder and bounded dead-ball edges are documented in
 [DECODER_EXPERIMENTS.md](DECODER_EXPERIMENTS.md). Its predecessor is in

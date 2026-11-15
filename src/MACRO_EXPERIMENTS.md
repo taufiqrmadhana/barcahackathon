@@ -1,5 +1,8 @@
 # Macro-focused classifier, November 15
 
+This records b441107 and `configs/macro_v1.json`. The subsequent two-view model is described
+in [MACRO_V2.md](MACRO_V2.md).
+
 The user changed the selection priority to macroF1. The default now uses a single logistic
 classifier with continuous context and video features, fitted with C=1 and fusion weight 0.5.
 The earlier spell-focused checkpoint is preserved separately.
