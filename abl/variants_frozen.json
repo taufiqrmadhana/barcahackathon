@@ -1,0 +1,80 @@
+{
+ "no_teleport": {
+  "use_teleport": 0
+ },
+ "no_interp": {
+  "use_interp": 0
+ },
+ "no_kick_localmax": {
+  "use_kick_localmax": 0
+ },
+ "no_kick": {
+  "use_kick": 0
+ },
+ "no_carry": {
+  "use_carry": 0
+ },
+ "no_clear": {
+  "use_clear": 0
+ },
+ "no_merge": {
+  "use_merge": 0
+ },
+ "no_min_run": {
+  "use_min_run": 0
+ },
+ "no_kick_exempt": {
+  "use_kick_exempt": 0
+ },
+ "no_out": {
+  "use_out": 0
+ },
+ "no_out_hold": {
+  "use_out_hold": 0
+ },
+ "no_restart_lag": {
+  "use_restart_lag": 0
+ },
+ "no_still_seen": {
+  "use_still_seen": 0
+ },
+ "no_still_missing_speed": {
+  "use_still_missing_speed": 0
+ },
+ "no_shape_dead": {
+  "use_shape_dead": 0
+ },
+ "no_shape_dead_seen": {
+  "use_shape_dead_seen": 0
+ },
+ "no_min_alive": {
+  "use_min_alive": 0
+ },
+ "no_min_dead": {
+  "use_min_dead": 0
+ },
+ "no_first_contact": {
+  "use_first_contact": 0
+ },
+ "no_shape_restart": {
+  "use_shape_restart": 0
+ },
+ "no_min_spell": {
+  "use_min_spell": 0
+ },
+ "no_shape": {
+  "use_shape": 0
+ },
+ "no_shape_gap": {
+  "use_shape_gap": 0
+ },
+ "no_shape_gap_switch": {
+  "use_shape_gap_switch": 0
+ },
+ "no_shape_gap_insert": {
+  "use_shape_gap_insert": 0
+ },
+ "add_still_long": {
+  "use_still_long": 1
+ }
+}

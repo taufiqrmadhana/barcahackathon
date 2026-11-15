@@ -1,0 +1,13 @@
+{
+ "add_graded_sign": {
+  "use_graded_sign": 1
+ },
+ "add_graded_train": {
+  "use_graded_train": 1
+ },
+ "add_s7_all": {
+  "use_still_long": 1,
+  "use_graded_sign": 1,
+  "use_graded_train": 1
+ }
+}

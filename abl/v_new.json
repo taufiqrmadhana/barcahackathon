@@ -1,0 +1,4 @@
+{"no_dead_memory":{"use_dead_memory":0},"no_lost_exit":{"use_lost_exit":0},"no_fast_restart":{"use_fast_restart":0},"no_still_long":{"use_still_long":0},
+ "no_mem_slow_gate":{"mem_slow":99},"still_long_1.0":{"still_long":1.0},"still_long_1.4":{"still_long":1.4},"still_long_1.6":{"still_long":1.6},
+ "mem_hold_500":{"mem_hold_max":500},"mem_hold_1500":{"mem_hold_max":1500},"mem_fast_5":{"mem_fast":5.0},"mem_fast_8":{"mem_fast":8.0},
+ "mem_lag_12":{"mem_lag":12},"mem_lag_25":{"mem_lag":25},"add_tag_dead":{"use_tag_dead":1},"no_out_hold":{"use_out_hold":0},"no_shape_dead":{"use_shape_dead":0},"no_shape_dead_seen":{"use_shape_dead_seen":0},"no_min_alive":{"use_min_alive":0}}
