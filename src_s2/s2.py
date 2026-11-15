@@ -46,7 +46,60 @@ def runs(mask):
     return list(zip(np.flatnonzero(d == 1), np.flatnonzero(d == -1)))
 
 
-def clean_ball(bx, by, p):
+def smooth(x, y, valid, p):
+    """S8: Savitzky-Golay (order 2, window smooth_win frames) over every valid run (0 = off)."""
+    sw = int(p.get("smooth_win", 0))
+    if sw < 5:
+        return x, y
+    from scipy.signal import savgol_filter
+    sx, sy = x.copy(), y.copy()
+    for a, b in runs(valid):
+        if b - a >= sw:
+            sx[a:b] = savgol_filter(x[a:b], sw, 2, mode="interp")
+            sy[a:b] = savgol_filter(y[a:b], sw, 2, mode="interp")
+    return sx, sy
+
+
+def velocity(x, y, m=2):
+    """Central difference over +-m frames [m/s] (NaN at the ends / where the position is NaN)."""
+    vx = np.full_like(x, np.nan)
+    vy = np.full_like(y, np.nan)
+    vx[m:-m] = (x[2 * m:] - x[:-2 * m]) / (2 * m) * FPS
+    vy[m:-m] = (y[2 * m:] - y[:-2 * m]) / (2 * m) * FPS
+    return vx, vy
+
+
+def kick_span(sigma, p):
+    """S8 noise-matched differencing span m (frames): the smallest m >= kick_k for which a velocity
+    change of kick_dv is noise_z standard deviations of the noise in dv = |v(t+m) - v(t-m)|, with
+    per-component std sigma*sqrt(6)*FPS/(2m) (2nd difference of iid position noise), 2-D: *sqrt(2).
+    Clean tracks (sigma ~ 0.003 m) keep m = kick_k = 2: the S7b detector."""
+    m = int(p.kick_k)
+    if not p.on("kick_span_auto", 0):
+        return m
+    while m < p.kick_span_max and p.noise_z * sigma * np.sqrt(6) * np.sqrt(2) * FPS / (2 * m) > p.kick_dv:
+        m += 1
+    return m
+
+
+def noise_floors(sigma, p):
+    """Quantiles of |v| and of the velocity change |v(t+k)-v(t-k)| that pure iid position noise of
+    std `sigma` produces after the SAME smoothing + velocity pipeline (seeded simulation).
+    Returns (v_floor, dv_floor) for the quantile p.noise_q."""
+    n = 6000
+    rng = np.random.default_rng(12345)
+    nx, ny = rng.normal(0, sigma, n), rng.normal(0, sigma, n)
+    ones = np.ones(n, bool)
+    nx, ny = smooth(nx, ny, ones, p)
+    vx, vy = velocity(nx, ny)
+    k = p.kick_k
+    dv = np.hypot(vx[2 * k:] - vx[:-2 * k], vy[2 * k:] - vy[:-2 * k])
+    v = np.hypot(vx[2:-2], vy[2:-2])
+    q = p.noise_q
+    return float(np.quantile(v, q)), float(np.nanquantile(dv, q))
+
+
+def clean_ball(bx, by, p, info=None):
     """Drop teleports (points far from a 5-frame running median), interpolate gaps <= max_gap."""
     seen = ~np.isnan(bx)
     x, y = bx.copy(), by.copy()
@@ -69,16 +122,22 @@ def clean_ball(bx, by, p):
         x[a:b] = x[a - 1] + (x[b] - x[a - 1]) * t
         y[a:b] = y[a - 1] + (y[b] - y[a - 1]) * t
         valid[a:b] = True
-    # velocity: central difference over +-2 frames, NaN where not valid
-    vx = np.full_like(x, np.nan)
-    vy = np.full_like(y, np.nan)
-    vx[2:-2] = (x[4:] - x[:-4]) / 4 * FPS
-    vy[2:-2] = (y[4:] - y[:-4]) / 4 * FPS
+    if info is not None:
+        # noise level of the ball track: robust sigma of the 2nd difference of seen triples
+        ok = seen[2:] & seen[1:-1] & seen[:-2]
+        d2 = np.r_[(x[2:] - 2 * x[1:-1] + x[:-2])[ok], (y[2:] - 2 * y[1:-1] + y[:-2])[ok]]
+        info["sigma"] = float(np.median(np.abs(d2)) / 0.6745 / np.sqrt(6)) if len(d2) else 0.0
+    if info is not None and p.get("smooth_mult", 0) > 0:
+        m = kick_span(info["sigma"], p)
+        if m > p.kick_k:  # noisy track: smooth over ~ the differencing span (clean tracks: untouched)
+            p = Params({**p, "smooth_win": int(p.smooth_mult * m + 1)})
+    x, y = smooth(x, y, valid, p)
+    vx, vy = velocity(x, y)
     return x, y, valid, seen, vx, vy
 
 
 # --------------------------------------------------------------------------------------- contacts
-def contacts(inp, x, y, vx, vy, p):
+def contacts(inp, x, y, vx, vy, p, floors=None, m=None):
     """Per-frame contact team (H/A, -1 none) and per-team nearest distances."""
     teams = inp["teams"]
     px, py = inp["px"], inp["py"]
@@ -90,25 +149,32 @@ def contacts(inp, x, y, vx, vy, p):
     dmin = dist[np.arange(len(x)), near]
     team = teams[near].astype(np.int8)
 
-    # player velocity of the nearest slot (central difference +-2)
-    pvx = np.full(px.shape, np.nan)
-    pvy = np.full(py.shape, np.nan)
-    pvx[2:-2] = (px[4:] - px[:-4]) / 4 * FPS
-    pvy[2:-2] = (py[4:] - py[:-4]) / 4 * FPS
+    # player velocity of the nearest slot (central difference +-m), ball likewise
+    k = m if m is not None else p.kick_k
+    if k != 2:
+        vx, vy = velocity(x, y, k)
+    pvx, pvy = velocity(px, py, k)
     r = np.arange(len(x))
     rel = np.hypot(vx - pvx[r, near], vy - pvy[r, near])
 
     # ball velocity change (a kick / deflection / trap): |v(t+k) - v(t-k)|
-    k = p.kick_k
     dv = np.zeros(len(x))
     dv[k:-k] = np.hypot(vx[2 * k:] - vx[:-2 * k], vy[2 * k:] - vy[:-2 * k])
     dv = np.nan_to_num(dv)
+    kick_dv, carry_rel = p.kick_dv, p.carry_rel
+    if floors is not None:
+        # S8: a velocity change / relative speed that iid noise of the measured level produces at
+        # quantile noise_q after the same smoothing is not evidence of a touch
+        if p.on("kick_noise", 0):
+            kick_dv = max(kick_dv, floors[1])
+        if p.on("carry_noise", 0):
+            carry_rel = max(carry_rel, floors[0])
     # second-closest opponent margin: ambiguous if both teams equally close
     other = np.where(team == 0, dA, dH)
     with np.errstate(invalid="ignore"):
         clear = np.nan_to_num(other - dmin, nan=0.0, posinf=99.0) >= p.clear_margin
 
-    kick = (dv >= p.kick_dv) & (dmin <= p.r_touch)
+    kick = (dv >= kick_dv) & (dmin <= p.r_touch)
     # local maximum of dv within +-k
     from scipy.ndimage import maximum_filter1d
     if p.on("use_kick_localmax"):
@@ -116,7 +182,7 @@ def contacts(inp, x, y, vx, vy, p):
     kick_raw = kick.copy()  # restart detection in dead_mask uses this one
     if not p.on("use_kick"):
         kick &= False
-    carry = (dmin <= p.r_carry) & (np.nan_to_num(rel, nan=99) <= p.carry_rel)
+    carry = (dmin <= p.r_carry) & (np.nan_to_num(rel, nan=99) <= carry_rel)
     if not p.on("use_carry"):
         carry &= False
     if not p.on("use_clear"):
@@ -363,8 +429,18 @@ def assemble(own, dead, cruns, p, proba=None):
 def predict(inp, p, debug=False):
     if not p.on("use_shape") and inp.get("shape") is not None:
         inp = {**inp, "shape": None}  # ablation: no team-shape model at all
-    x, y, valid, seen, vx, vy = clean_ball(inp["bx"], inp["by"], p)
-    con = contacts(inp, x, y, vx, vy, p)
+    bx, by = inp["bx"], inp["by"]
+    if p.get("noise_sigma", 0) > 0:
+        # stress test only (never in a submission): seeded iid Gaussian noise [m] on the seen ball
+        rng = np.random.default_rng(int(p.get("noise_seed", 0)))
+        bx = bx + rng.normal(0, p.noise_sigma, bx.shape)
+        by = by + rng.normal(0, p.noise_sigma, by.shape)
+    info = {}
+    x, y, valid, seen, vx, vy = clean_ball(bx, by, p, info)
+    floors = noise_floors(info["sigma"], p) if p.get("noise_q", 0) > 0 else None
+    m = kick_span(info["sigma"], p)
+    info["span"] = m
+    con = contacts(inp, x, y, vx, vy, p, floors, m)
     cruns = contact_runs(con["c"], con["kick"], p)
     own = shift(owner_from_runs(cruns, inp["n"], p), p.lag)
     if inp.get("shape") is not None and p.get("shape_gap", 0) > 0 and p.on("use_shape_gap"):
