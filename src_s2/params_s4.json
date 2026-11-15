@@ -59,5 +59,22 @@
   "still_long": 1.0,
   "still_long_win": 250,
   "use_graded_sign": 0,
-  "use_graded_train": 0
+  "use_graded_train": 0,
+  "use_dead_memory": 0,
+  "mem_hold_max": 750,
+  "use_lost_exit": 1,
+  "mem_lost_gap": 50,
+  "mem_edge": 2.0,
+  "use_fast_restart": 1,
+  "mem_fast": 6.0,
+  "mem_min_delay": 50,
+  "mem_rest": 1.0,
+  "mem_lag": 0,
+  "mem_slow": 99,
+  "mem_slow_win": 125,
+  "mem_gap_before": 25,
+  "use_tag_dead": 0,
+  "tag_pre": 50,
+  "tag_post": 50,
+  "tag_ko_pre": 75
 }

@@ -245,9 +245,43 @@ def dead_mask(inp, x, y, valid, seen, vx, vy, kick, p):
     # the ball inside the pitch, after which the ball keeps moving; plus restart_lag frames (the
     # public GT turns alive ~1 s after the restart strike)
     kicks = np.flatnonzero(kick & seen & ~out)
-    for a, b in runs(out):
+    exits = [(a, b) for a, b in runs(out)]
+    hold_max = p.out_hold_max
+    if p.on("use_dead_memory", 0):
+        # S7b dead memory (idea of Valdi's model_v2.dead_memory, re-implemented): the ball leaves
+        # play -> dead until a restart. Differences to the out-hold above: (1) the hold lasts up to
+        # mem_hold_max frames, (2) a restart is also "the ball starts moving fast again" (a kick
+        # after a ball-less gap has no measurable velocity change), (3) a ball that disappears
+        # next to a line for >= mem_lost_gap frames counts as having left play.
+        hold_max = p.mem_hold_max
+        if p.on("use_lost_exit"):
+            Lx, Wy = inp["L"], inp["W"]
+            si = np.flatnonzero(seen)
+            for a, b in runs(~seen):
+                if b - a < p.mem_lost_gap or a == 0 or b >= n:
+                    continue
+                j = si[np.searchsorted(si, a) - 1] if np.searchsorted(si, a) > 0 else None
+                if j is None:
+                    continue
+                edge = min(x[j], Lx - x[j], y[j], Wy - y[j])
+                if edge < p.mem_edge and np.mean(sp[a:min(b, a + p.get("mem_slow_win", 125))]) < p.get("mem_slow", 99):
+                    exits.append((a, b))
+            exits.sort()
+    fast = np.array([], int)
+    if p.on("use_dead_memory", 0) and p.on("use_fast_restart"):
+        # restart candidates: fast ball motion in a seen run that starts after a ball-less gap
+        # (the kick detector needs the ball velocity before the strike, which a gap hides)
+        fast_l, mg = [], p.get("mem_gap_before", 25)
+        for r0, r1 in runs(seen):
+            if r0 == 0 or (~seen[max(0, r0 - mg):r0]).sum() < mg:
+                continue
+            ff = np.flatnonzero((bspeed[r0:r1] > p.get("mem_fast", 6.0)) & ~out[r0:r1])
+            if len(ff):
+                fast_l.append(r0 + ff[0])
+        fast = np.array(fast_l, int)
+    for a, b in exits:
         i = np.searchsorted(kicks, b)
-        t = min(n, b + p.out_hold_max)
+        t = min(n, b + hold_max)
         if not p.on("use_out_hold"):
             t = b  # dead only while the ball is outside
             i = len(kicks)
@@ -257,12 +291,29 @@ def dead_mask(inp, x, y, valid, seen, vx, vy, kick, p):
                 t = min(n, k + (p.restart_lag if p.on("use_restart_lag") else 0))
                 break
             i += 1
+        if len(fast):
+            # ball moving fast again after the exit: restart at the onset of that motion
+            j = np.searchsorted(fast, a + p.get("mem_min_delay", 0))
+            if j < len(fast) and fast[j] < t:
+                f = fast[j]
+                g = f
+                while g > b and g > f - 50 and seen[g - 1] and bspeed[g - 1] > p.get("mem_rest", 1.0):
+                    g -= 1  # onset of the motion (stays inside the seen run: unseen frames stop it)
+                t = min(t, g + p.get("mem_lag", 0))
         # fallback: play visibly running again (ball inside and moving, players fast)
         run_again = np.flatnonzero(seen[b:t] & ~out[b:t] & (sm[b:t] >= p.resume_speed)
                                    & (bspeed[b:t] > p.restart_speed))
         if len(run_again):
             t = min(t, b + run_again[0])
         dead[a:t] = True
+    if p.on("use_tag_dead", 0):
+        # Smart Tagging set pieces: the tag starts when the ball is dead (throw-in, corner, goal
+        # kick, free kick); a kick-off after a goal is the restart itself, dead just before it
+        for ts, _te, _side, ty in inp.get("set_pieces", []):
+            if "Kick Off" in (ty or ""):
+                dead[max(0, ts - p.get("tag_ko_pre", 75)):ts] = True
+            else:
+                dead[max(0, ts - p.get("tag_pre", 50)):ts + p.get("tag_post", 50)] = True
     # cleanup: bridge short alive islands inside stoppages, drop short dead blips
     if p.on("use_min_alive"):
         for a, b in runs(~dead):
