@@ -1,7 +1,8 @@
 # Borrow Khan technical submission
 
-Four-page English technical report with a single-column layout, 11 pt body text,
-and seven explanatory/data figures. Author names and registered team name are in `team.tex`.
+Three-page English technical report using the IEEEtran conference template:
+two columns, 10 pt body text, and seven explanatory/data figures. Author names
+and registered team name are in `team.tex`.
 The described algorithm is frozen at code revision `b8e4ad0` on `taufiq`.
 
 Build from the repository root with Python 3, Matplotlib and either Tectonic or pdfLaTeX:
@@ -16,7 +17,7 @@ python3 src/submission/build.py --plot-python .venv-docs/bin/python
 
 Tectonic installation: <https://tectonic-typesetting.github.io/install.html>.
 The local build can use `cache/document_tools/tectonic` if already installed.
-The document uses standard TeX Live/Overleaf packages. Install the plotting
+Standard TeX Live/Overleaf provides IEEEtran and the other document packages. Install the plotting
 dependency from `src/submission/requirements.txt` in the chosen Python environment.
 The local build also detects the existing `.venv-cv` plotting environment.
 

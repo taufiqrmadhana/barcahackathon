@@ -1,279 +1,296 @@
-\documentclass[a4paper,11pt]{article}
-\usepackage[T1]{fontenc}
-\usepackage[a4paper,left=18mm,right=18mm,top=18mm,bottom=17mm,headheight=13pt,headsep=7mm,footskip=10mm]{geometry}
-\usepackage{amsmath,booktabs,array,graphicx,tikz,xurl,listings,fancyhdr}
+\RequirePackage[T1]{fontenc}
+\documentclass[conference,a4paper,10pt]{IEEEtran}
+\usepackage{amsmath,amssymb,booktabs,array,graphicx,tikz,xurl,listings,balance}
 \usetikzlibrary{arrows.meta,positioning,calc}
 \usepackage[hidelinks]{hyperref}
-\renewcommand{\rmdefault}{ptm}
-\renewcommand{\sfdefault}{phv}
-\definecolor{Ink}{HTML}{1F2D38}
 \definecolor{Blue}{HTML}{185B80}
 \definecolor{Orange}{HTML}{B45E22}
 \definecolor{Muted}{HTML}{536573}
 \definecolor{Pale}{HTML}{EDF3F6}
 \definecolor{Line}{HTML}{DCE4E9}
-\definecolor{Home}{HTML}{185B80}
-\definecolor{Away}{HTML}{B45E22}
 \input{team.tex}
 \input{metrics.tex}
 \hypersetup{pdftitle={Recovering Football Possession Spells with Tracking, Video and Temporal Consensus},
-  pdfauthor={\PDFAuthors},pdfsubject={Borrow Khan -- visual technical document, Phase 1}}
-\pagestyle{fancy}\fancyhf{}
-\fancyhead[L]{\sffamily\scriptsize\color{Muted}BORROW KHAN\quad /\quad MORE THAN A HACK 2027}
-\fancyhead[R]{\sffamily\scriptsize\color{Muted}PHASE 1}
-\fancyfoot[L]{\sffamily\scriptsize\color{Muted}Code checkpoint \CodeRevision}
-\fancyfoot[R]{\sffamily\scriptsize\color{Muted}\thepage\ / 4}
-\renewcommand{\headrulewidth}{.3pt}
-\setlength{\parindent}{0pt}\setlength{\parskip}{5pt}
-\renewcommand{\baselinestretch}{1.08}
-\setlength{\tabcolsep}{6pt}
-\color{Ink}
+ pdfauthor={\PDFAuthors},pdfsubject={Borrow Khan -- IEEE two-column technical document, Phase 1}}
 \newcommand{\file}[1]{\path{#1}}
-\newcommand{\heading}[1]{\par\vspace{5pt}{\sffamily\bfseries\color{Blue}\large #1}\par\vspace{2pt}}
-\newcommand{\pageheading}[3]{%
-  {\sffamily\scriptsize\bfseries\color{Blue}#1\quad /\quad BORROW KHAN TECHNICAL DOCUMENT}\par
-  \vspace{3pt}{\sffamily\bfseries\fontsize{22}{25}\selectfont #2}\par
-  {\color{Muted}#3}\par\vspace{6pt}}
-\newcommand{\metric}[3]{\colorbox{Pale}{\begin{minipage}[c][17mm][c]{.22\linewidth}
-  \centering{\sffamily\bfseries\fontsize{20}{23}\selectfont\color{Blue}#1}\par
-  {\sffamily\small\bfseries #2}\par{\scriptsize\color{Muted}#3}\end{minipage}}}
-\newcommand{\captionline}[1]{\par{\small\raggedright\color{Muted}#1\par}}
-\newcommand{\notice}[1]{\par\colorbox{Pale}{\parbox{\dimexpr\linewidth-2\fboxsep\relax}{\small #1}}\par}
-\lstset{basicstyle=\ttfamily\footnotesize,breaklines=true,columns=fullflexible,
-  keepspaces=true,showstringspaces=false,frame=single,rulecolor=\color{Line},
-  backgroundcolor=\color{Pale},framerule=.3pt,aboveskip=4pt,belowskip=4pt,
-  xleftmargin=3pt,xrightmargin=3pt}
+\lstset{basicstyle=\ttfamily\scriptsize,breaklines=true,columns=fullflexible,
+ keepspaces=true,showstringspaces=false,frame=single,rulecolor=\color{Line},
+ framerule=.3pt,aboveskip=5pt,belowskip=5pt,xleftmargin=3pt,xrightmargin=3pt}
+\title{Recovering Football Possession Spells\\with Tracking, Video and Temporal Consensus}
+\author{\IEEEauthorblockN{\TeamAuthors}
+ \IEEEauthorblockA{Team \TeamName\\More than a Hack 2027 --- Phase 1 Technical Document}}
 \begin{document}
+\maketitle
 
-{\sffamily\scriptsize\bfseries\color{Blue}SHORT TECHNICAL DOCUMENT\quad /\quad TEAM \MakeUppercase{\TeamName}}\par
-\vspace{4pt}
-{\sffamily\bfseries\fontsize{23}{27}\selectfont Recovering football possession spells}\par
-{\sffamily\fontsize{16}{21}\selectfont with tracking, video and temporal consensus}\par
-\vspace{5pt}
-{\small\TeamAuthors}\par
-\vspace{7pt}
-\metric{0.875}{Spell-F1}{Public OOF evaluation}\hfill
-\metric{0.95613}{Macro-F1}{Home / away / dead}\hfill
-\metric{14 / 17}{GT spells matched}{15 predicted spells}\hfill
-\metric{5 folds}{Time-based validation}{5-second purge}
-\vspace{5pt}
+\begin{abstract}
+We reconstruct possession from automatic tracking and tactical video using a
+physical state decoder, external ownership/shape models and complementary video
+classifiers. The final refinement combines separate dead-ball estimation with
+short oscillation removal and agreement on short possession boundaries. Both
+video mixtures use matching held-out classifiers and are decoded before public
+slices are stitched. On the 7,500-frame public window, the system achieves
+spell-F1 \SpellScore{} and macro-F1 \MacroScore{}, matching 14 of 17 GT spells
+with one spurious prediction. All method selection reuses this public slice;
+private and unseen-match performance remain unknown.
+\end{abstract}
 
-We reconstruct possession from noisy tracking and tactical video. A physical
- decoder preserves continuity; complementary video predictions then repair short
-team oscillations and possession boundaries. The output is one H/A/D/X label
-for each of 199,319 tactical frames at 25\,Hz~\cite{challenge}.
+\section{Task and System Overview}
+The challenge requires H (home), A (away), D (dead ball) or X outside our graded-half
+windows for 199,319 tactical frames at 25\,Hz~\cite{challenge}. We combine physical
+continuity and learned evidence, then repair short temporal disagreements
+(Fig.~\ref{fig:pipeline}). All labels are generated algorithmically.
 
-\heading{1\quad System at a glance}
-\begin{center}
-\begin{tikzpicture}[font=\small,
- box/.style={draw=Line,rounded corners=2pt,align=center,inner sep=5pt,
-             minimum height=13mm,text width=45mm,fill=Pale},
- wide/.style={box,text width=72mm},
- link/.style={-{Latex[length=2mm]},draw=Blue,thick}]
-\node[box] (input) at (2.6,0) {\textbf{Inputs}\newline ATD + video/audio\newline homography + tagging};
-\node[box] (physical) at (8.5,0) {\textbf{Physical HSMM}\newline control / loose / dead\newline contact + player shape};
-\node[box] (heads) at (14.4,0) {\textbf{Video feature heads}\newline dense / 5\,Hz / motion\newline fused-ball crop expert};
-\node[wide] (primary) at (4.2,-2.0) {\textbf{PRIMARY}\newline 0.75 dense + 0.25 5\,Hz\newline ordered motion / fused experts};
-\node[wide] (aux) at (12.8,-2.0) {\textbf{AUXILIARY}\newline 0.5 dense + 0.5 motion\newline matching held-out classifier};
-\node[box,text width=154mm,minimum height=12mm] (decode) at (8.5,-3.8)
- {\textbf{Average P(D) separately; decode both mixtures}\newline preserve primary conditional home/away odds};
-\node[box,text width=154mm,minimum height=11mm,fill=Blue,text=white,draw=Blue] (output) at (8.5,-5.3)
- {\textbf{Temporal agreement $\rightarrow$ held-out stitching $\rightarrow$ CSV}\newline
- H: home\quad A: away\quad D: dead ball\quad X: outside graded halves};
-\draw[link] (input)--(physical);\draw[link] (physical)--(heads);
-\draw[link] (heads.south)--++(0,-.3)-|(primary.north);
-\draw[link] (heads.south)--++(0,-.3)-|(aux.north);
-\draw[link] (primary.south)--(primary.south|-decode.north);
-\draw[link] (aux.south)--(aux.south|-decode.north);
-\draw[link] (decode)--(output);
-\end{tikzpicture}
-\end{center}
-\captionline{Figure 1. Physical context supports both video mixtures. All temporal operations
-run inside each matching held-out head, before the public slices are joined.}
+\section{Data and Model Assets}
+\textbf{Provided assets.} ATD and homography supply ball/player geometry and
+video-to-pitch alignment. Tactical video/audio provides ball/motion features,
+a 3.8\,kHz whistle score and scoreboard changes. Smart Tagging, team metadata
+and official kick-off timing supply restart/structural cues. Broadcast video
+is unused; the physical phase-team prior has zero direct weight.
 
-\heading{Assets and their roles}
-{\small\renewcommand{\arraystretch}{1.13}
-\begin{tabular}{@{}p{.27\linewidth}p{.69\linewidth}@{}}
-\toprule
-\textbf{Asset} & \textbf{Use in the submitted system}\\\midrule
-ATD + homography & Clean/fuse ball positions; measure player motion, control and contact.\\
-Tactical video/audio & YOLO11s ball candidates~\cite{yolo}; frozen FILM residuals~\cite{film}; whistle and scoreboard cues.\\
-Tagging + metadata & Teams, set pieces, restarts and official kick-off timing.\\
-Metrica games 1--3 & Event-derived weak labels train external ownership, transition and player-shape models~\cite{metrica}.\\
-\bottomrule
-\end{tabular}}
-\captionline{Broadcast video is unused. The physical decoder's broad phase-team prior has
-zero direct weight; legacy video context retains its own configured features.}
-{\small\textbf{Model provenance.} YOLO11s is COCO-pretrained and exported to OpenVINO
-(INT8 calibration: 200 unlabelled crops). Frozen FILM uses $t\pm2$ frames and
-$256\times192$ crops. External histogram-boosting models use clean/corrupted Metrica
-tracking and weak event labels. Base shape self-training uses 8 time blocks, a 10\,s
-guard and 2 rounds; external shape replaces its conditional H/A ratio only.}
+\textbf{Public vision models.} COCO-pretrained YOLO11s~\cite{yolo}, exported
+to OpenVINO with unlabelled INT8 calibration, detects ball candidates in tracked
+crops and independent grid searches. A temporal tracker fuses them with ATD.
+Frozen FILM~\cite{film} predicts $t$ from $t\pm2$ frames; residuals in
+$256\times192$ ball/player crops and flow/crossfade references measure motion changes.
+Neither model is trained on possession labels.
 
-\newpage
-\pageheading{02}{How predictions become possessions}{Two conservative temporal rules repair short disagreements.}
+\textbf{External supervision.} Metrica games 1--3~\cite{metrica} supply weak
+event labels for histogram-boosting ownership, transition and shape models,
+trained on clean/corrupted tracking. Base shape self-training uses physical
+pseudo-labels (8 blocks, 10\,s guard, 2 rounds); external shape replaces only its
+conditional H/A ratio. Match assets/caches remain outside public Git.
+We acknowledge Metrica Sports; FILM uses Apache-2.0 and YOLO11 follows upstream terms.
 
-\heading{1\quad Remove short ownership oscillations}
-\begin{minipage}[c]{.57\linewidth}
+\begin{figure}[!t]
 \centering
-\begin{tikzpicture}[font=\small,x=1.35cm,y=1.2cm]
+\begin{tikzpicture}[font=\footnotesize,
+ box/.style={draw=Line,rounded corners=1pt,align=center,inner sep=4pt,
+ text width=71mm,minimum height=9mm,fill=Pale},
+ arrow/.style={-{Latex[length=1.7mm]},Blue,thick}]
+\node[box] (input) {\textbf{Tracking, video/audio, homography, tagging}\\
+ Clean/fused ball, contact, player shape and restart cues};
+\node[box,below=3mm of input] (base) {\textbf{Physical HSMM baseline}\\
+ Home/away control and loose states; duration-constrained D};
+\node[box,below=3mm of base] (heads) {\textbf{Primary and auxiliary video mixtures}\\
+ Primary: 0.75 dense + 0.25 5\,Hz + ordered experts\\
+ Auxiliary: 0.5 dense + 0.5 motion};
+\node[box,below=3mm of heads] (decode) {\textbf{Average P(D); independently decode both mixtures}\\
+ Preserve primary conditional H/A; use matching held-out heads};
+\node[box,below=3mm of decode,fill=Blue,text=white,draw=Blue] (out)
+ {\textbf{Temporal agreement $\rightarrow$ public stitching $\rightarrow$ CSV}\\
+ H / A / D on graded halves; X outside};
+\draw[arrow] (input)--(base);\draw[arrow] (base)--(heads);
+\draw[arrow] (heads)--(decode);\draw[arrow] (decode)--(out);
+\end{tikzpicture}
+\caption{Inference pipeline. Temporal corrections precede public stitching;
+full-data refits are used only outside the public window.}
+\label{fig:pipeline}
+\end{figure}
+
+\begin{figure*}[!t]
+\centering\includegraphics[width=.98\textwidth]{figures/ablation.pdf}
+\caption{Public ablation under the same five-fold protocol. All bars start
+at zero and exact scores are annotated. Temporal cleanup drives the spell-F1 gain;
+separate P(D) averaging gives the final macro-F1 improvement.}
+\label{fig:ablation}
+\end{figure*}
+
+\section{Method and Possession Rules}
+\subsection{Physical Continuity and Contact Evidence}
+Viterbi states are $H_{\rm ctrl},H_{\rm loose},A_{\rm ctrl},A_{\rm loose}$ and a
+D chain. Loose states retain possession through passes and contested travel;
+team changes require the other control state. Geometry, motion, contacts,
+whistles and restart cues supply emissions/transition bonuses.
+The raw-ATD contact vote switches midway between opposing contacts and abstains
+beyond 5\,s from a ball observation.
+
+D is never possession: its chain enforces 100 frames minimum and exits into
+control. Video can move D edges by at most 12 frames while preserving phase
+centres. Official kick-off timing and confirmed scoreboard-to-restart intervals
+supply structural D. Halves are independent; cleanup preserves D while merging
+surrounded team islands shorter than 12 frames.
+
+\subsection{Video Mixtures and Separate Dead-Ball Evidence}
+Each head is an imputed, standardised logistic classifier trained on 301 native
+1\,Hz public rows, with 34 continuous/context/video features. The primary is
+0.75 dense/raw ($C=1$) plus 0.25 raw/5\,Hz ($C=3$). Ordered H/A experts are
+motion ($C=1$, six extra features), then fused-ball crops ($C=3$). An expert
+acts when primary confidence is below 0.8 and its own exceeds 0.9; earlier
+confident choices keep priority and P(D) is preserved. The auxiliary is
+0.5 dense/raw plus 0.5 motion.
+
+For primary $q$ after experts and auxiliary $r$, average only dead-ball probability:
+\begin{equation}
+\bar q_D=\tfrac12(q_D+r_D),\qquad
+\bar q_k=(1-\bar q_D)\frac{q_k}{q_H+q_A},
+\end{equation}
+for $k\in\{H,A\}$. Missing/undefined evidence abstains. Team and alive/dead
+log-evidence weights are 0.5 and 2.0. Existing pruning removes surrounded
+islands up to 100 frames when mean conditional own-team confidence is below
+0.5. Missing experts abstain. Video holes over 1\,s are not interpolated;
+uncovered output retains the physical baseline.
+
+\begin{figure}[!t]
+\centering
+\begin{tikzpicture}[font=\footnotesize,x=1.1cm,y=1cm]
 \node[anchor=west,font=\scriptsize\color{Muted}] at (0,1.15) {BEFORE};
-\fill[Home] (0,.45) rectangle (2,.9);
-\fill[Away] (2,.45) rectangle (3,.9);
-\fill[Home] (3,.45) rectangle (6,.9);
+\fill[Blue] (0,.45) rectangle (2,.9);
+\fill[Orange] (2,.45) rectangle (3,.9);
+\fill[Blue] (3,.45) rectangle (6,.9);
 \node[text=white] at (1,.675) {H: 2\,s};
-\node[text=white,font=\scriptsize] at (2.5,.675) {A: 1\,s};
+\node[text=white] at (2.5,.675) {A: 1\,s};
 \node[text=white] at (4.5,.675) {H: 3\,s};
-\node[font=\scriptsize] at (1,.18) {$c_L=0.88$};
-\node[font=\scriptsize] at (2.5,.18) {$c_M=0.72$};
-\node[font=\scriptsize] at (4.5,.18) {$c_R=0.94$};
+\node[font=\scriptsize] at (1,.18) {$c_L=.88$};
+\node[font=\scriptsize] at (2.5,.18) {$c_M=.72$};
+\node[font=\scriptsize] at (4.5,.18) {$c_R=.94$};
 \node[anchor=west,font=\scriptsize\color{Muted}] at (0,-.25) {AFTER};
-\fill[Home] (0,-.95) rectangle (6,-.5);
+\fill[Blue] (0,-.95) rectangle (6,-.5);
 \node[text=white] at (3,-.725) {Home: one continuous 6-second spell};
-\draw[-{Latex[length=2mm]},Blue,thick] (6.3,.68)--(6.3,-.72);
+\draw[-{Latex[length=1.7mm]},Blue,thick] (6.3,.68)--(6.3,-.72);
 \end{tikzpicture}
-\end{minipage}\hfill
-\begin{minipage}[c]{.39\linewidth}
-\textbf{Apply only when:}\par
-Each of the three spells is at most 4\,s; both neighbours support their team
-above chance; pooled neighbour confidence exceeds the middle's confidence.
-\[
-\frac{2(0.88)+3(0.94)}{2+3}=0.916>0.72
-\]
-Select disjoint proposals once. Merges do not cascade.
-\end{minipage}
-\captionline{Figure 2. Illustrative timeline, not measured match data. Confidence is
-conditional on alive play. The rule is symmetric for H/A/H and A/H/A.}
+\caption{Illustrative oscillation removal, not measured match data. Pooled
+neighbour confidence is $(2(.88)+3(.94))/5=.916>.72$; all three input spells
+are at most 4\,s. The rule is symmetric for H/A/H and A/H/A.}
+\label{fig:oscillation}
+\end{figure}
 
-\heading{2\quad Extend short spells that both models support}
-\begin{minipage}[c]{.57\linewidth}
+\begin{figure}[!t]
 \centering
-\begin{tikzpicture}[font=\small,x=1cm,y=1cm]
+\begin{tikzpicture}[font=\footnotesize,x=.82cm,y=1cm]
 \node[anchor=east] at (1.5,1.0) {Primary};
 \node[anchor=east] at (1.5,.3) {Auxiliary};
 \node[anchor=east,font=\bfseries] at (1.5,-.4) {Union};
-\fill[Home!72] (3.4,.8) rectangle (7,1.2);
-\fill[Home!48] (2.5,.1) rectangle (7.9,.5);
-\fill[Home] (2.5,-.6) rectangle (7.9,-.2);
+\fill[Blue!72] (3.4,.8) rectangle (7,1.2);
+\fill[Blue!48] (2.5,.1) rectangle (7.9,.5);
+\fill[Blue] (2.5,-.6) rectangle (7.9,-.2);
 \node[text=white] at (5.2,1) {H};\node at (5.2,.3) {H};
 \node[text=white] at (5.2,-.4) {H: 3 seconds};
 \draw[Muted] (1.6,-1)--(8.8,-1);
 \foreach \i in {0,1,2,3,4}{\draw[Muted] ({1.6+1.8*\i},-1)--++(0,-.08);
  \node[font=\scriptsize,below] at ({1.6+1.8*\i},-1.08) {\i\,s};}
 \end{tikzpicture}
-\end{minipage}\hfill
-\begin{minipage}[c]{.39\linewidth}
-\textbf{Apply only when:}\par
-Same team; IoU $\geq0.5$; union $\leq4$\,s; both models cover the entire union;
-primary labels are all H/A.
-\[
-\operatorname{IoU}=\frac{2\,\mathrm{s}}{3\,\mathrm{s}}=0.667
-\]
-Higher-IoU proposals win conflicts. D/X and half boundaries stay fixed.
-\end{minipage}
-\captionline{Figure 3. Illustrative intervals: primary [1,3] s, auxiliary [0.5,3.5] s.
-Only an existing, mutually supported short possession is extended.}
+\caption{Illustrative short-spell agreement. Primary [1,3] s and auxiliary
+[0.5,3.5] s have IoU $2/3$; their union is 3\,s. The entire union must have
+both models' support and primary H/A labels.}
+\label{fig:union}
+\end{figure}
 
-\heading{Physical rules and model settings}
-{\small\renewcommand{\arraystretch}{1.22}
-\begin{tabular}{@{}p{.24\linewidth}p{.72\linewidth}@{}}
-\toprule
-\textbf{Situation} & \textbf{Implemented decision}\\\midrule
-Pass / loose ball & Retain the last team in its loose state; a team change requires the other control state.\\
-Contact / challenge & Carry: within 1.5\,m and relative speed $\leq1.5$\,m/s. Kick: velocity-change peak $\geq2$\,m/s within 2\,m; opponent at least 0.5\,m farther.\\
-Stoppage / restart & D chain: 100 frames minimum. Exit D into control. Official kick-off timing and confirmed goal-to-restart intervals provide structural D.\\
-Video / half boundaries & D edges can move by at most 12 frames; preserve phase centres. No temporal edit crosses D/X, absent video or a half boundary.\\
-Video heads & Logistic regression, 34 continuous/video features (+6 for motion), 301 native 1\,Hz public rows; $C=1$ dense/motion, $C=3$ 5\,Hz/fused.\\
-Experts / fusion & Use expert H/A only if primary confidence $<0.8$ and expert $>0.9$. Average P(D) 50:50; retain primary H/A odds.\\
-\bottomrule
-\end{tabular}}
-\captionline{Additional safeguards: contact vote abstains beyond 5 s from a ball observation;
-existing confidence pruning removes unsupported team islands of at most 100 frames.
-Feature interpolation does not bridge sampling gaps over 1 s.}
+\begin{figure*}[!t]
+\centering\includegraphics[width=.98\textwidth]{figures/fold_sensitivity.pdf}
+\caption{Paired repartitions of the same public possessions. Both mixtures
+are refitted at each fold count. Final macro-F1 improves in all four checks;
+spell-F1 never decreases. These are sensitivity checks, not independent test sets.}
+\label{fig:sensitivity}
+\end{figure*}
 
-\newpage
-\pageheading{03}{What improves, and how we tested it}{Public spell recovery rises while macro-F1 remains high.}
+\begin{figure*}[!t]
+\centering\includegraphics[width=.98\textwidth]{figures/match_statistics.pdf}
+\caption{Predicted full-match statistics over 158,857 graded frames.
+Alive-time percentages exclude D; possession counts include only H/A.
+These are model summaries, with no full-match GT comparison.}
+\label{fig:match}
+\end{figure*}
 
-\heading{Ablation: separate the contribution of each step}
-\begin{center}\includegraphics[width=\linewidth]{figures/ablation.pdf}\end{center}
-\captionline{Figure 4. Same five-fold protocol and physical baseline. Bars start at zero;
-annotations give exact scores. Temporal cleanup drives the spell-F1 gain.}
+\subsection{Temporal Agreement}
+\textbf{Oscillations (Fig.~\ref{fig:oscillation}).} Consider H/A/H or A/H/A
+triplets with each spell at most 100 frames and complete video support.
+Neighbour own-team confidence must exceed 0.5, and their duration-weighted mean
+must exceed the middle's own confidence. Apply non-overlapping proposals once,
+in confidence-gain order. Merges cannot cascade.
 
-\notice{\textbf{Final public result:} 14 matched spells, 1 spurious prediction and 3 missed GT
-spells. At every official IoU threshold (0.3--0.7), spell-F1 is
-$2\times14/(15+17)=0.875$. H/A/D class F1 is 0.955923 / 0.970389 / 0.942077.}
+\textbf{Agreed boundaries (Fig.~\ref{fig:union}).} Independently decode the
+auxiliary; pair same-team spells at IoU $\geq0.5$. Use their union only if
+it is at most 100 frames, fully covered by both models, and contains only
+primary H/A labels. Higher-IoU proposals win overlap conflicts. Temporal edits
+preserve D/X, missing-video and half boundaries and use no frame-specific
+manual corrections. Earlier probability fusion can move D through the bounded decoder.
 
-\heading{Sensitivity to the time partition}
-\begin{center}\includegraphics[width=\linewidth]{figures/fold_sensitivity.pdf}\end{center}
-\captionline{Figure 5. Both mixtures are refitted at each fold count. Final macro-F1 improves
-in all four checks; spell-F1 never decreases. These are repartitions of the same 17
-possessions, not independent validation. Short-spell agreement alone regresses at four folds.}
+\section{Validation and Results}
+\subsection{Independent Decoding Before Stitching}
+The public slice has 7,500 frames and 17 GT possessions. Five contiguous
+60-second folds use a 125-frame (5\,s) purge. Primary, auxiliary and expert
+heads exclude the same target labels, decode the whole halves and apply
+temporal edits before copying the held-out slice (Fig.~\ref{fig:validation}).
+Full-data refits apply only outside public frames.
 
-\heading{Validation happens before the public slices are stitched}
-\begin{center}
-\begin{tikzpicture}[x=.045cm,y=1cm,font=\small]
-\foreach \f in {1,2,3,4,5}{\node[font=\scriptsize\color{Muted}] at ({60*\f-30},.8) {Fold \f};}
-\fill[Line] (0,0) rectangle (115,.5);
-\fill[Orange] (115,0) rectangle (120,.5);
-\fill[Blue] (120,0) rectangle (180,.5);
-\fill[Orange] (180,0) rectangle (185,.5);
-\fill[Line] (185,0) rectangle (300,.5);
-\node at (55,.25) {Training};\node[text=white] at (150,.25) {Held out};
-\node at (240,.25) {Training};
-\foreach \t in {0,60,120,180,240,300}{\draw[Muted] (\t,-.05)--(\t,-.12);
- \node[font=\scriptsize,below] at (\t,-.15) {\t\,s};}
-\node[font=\scriptsize\color{Orange}] at (150,-.85) {Orange strips: 5-second purge on both sides};
+\begin{figure}[!t]
+\centering
+\begin{tikzpicture}[x=.024cm,y=1cm,font=\footnotesize]
+\foreach \f in {1,2,3,4,5}{\node[font=\scriptsize\color{Muted}] at ({60*\f-30},.75) {Fold \f};}
+\fill[Line] (0,0) rectangle (115,.45);
+\fill[Orange] (115,0) rectangle (120,.45);
+\fill[Blue] (120,0) rectangle (180,.45);
+\fill[Orange] (180,0) rectangle (185,.45);
+\fill[Line] (185,0) rectangle (300,.45);
+\node at (55,.225) {Training};\node[text=white] at (150,.225) {Held out};
+\node at (240,.225) {Training};
+\foreach \t in {0,60,120,180,240,300}{\draw[Muted] (\t,-.04)--(\t,-.1);
+ \node[font=\scriptsize,below] at (\t,-.13) {\t\,s};}
+\node[font=\scriptsize\color{Orange}] at (150,-.8) {Orange: 5-second purge on each side};
 \end{tikzpicture}
-\end{center}
-\captionline{Figure 6. Example held-out fold. Primary, auxiliary and expert heads exclude the
-same target labels. Each decodes the whole halves; temporal edits run before copying its slice.
-All-public refits are used only outside the public window.}
+\caption{Example held-out fold. Both video mixtures and every expert use
+the matching held-out head before temporal corrections and public stitching.}
+\label{fig:validation}
+\end{figure}
 
-\notice{\textbf{Scope of the evidence.} The public slice is 7,500 frames (5 minutes).
-Feature, weight and rule selection reuses these labels. OOF fitting therefore does not remove
-selection bias. Private and unseen-match performance remain unknown.}
 
-\newpage
-\pageheading{04}{Match statistics, limits and reproduction}{Predicted football summaries and a verifiable output file.}
 
-\begin{center}\includegraphics[width=\linewidth]{figures/match_statistics.pdf}\end{center}
-\captionline{Figure 7. Model predictions across 158,857 graded frames. Alive-time percentages
-exclude D; spell counts include only H/A. Full-match GT is unavailable.}
-\vspace{4pt}
-\metric{402}{Possession spells}{204 first half / 198 second}\hfill
-\metric{8.52 s}{Mean spell length}{Home 10.43 s / away 6.67 s}\hfill
-\metric{46.08\%}{Dead-ball share}{Of graded time}\hfill
-\metric{130}{Dead intervals}{Counted separately by half}
 
-\heading{Limitations and next steps}
-Three public spells remain missed. Occlusion and crop alignment limit contact evidence;
-temporal rules can suppress real turnovers. Metrica weak labels and recording-specific
-whistle/scoreboard settings limit transfer. Next: independently labelled matches,
-better contact localisation and confidence calibration. The system uses offline context.
-Trees, denser raw video, gap-kick and pose trials did not improve this checkpoint.
 
-\heading{Reproduce the frozen checkpoint}
-The public \file{taufiq} branch at \texttt{\CodeRevision} uses
-\file{src/configs/macro_v5.json} and Python 3.11. Dependencies are pinned in
-\file{requirements-src.txt}; CV/FILM use separate environments. Prepare the provided
-bundle and regenerate model/video caches first: commands are in \file{src/README.md},
-\file{src/bench/README.md} and \file{src/MACRO_V4.md}/\file{src/MACRO_V5.md}.
+\subsection{Public Metrics and Ablations}
+Spell-F1 averages matching at IoU 0.3/0.4/0.5/0.6/0.7; macro-F1 averages H/A/D.
+The final output has 15 predicted spells: 14 matched, one spurious and three
+GT spells missed at every threshold, giving $2\times14/(15+17)=0.875$.
+H/A/D F1 is 0.955923/0.970389/0.942077; one-second transition F1 is 0.736842.
+
+Figure~\ref{fig:ablation} separates the contributions. Oscillation removal alone
+raises spell-F1 from 0.752941 to 0.837500; both temporal steps reach 0.875000.
+Figure~\ref{fig:sensitivity} shows robustness to 3/4/5/6 folds. Short-spell
+agreement alone regresses at four folds; its isolated gain is not uniformly reliable.
+Native 5\,Hz trees, denser raw video, gap-kick/contact variants and pose expert
+trials did not improve the retained checkpoint.
+
+\textbf{Selection limit.} Features, weights and temporal rules were selected
+using the same 17 public possessions. OOF fitting does not remove this
+method-selection bias. Private and unseen-match performance are unknown.
+
+
+
+\subsection{Predicted Match Statistics}
+Figure~\ref{fig:match} reports 402 possessions averaging 8.52\,s: 204 in the first
+half and 198 in the second. Home has 60.30\% of alive time (198 spells,
+10.43\,s mean); away has 39.70\% (204 spells, 6.67\,s mean). D occupies
+46.08\% of graded time in 130 intervals counted separately by half.
+
+\section{Limitations and Reproduction}
+\textbf{Limitations.} Occlusion, small players and crop alignment limit contact
+evidence. Short-spell rules can suppress real turnovers. Metrica weak labels
+and recording-specific whistle/scoreboard settings limit transfer. The system
+uses offline context. Next priorities are independently labelled matches,
+better contact localisation and calibrated confidence.
+
+\balance
+\textbf{Reproduction.} The public \file{taufiq} branch at
+\texttt{\CodeRevision} uses \file{src/configs/macro_v5.json} and Python 3.11.
+Dependencies are pinned in \file{requirements-src.txt}; CV/FILM use separate
+environments. Prepare the provided bundle and regenerate model/video caches
+first. Commands are in \file{src/README.md}, \file{src/bench/README.md} and
+\file{src/MACRO_V4.md}/\file{src/MACRO_V5.md}.
 \begin{lstlisting}
-OMP_NUM_THREADS=3 OPENBLAS_NUM_THREADS=3 .venv/bin/python src/run.py \
+OMP_NUM_THREADS=3 OPENBLAS_NUM_THREADS=3 \
+  .venv/bin/python src/run.py \
   --params src/configs/macro_v5.json --name Borrow_Khan
-.venv/bin/python evaluation/validate_submission.py evaluation/results/Borrow_Khan.csv
-.venv/bin/python evaluation/run_evaluation.py --gt public --bootstrap 0 --no-detail
+.venv/bin/python evaluation/validate_submission.py \
+  evaluation/results/Borrow_Khan.csv
+.venv/bin/python evaluation/run_evaluation.py \
+  --gt public --bootstrap 0 --no-detail
 \end{lstlisting}
-{\small Expect 199,319 output rows. The scorer reads every CSV in its results directory.
-All 48 contract tests passed; prototype, builder, production and tuner agree on every frame.
-The full CSV checksum, metrics and asset hashes are recorded in
-\file{src/bench/results/macro_v5_2026-11-16.json}.}
+Expect 199,319 rows; the scorer reads every CSV in its results directory.
+All 48 contract tests passed at this checkpoint. Prototype, builder, production
+and tuner agree on every frame. The full CSV checksum, metrics and asset hashes
+are in \file{src/bench/results/macro_v5_2026-11-16.json}.
 
-{\small Metrica Sports is acknowledged under its source terms; FILM uses Apache-2.0;
-YOLO11 follows upstream terms. Match assets and generated model/video caches are
-outside the public Git tree.}
-{\footnotesize\setlength{\parskip}{0pt}
-\begin{thebibliography}{4}\setlength{\itemsep}{0pt}
+\begin{thebibliography}{4}
 \bibitem{challenge} More than a Hack 2027, ``Phase 1: Ball Possession,'' 2026.
 \url{https://github.com/taufiqrmadhana/barcahackathon/tree/b8e4ad0}.
 \bibitem{yolo} Ultralytics, ``YOLO11.'' \url{https://docs.ultralytics.com/models/yolo11/}.
@@ -281,5 +298,5 @@ outside the public Git tree.}
 \url{https://github.com/google-research/frame-interpolation}.
 \bibitem{metrica} Metrica Sports, ``Sample tracking and event data,'' games 1--3.
 \url{https://github.com/metrica-sports/sample-data}.
-\end{thebibliography}}
+\end{thebibliography}
 \end{document}

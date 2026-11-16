@@ -82,7 +82,7 @@ def main():
             archive.write(output / name, name)
         archive.writestr('README.txt',
             'Main document: Borrow_Khan.tex. Compile with pdfLaTeX.\n'
-            'Four-page visual technical report. Standard TeX Live/Overleaf packages.\n'
+            'Three-page IEEEtran conference report: two columns, 10 pt, seven figures.\n'
             'Figures are vector PDFs generated from aggregate checkpoint metrics.\n'
             'Edit team.tex for author information. Metrics refer to code b8e4ad0.\n')
     print(f'PDF: {pdf}')
