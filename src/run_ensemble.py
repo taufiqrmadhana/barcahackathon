@@ -27,6 +27,8 @@ def main():
                     help='zero-weight H/A expert index; repeat in priority order')
     ap.add_argument('--primary-max',type=float,default=.8)
     ap.add_argument('--expert-min',type=float,default=.9)
+    ap.add_argument('--dead-expert',type=int,help='zero-weight P(D) expert index')
+    ap.add_argument('--dead-expert-weight',type=float,default=.5)
     ap.add_argument('--consensus-weights',nargs='+',type=float,
                     help='auxiliary mixture for agreeing short spells, using the same held-out heads')
     ap.add_argument('--consensus-max-frames',type=int,default=100)
@@ -54,7 +56,9 @@ def main():
                 if args.consensus_weights is not None else None)
     if (args.oscillation_max_frames or args.consensus_dead_weight) and temporal is None:
         raise ValueError('temporal processing requires --consensus-weights')
-    artifact=hybrid.combine_artifacts(members,args.weights,router,multiple,temporal)
+    dead_router = (dict(expert=args.dead_expert,weight=args.dead_expert_weight)
+                   if args.dead_expert is not None else None)
+    artifact=hybrid.combine_artifacts(members,args.weights,router,multiple,temporal,dead_router)
     p=Params.load(args.params,**parse_overrides(args.set))
     physical=lambda value:{k:v for k,v in value.items() if not k.startswith('hybrid_')}
     if physical(artifact['base_params'])!=physical(asdict(p)):
@@ -71,6 +75,7 @@ def main():
     pipeline.write(str(Path(ROOT,'evaluation/results',args.name+'.csv')),labels)
     (path.parent/'result.json').write_text(json.dumps(dict(objective='macroF1',selected_on_public=True,
         models=args.models,weights=args.weights,team_router=router,team_routers=multiple,temporal=temporal,
+        dead_router=dead_router,
         macroF1=result['macro_f1'],
         spellF1=result['spell_f1_mean'],params=asdict(p)),indent=2)+'\n')
     report(result)

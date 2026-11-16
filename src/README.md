@@ -4,10 +4,13 @@ Own pipeline for More than a Hack 2027, Phase 1. Everything outside `src/` is th
 repository (remote `upstream`), kept as is so `git pull upstream main` keeps working. The method,
 the possession rules and what was tried and dropped are in [TECHNICAL.md](TECHNICAL.md).
 
-Latest (November 16): the default prioritises **macroF1**, as requested. Two video-cadence
-heads, ordered motion/aligned-crop experts and temporal agreement reach public macroF1
-**0.95613**, spellF1 **0.8750**. Approach, statistics and validation:
-[MACRO_V5.md](MACRO_V5.md), `configs/macro_v5.json`. The previous **0.95000 / 0.7529**
+Latest (November 17): the default prioritises **macroF1**, as requested. Two video-cadence
+heads, ordered motion/aligned-crop experts, temporal agreement and a binary dead-ball head
+reach public macroF1 **0.95709**, spellF1 **0.8750**. Approach, statistics and validation:
+[MACRO_V6.md](MACRO_V6.md), `configs/macro_v6.json`. The gain is small and regresses slightly
+at three folds; all partitions reuse the same public possessions. The **0.95613 / 0.8750**
+checkpoint remains in `configs/macro_v5.json`, described in [MACRO_V5.md](MACRO_V5.md).
+The previous **0.95000 / 0.7529**
 checkpoint is retained in `configs/macro_v4.json`; its method is in [MACRO_V4.md](MACRO_V4.md).
 The **0.94955** checkpoint remains in `configs/macro_v3.json`.
 The earlier spell alternative reaches **0.8000** spellF1 / **0.9423** macroF1 in

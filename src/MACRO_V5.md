@@ -7,7 +7,7 @@ keeping the previous checkpoints available.
 | Frozen configuration | Public macroF1 | Public spellF1 |
 |---|---:|---:|
 | Macro v4, `configs/macro_v4.json` | 0.950003 | 0.752941 |
-| **Macro v5, current default** | **0.956130** | **0.875000** |
+| **Macro v5, retained checkpoint** | **0.956130** | **0.875000** |
 | Earlier motion mixture, `configs/balanced_v1.json` | 0.942279 | 0.800000 |
 
 These are held-out video predictions over the same 7,500 public frames and 17
