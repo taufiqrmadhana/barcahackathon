@@ -74,7 +74,7 @@ def sensitivity(report, folder):
     fig, axes = plt.subplots(1, 2, figsize=(7.15, 1.85))
     data = dict(folds=folds)
     for ax, metric, title, limits in [(axes[0], 'macroF1', 'Macro-F1', (.92, .97)),
-                                      (axes[1], 'spellF1', 'Spell-F1', (.65, .90))]:
+                                      (axes[1], 'spellF1', 'Spell-F1', (.65, .93))]:
         for key, name, color, marker in [('baseline', report.get('document_baseline', 'Previous (v4)'), GRAY, 'o'),
                                           ('candidate', 'Final', BLUE, 's')]:
             scores = [next(x[metric] for x in rows if x['folds'] == f and x['objective'] == key)

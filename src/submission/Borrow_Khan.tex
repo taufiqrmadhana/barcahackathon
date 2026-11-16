@@ -24,13 +24,13 @@
 
 \begin{abstract}
 We reconstruct possession from automatic tracking and tactical video using a
-physical state decoder, external ownership/shape models and complementary video
-classifiers. The final refinement combines separate dead-ball estimation with
-short oscillation removal and agreement on short possession boundaries. Both
-video mixtures use matching held-out classifiers and are decoded before public
-slices are stitched. On the 7,500-frame public window, the system achieves
+physical state decoder, external ownership/shape models, video classifiers and
+aligned broadcast geometry. A separate broadcast phase branch refines D/alive
+while retaining established team labels. Short oscillation removal and boundary
+agreement precede pointwise phase fusion. All branches use matching held-out
+classifiers before public slices are stitched. On the 7,500-frame public window, the system achieves
 spell-F1 \SpellScore{} and macro-F1 \MacroScore{}, matching 14 of 17 GT spells
-with one spurious prediction. All method selection reuses this public slice;
+with zero spurious predictions. All method selection reuses this public slice;
 private and unseen-match performance remain unknown.
 \end{abstract}
 
@@ -44,8 +44,9 @@ continuity and learned evidence, then repair short temporal disagreements
 \textbf{Provided assets.} ATD and homography supply ball/player geometry and
 video-to-pitch alignment. Tactical video/audio provides ball/motion features,
 a 3.8\,kHz whistle score and scoreboard changes. Smart Tagging, team metadata
-and official kick-off timing supply restart/structural cues. Broadcast video
-is unused; the physical phase-team prior has zero direct weight.
+and official kick-off timing supply restart/structural cues. Broadcast ATD and
+homography add phase evidence after geometric clock matching; broadcast RGB
+is unused. The physical phase-team prior has zero direct weight.
 
 \textbf{Public vision models.} COCO-pretrained YOLO11s~\cite{yolo}, exported
 to OpenVINO with unlabelled INT8 calibration, detects ball candidates in tracked
@@ -67,22 +68,22 @@ We acknowledge Metrica Sports; FILM uses Apache-2.0 and YOLO11 follows upstream 
  box/.style={draw=Line,rounded corners=1pt,align=center,inner sep=4pt,
  text width=71mm,minimum height=9mm,fill=Pale},
  arrow/.style={-{Latex[length=1.7mm]},Blue,thick}]
-\node[box] (input) {\textbf{Tracking, video/audio, homography, tagging}\\
- Clean/fused ball, contact, player shape and restart cues};
+\node[box] (input) {\textbf{Tracking, tactical video/audio, both geometries}\\
+ Clean/fused ball, contact, shape, tagging and broadcast clock match};
 \node[box,below=3mm of input] (base) {\textbf{Physical HSMM baseline}\\
  Home/away control and loose states; duration-constrained D};
 \node[box,below=3mm of base] (heads) {\textbf{Primary and auxiliary video mixtures}\\
  Primary: 0.75 dense + 0.25 5\,Hz + ordered experts\\
- Auxiliary: 0.5 dense + 0.5 motion; binary dead-ball head};
-\node[box,below=3mm of heads] (decode) {\textbf{Fuse P(D); independently decode both mixtures}\\
- Preserve primary conditional H/A; use matching held-out heads};
+ Auxiliary: 0.5 dense + 0.5 motion; C=10 dead head};
+\node[box,below=3mm of heads] (decode) {\textbf{Decode both branches + temporal agreement}\\
+ D edges: 12 / 50 frames; matching held-out classifiers};
 \node[box,below=3mm of decode,fill=Blue,text=white,draw=Blue] (out)
- {\textbf{Temporal agreement $\rightarrow$ public stitching $\rightarrow$ CSV}\\
- H / A / D on graded halves; X outside};
+ {\textbf{Pointwise D/team fusion $\rightarrow$ stitching $\rightarrow$ CSV}\\
+ Retain V7 alive teams; H / A / D / X output};
 \draw[arrow] (input)--(base);\draw[arrow] (base)--(heads);
 \draw[arrow] (heads)--(decode);\draw[arrow] (decode)--(out);
 \end{tikzpicture}
-\caption{Inference pipeline. Temporal corrections precede public stitching;
+\caption{Inference pipeline. Temporal corrections and phase fusion precede stitching;
 full-data refits are used only outside the public window.}
 \label{fig:pipeline}
 \end{figure}
@@ -90,8 +91,8 @@ full-data refits are used only outside the public window.}
 \begin{figure*}[!t]
 \centering\includegraphics[width=.98\textwidth]{figures/ablation.pdf}
 \caption{Public ablation under the same five-fold protocol. All bars start
-at zero and exact scores are annotated. Temporal cleanup drives the spell-F1 gain;
-separate P(D) estimation gives the final macro-F1 improvement.}
+at zero and exact scores are annotated. Broadcast P(D), wider phase edges and
+retained team labels are isolated.}
 \label{fig:ablation}
 \end{figure*}
 
@@ -105,13 +106,13 @@ The raw-ATD contact vote switches midway between opposing contacts and abstains
 beyond 5\,s from a ball observation.
 
 D is never possession: its chain enforces 100 frames minimum and exits into
-control. Video can move D edges by at most 12 frames while preserving phase
-centres. Official kick-off timing and confirmed scoreboard-to-restart intervals
+control. Primary D edges move at most 12 frames; the broadcast phase branch
+allows 50, preserving fixed phase centres. Official kick-off timing and confirmed scoreboard-to-restart intervals
 supply structural D. Halves are independent; cleanup preserves D while merging
 surrounded team islands shorter than 12 frames.
 
 \subsection{Video Mixtures and Separate Dead-Ball Evidence}
-Each head is an imputed, standardised logistic classifier trained on 301 native
+Each video head is an imputed, standardised logistic classifier trained on 301 native
 1\,Hz public rows, with 34 continuous/context/video features. The primary is
 0.75 dense/raw ($C=1$) plus 0.25 raw/5\,Hz ($C=3$). Ordered H/A experts are
 motion ($C=1$, six extra features), then fused-ball crops ($C=3$). An expert
@@ -179,7 +180,7 @@ both models' support and primary H/A labels.}
 \begin{figure*}[!t]
 \centering\includegraphics[width=.98\textwidth]{figures/fold_sensitivity.pdf}
 \caption{Paired repartitions of the same public possessions, refitting all heads.
-Macro-F1 rises at 4/5 folds, is equal at 6 and falls 0.000190 at 3; spell-F1 is unchanged.
+Macro-F1 rises at 3/4/5 folds and falls 0.001797 at 6; spell-F1 rises at 4/5 and is equal at 3/6.
 These are sensitivity checks, not independent test sets.}
 \label{fig:sensitivity}
 \end{figure*}
@@ -205,6 +206,51 @@ it is at most 100 frames, fully covered by both models, and contains only
 primary H/A labels. Higher-IoU proposals win overlap conflicts. Temporal edits
 preserve D/X, missing-video and half boundaries and use no frame-specific
 manual corrections. Earlier probability fusion can move D through the bounded decoder.
+
+\subsection{Broadcast Alignment and Phase Refinement}
+\textbf{Clock and quality.} Match five-minute ball trajectories between recordings:
+one-second cross-correlation screens offsets/reflections, then frame-level search
+minimises clipped geometric error. Accept median-error $<2$\,m anchors; require
+at least three per half with offset span $\leq5$ frames. Each half uses its
+median offset. Ten anchors pass per half, spanning 3/2 frames. Alignment reads no GT.
+
+Reject invalid/poor homography and inconsistent views. Require at least 5 broadcast
+and 8 tactical players with median same-team discrepancy $<1.5$\,m. The gate
+supports 5,590 public frames (74.53\%); supported player discrepancy has median
+0.288\,m. This is agreement between recordings, not independent location accuracy.
+
+\textbf{Phase head.} A binary logistic head ($C=0.3$) uses 17 quality, ball-motion,
+nearest-player and contact features on 223 supported native rows. Purge 125 frames
+from the actual fold edges despite coverage holes. At supported frames, average
+its P(D) with the primary's, 50:50, preserving conditional H/A. Independently
+decode the phase branch with 50-frame edges and the same temporal operations.
+
+Take its D mask, retain primary H/A where both branches predict alive, and use
+the phase team where primary D becomes alive (Fig.~\ref{fig:phase}). This fusion
+is pointwise, before stitching, with no later temporal edits. Fixed D cores and
+primary-video coverage remain protected; empty expert coverage/zero weight gives V7.
+
+\begin{figure}[!t]
+\centering
+\begin{tikzpicture}[font=\footnotesize,x=.83cm,y=1cm]
+\node[anchor=east] at (1.45,1.1) {Primary};
+\node[anchor=east] at (1.45,.4) {Phase};
+\node[anchor=east,font=\bfseries] at (1.45,-.3) {Output};
+\foreach \label/\col/\i in {H/Blue/0,H/Blue/1,D/Muted/2,D/Muted/3,A/Orange/4,A/Orange/5}{
+ \fill[\col] ({1.6+\i},.9) rectangle ({2.55+\i},1.3);
+ \node[text=white] at ({2.07+\i},1.1) {\label};}
+\foreach \label/\col/\i in {A/Orange/0,D/Muted/1,H/Blue/2,D/Muted/3,H/Blue/4,A/Orange/5}{
+ \fill[\col] ({1.6+\i},.2) rectangle ({2.55+\i},.6);
+ \node[text=white] at ({2.07+\i},.4) {\label};}
+\foreach \label/\col/\i in {H/Blue/0,D/Muted/1,H/Blue/2,D/Muted/3,A/Orange/4,A/Orange/5}{
+ \fill[\col] ({1.6+\i},-.5) rectangle ({2.55+\i},-.1);
+ \node[text=white] at ({2.07+\i},-.3) {\label};}
+\end{tikzpicture}
+\caption{Illustrative pointwise phase fusion, not measured match data. D follows
+the phase branch; disagreements between alive teams retain the primary label.
+Newly exposed alive frames use the phase team.}
+\label{fig:phase}
+\end{figure}
 
 \section{Validation and Results}
 \subsection{Independent Decoding Before Stitching}
@@ -240,18 +286,17 @@ the matching held-out head before temporal corrections and public stitching.}
 
 \subsection{Public Metrics and Ablations}
 Spell-F1 averages matching at IoU 0.3/0.4/0.5/0.6/0.7; macro-F1 averages H/A/D.
-The final output has 15 predicted spells: 14 matched, one spurious and three
-GT spells missed at every threshold, giving $2\times14/(15+17)=0.875$.
-H/A/D F1 is 0.958455/0.968889/0.945467; one-second transition F1 is 0.736842.
+The final output has 14 predicted spells: 14 matched, zero spurious and three
+GT spells missed at every threshold, giving $2\times14/(14+17)=0.903226$.
+H/A/D F1 is 0.961832/0.968141/0.956464; one-second transition F1 is 0.810811.
 
-Figure~\ref{fig:ablation} separates the contributions. Oscillation removal alone
-raises spell-F1 from 0.752941 to 0.837500; both temporal steps reach 0.875000.
-The binary head with $C=1$ reaches 0.957088; $C=10$ corrects three more public
-frames, reaching \MacroScore{} with spell-F1 unchanged. Figure~\ref{fig:sensitivity}
-shows the gain is not uniform
-across repartitions; away-class F1 rises from v6's 0.968291 to 0.968889.
-Denser video, alternate contact rules, pose and binary team heads did not beat
-the retained checkpoint.
+Figure~\ref{fig:ablation} separates contributions. Wider edges alone leave V7's
+0.957604/0.875000 unchanged. The broadcast phase with joint team output reaches
+0.958850/0.848485; retaining primary teams gives \MacroScore{}/\SpellScore{}.
+Of 32 public label changes, 26 fix errors and none regress correct labels.
+Away F1 still falls slightly from 0.968889. Figure~\ref{fig:sensitivity} shows
+the six-fold regression. Frozen class/patch embeddings, extra contact rules and
+nested dead-head calibration did not improve the retained checkpoint.
 
 \textbf{Selection limit.} Features, weights and temporal rules were selected
 using the same 17 public possessions. OOF fitting does not remove this
@@ -260,42 +305,43 @@ method-selection bias. Private and unseen-match performance are unknown.
 
 
 \subsection{Predicted Match Statistics}
-Figure~\ref{fig:match} reports 401 possessions averaging 8.55\,s: 203 in the first
-half and 198 in the second. Home has 60.36\% of alive time (198 spells,
-10.45\,s mean); away has 39.64\% (203 spells, 6.69\,s mean). D occupies
-46.05\% of graded time in 130 intervals counted separately by half.
+Figure~\ref{fig:match} reports 400 possessions averaging 8.59\,s: 202 in the first
+half and 198 in the second. Home has 60.22\% of alive time (197 spells,
+10.51\,s mean); away has 39.78\% (203 spells, 6.74\,s mean). D occupies
+45.90\% of graded time in 130 intervals counted separately by half.
 
 \section{Limitations and Reproduction}
 \textbf{Limitations.} Occlusion, small players and crop alignment limit contact
-evidence. Short-spell rules can suppress real turnovers. Metrica weak labels
+evidence. Replay/clock or homography errors can corrupt broadcast evidence.
+Short-spell rules can suppress real turnovers. Metrica weak labels
 and recording-specific whistle/scoreboard settings limit transfer. The system
 uses offline context. Next priorities are independently labelled matches,
 better contact localisation and calibrated confidence.
 
 \balance
 \textbf{Reproduction.} The public \file{taufiq} branch at
-\texttt{\CodeRevision} uses \file{src/configs/macro_v7.json} and Python 3.11.
+\texttt{\CodeRevision} uses \file{src/configs/macro_v8.json} and Python 3.11.
 Dependencies are pinned in \file{requirements-src.txt}; CV/FILM use separate
 environments. Prepare the provided bundle and regenerate model/video caches
 first. Commands are in \file{src/README.md}, \file{src/bench/README.md} and
-\file{src/MACRO_V6.md}/\file{src/MACRO_V7.md}.
+\file{src/MACRO_V7.md}/\file{src/MACRO_V8.md}.
 \begin{lstlisting}
 OMP_NUM_THREADS=3 OPENBLAS_NUM_THREADS=3 \
   .venv/bin/python src/run.py \
-  --params src/configs/macro_v7.json --name Borrow_Khan
+  --params src/configs/macro_v8.json --name Borrow_Khan
 .venv/bin/python evaluation/validate_submission.py \
   evaluation/results/Borrow_Khan.csv
 .venv/bin/python evaluation/run_evaluation.py \
   --gt public --bootstrap 0 --no-detail
 \end{lstlisting}
 Expect 199,319 rows; the scorer reads every CSV in its results directory.
-All 51 contract tests passed at this checkpoint. Prototype, builder, production
+All 55 contract tests passed at this checkpoint. Prototype, builder, production
 and tuner agree on every frame. The full CSV checksum, metrics and asset hashes
-are in \file{src/bench/results/macro_v7_2026-11-17.json}.
+are in \file{src/bench/results/macro_v8_2026-11-17.json}.
 
 \begin{thebibliography}{4}
 \bibitem{challenge} More than a Hack 2027, ``Phase 1: Ball Possession,'' 2026.
-\url{https://github.com/taufiqrmadhana/barcahackathon/tree/0fa7ac2}.
+\url{https://github.com/taufiqrmadhana/barcahackathon/tree/988bcde}.
 \bibitem{yolo} Ultralytics, ``YOLO11.'' \url{https://docs.ultralytics.com/models/yolo11/}.
 \bibitem{film} F. Reda et al., ``FILM: Frame Interpolation for Large Motion,'' ECCV, 2022.
 \url{https://github.com/google-research/frame-interpolation}.

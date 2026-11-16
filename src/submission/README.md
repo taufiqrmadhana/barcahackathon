@@ -1,9 +1,9 @@
 # Borrow Khan technical submission
 
-Three-page English technical report using the IEEEtran conference template:
-two columns, 10 pt body text, and seven explanatory/data figures. Author names
+Four-page English technical report using the IEEEtran conference template:
+two columns, 10 pt body text, and eight explanatory/data figures. Author names
 and registered team name are in `team.tex`.
-The described algorithm is frozen at code revision `0fa7ac2` on `taufiq` (macro v7).
+The described algorithm is frozen at code revision `988bcde` on `taufiq` (macro v8).
 
 Build from the repository root with Python 3, Matplotlib and either Tectonic or pdfLaTeX:
 
