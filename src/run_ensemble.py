@@ -29,6 +29,10 @@ def main():
     ap.add_argument('--expert-min',type=float,default=.9)
     ap.add_argument('--dead-expert',type=int,help='zero-weight P(D) expert index')
     ap.add_argument('--dead-expert-weight',type=float,default=.5)
+    ap.add_argument('--phase-expert',type=int,help='separate zero-weight P(D) specialist index')
+    ap.add_argument('--phase-weight',type=float,default=.5)
+    ap.add_argument('--phase-dead-margin',type=int,default=50)
+    ap.add_argument('--phase-keep-teams',action='store_true')
     ap.add_argument('--consensus-weights',nargs='+',type=float,
                     help='auxiliary mixture for agreeing short spells, using the same held-out heads')
     ap.add_argument('--consensus-max-frames',type=int,default=100)
@@ -58,7 +62,10 @@ def main():
         raise ValueError('temporal processing requires --consensus-weights')
     dead_router = (dict(expert=args.dead_expert,weight=args.dead_expert_weight)
                    if args.dead_expert is not None else None)
-    artifact=hybrid.combine_artifacts(members,args.weights,router,multiple,temporal,dead_router)
+    phase_router = (dict(expert=args.phase_expert, weight=args.phase_weight,
+                         dead_margin=args.phase_dead_margin, keep_teams=args.phase_keep_teams)
+                    if args.phase_expert is not None else None)
+    artifact=hybrid.combine_artifacts(members,args.weights,router,multiple,temporal,dead_router,phase_router)
     p=Params.load(args.params,**parse_overrides(args.set))
     physical=lambda value:{k:v for k,v in value.items() if not k.startswith('hybrid_')}
     if physical(artifact['base_params'])!=physical(asdict(p)):
@@ -76,6 +83,7 @@ def main():
     (path.parent/'result.json').write_text(json.dumps(dict(objective='macroF1',selected_on_public=True,
         models=args.models,weights=args.weights,team_router=router,team_routers=multiple,temporal=temporal,
         dead_router=dead_router,
+        phase_router=phase_router,
         macroF1=result['macro_f1'],
         spellF1=result['spell_f1_mean'],params=asdict(p)),indent=2)+'\n')
     report(result)

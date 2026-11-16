@@ -46,13 +46,14 @@ def main():
                     return hybrid.combine_artifacts([refit(m,v) for m,v in zip(source['members'],view)],
                                                     source['weights'],source.get('team_router'),
                                                     source.get('team_routers'),source.get('temporal'),
-                                                    source.get('dead_router'))
+                                                    source.get('dead_router'),source.get('phase_router'))
                 if folds==source['folds']:
                     return source
                 columns,mask,frames,legacy=view
                 return hybrid.fit(columns,frames,gt,source['names'],source['model_name'],
                     source['kind'],legacy,n_folds=folds,gap=source['purge_frames'],
-                    train_stride=source['train_stride'],logreg_c=source.get('logreg_c',.3))
+                    train_stride=source['train_stride'],logreg_c=source.get('logreg_c',.3),
+                    strict_fold_edges=source.get('strict_fold_edges',False))
             a=refit(original,prepared)
             mask=(np.logical_and.reduce([v[1] for v,w in zip(prepared,a['weights']) if w>0])
                   if isinstance(prepared,list)

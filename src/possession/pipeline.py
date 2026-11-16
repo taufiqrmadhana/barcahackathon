@@ -41,6 +41,7 @@ class Inputs:
 
     def __init__(self, game=GAME, data_dir=None, refresh=False):
         self.game = game
+        self.data_dir = data_dir
         self.atd = atd_io.load(game, data_dir, refresh)
         self.tags = tagging.priors(game, data_dir)
         self.blocks = half_video_blocks(game)

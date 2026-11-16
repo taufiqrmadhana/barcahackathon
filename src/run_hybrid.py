@@ -35,6 +35,7 @@ def main():
     ap.add_argument('--purge', type=int, default=125)
     ap.add_argument('--train-stride', type=int, default=25)
     ap.add_argument('--logreg-c', type=float, default=.3)
+    ap.add_argument('--strict-fold-edges', action='store_true')
     ap.add_argument('--objective', choices=['spell','macro'], default='spell')
     args = ap.parse_args()
     p = replace(Params.load(args.params, **parse_overrides(args.set)), hybrid_model='')
@@ -55,9 +56,12 @@ def main():
         for model in args.models:
             artifact = hybrid.fit(columns, frames, gt, hybrid.FEATURE_SETS[feature_set],
                 model, args.interp, legacy_params, args.folds, args.purge,args.train_stride,
-                logreg_c=args.logreg_c)
+                logreg_c=args.logreg_c, strict_fold_edges=args.strict_fold_edges)
             artifact['base_params'] = asdict(p)
             artifact['tracking_ball_sha256'] = hashlib.sha256(inputs.atd['ball'].tobytes()).hexdigest()
+            if any(name.startswith('broadcast_') for name in artifact['names']):
+                from possession import broadcast
+                artifact['broadcast_provenance'] = broadcast.features(inputs, p)[2]
             if video_provenance.describe(inputs, p, args.interp, legacy_params) != provenance:
                 raise ValueError('video cache changed during fitting; wait for extraction to finish and refit')
             if provenance is not None:

@@ -1,0 +1,2239 @@
+{
+  "date": "2026-11-17",
+  "objective": "macroF1",
+  "baseline_commit": "241f517",
+  "selected_on_public": true,
+  "private_score_known": false,
+  "same_public_possessions": true,
+  "public_frames": 7500,
+  "public_ground_truth_possessions": 17,
+  "method": "Macro v7 plus aligned broadcast geometric P(D), a 50-frame phase-edge decode, and pointwise retention of v7 alive-team labels inside each matching held-out head.",
+  "params": {
+    "player_margin": 5.0,
+    "max_player_speed": 12.0,
+    "vel_k": 2,
+    "ball_spike_speed": 45.0,
+    "ball_island_len": 3,
+    "ball_island_gap": 50,
+    "max_gap": 12,
+    "ball_source": "fused_full",
+    "ctrl_radius": 1.3,
+    "ctrl_softness": 0.35,
+    "sync_free": 2.5,
+    "sync_scale": 3.0,
+    "filled_trust": 0.6,
+    "corner_zone": 3.0,
+    "still_speed": 1.2,
+    "slow_window": 50,
+    "ball_smooth": 9,
+    "touch_k": 3,
+    "touch_dv": 3.5,
+    "touch_spacing": 6,
+    "touch_radius": 2.0,
+    "touch_margin": 1.5,
+    "duel_radius": 1.5,
+    "seq_max_gap": 100,
+    "pass_min_travel": 5.0,
+    "shot_speed": 18.0,
+    "shot_range": 35.0,
+    "out_margin": 0.5,
+    "out_min_frames": 3,
+    "vanish_min_frames": 50,
+    "vanish_horizon": 0.4,
+    "decel_window": 25,
+    "decel_drop": 1.2,
+    "decel_to": 1.6,
+    "decel_lead": 20,
+    "rest_speed": 1.8,
+    "placed_min_frames": 25,
+    "placed_calm_speed": 1.8,
+    "restart_kick_speed": 5.0,
+    "kick_within": 20,
+    "reappear_min_frames": 75,
+    "dead_min_gap": 50,
+    "dead_max_gap": 2250,
+    "hold_kinds": "goal_line,touchline,vanish",
+    "hold_goal_line": 200,
+    "hold_touchline": 75,
+    "shape_folds": 8,
+    "shape_guard": 250,
+    "shape_stride": 3,
+    "shape_iter": 150,
+    "shape_eps": 0.05,
+    "pretrained_shape": "",
+    "pretrained_mix": 1.0,
+    "shape_rounds": 2,
+    "shape_conf": 0.0,
+    "ownership_model": "pretrain_data/ownership_v2/ownership_all.joblib",
+    "supervised_shape_model": "pretrain_data/ownership_v2/shape_all.joblib",
+    "w_owner": 1.0,
+    "w_owner_switch": 12.0,
+    "w_contact": 1.0,
+    "contact_alpha": 0.5,
+    "contact_window": 125,
+    "contact_lock_dead": 1,
+    "contact_switch_cost": 4.0,
+    "contact_min_frames": 12,
+    "contact_local_switch": 0,
+    "hybrid_model": "pretrain_data/macro_v8/ensemble.joblib",
+    "hybrid_weight": 0.5,
+    "hybrid_lock_dead": 1,
+    "hybrid_prune_max_frames": 100,
+    "hybrid_prune_min_confidence": 0.5,
+    "hybrid_loose_threshold": 0.0,
+    "hybrid_dead_margin": 12,
+    "hybrid_dead_weight": 2.0,
+    "ctrl_eps": 0.05,
+    "near_radius": 1.3,
+    "near_margin": 0.5,
+    "w_near": 0.0,
+    "near_rounds": 0,
+    "w_ball": 1.0,
+    "w_shape": 1.0,
+    "w_shape_known": 0.0,
+    "w_tag": 0.0,
+    "w_dead": 1.0,
+    "d_bias": 0.0,
+    "w_out": 6.0,
+    "w_out_carry": 3.0,
+    "slow_speed": 1.3,
+    "slow_scale": 0.3,
+    "w_slow": 1.0,
+    "dead_gap": 75,
+    "w_missing": 0.0,
+    "w_missing_slow": 0.5,
+    "w_still": 2.0,
+    "w_shape_dead": 0.5,
+    "alive_ball_speed": 6.0,
+    "w_alive": 3.0,
+    "w_hold": 5.0,
+    "w_post_restart": 2.0,
+    "inner_restarts": 0,
+    "post_restart_frames": 50,
+    "w_tag_dead": 1.0,
+    "tag_dead_frames": 25,
+    "z_max": 4.0,
+    "pre_kickoff_dead": 1,
+    "goal_dead": 1,
+    "w_whistle": 10.0,
+    "w_whistle_dead": 2.0,
+    "whistle_thresh": 24.0,
+    "whistle_before": 5,
+    "whistle_after": 20,
+    "whistle_hold": 150,
+    "w_whistle_confirmed": 16.0,
+    "whistle_confirm_speed": 1.5,
+    "whistle_confirm_window": 125,
+    "whistle_lag": 10,
+    "whistle_min_speed": 1.8,
+    "loose_cost": 1.0,
+    "switch_cost": 16.0,
+    "tackle_extra": 5.0,
+    "dead_entry_cost": 20.0,
+    "dead_exit_cost": 30.0,
+    "dead_min_frames": 100,
+    "w_turnover": 8.0,
+    "w_touch": 4.0,
+    "w_duel": 2.0,
+    "w_deflection": 0.0,
+    "touch_before": 2,
+    "touch_after": 10,
+    "w_near_switch": 0.0,
+    "w_stoppage": 8.0,
+    "stop_before": 10,
+    "stop_after": 25,
+    "w_shot_dead": 3.0,
+    "shot_window": 75,
+    "w_restart": 8.0,
+    "restart_before": 10,
+    "restart_after": 10
+  },
+  "dead_head": {
+    "model": "dead_logreg",
+    "C": 10.0,
+    "features": 28,
+    "feature_group": "film_dead_motion",
+    "training_rows": 301,
+    "folds": 5,
+    "purge_frames": 125,
+    "blend_weight": 0.5,
+    "primary_conditional_team_preserved": true
+  },
+  "phase_head": {
+    "model": "dead_logreg",
+    "C": 0.3,
+    "features": 17,
+    "training_rows": 223,
+    "folds": 5,
+    "purge_frames": 125,
+    "purge_basis": "actual fold interval edges",
+    "weight": 0.5,
+    "dead_margin": 50,
+    "keep_teams": true,
+    "pointwise_before_stitching": true
+  },
+  "checkpoint": {
+    "public": {
+      "macro_f1": 0.9621455234182225,
+      "spell_f1_mean": 0.9032258064516128,
+      "spell_f1_at_headline": 0.9032258064516129,
+      "spell_iou_headline": 0.5,
+      "spell_bootstrap_low": null,
+      "spell_bootstrap_high": null,
+      "n_gt_spells": 17,
+      "n_pred_spells": 14,
+      "spell_count_error": -3,
+      "mean_spell_duration_s": 17.02857142857143,
+      "gt_mean_spell_duration_s": 14.190588235294117,
+      "accuracy": 0.9629333333333333,
+      "kappa": 0.9415702126793817,
+      "alive_dead_f1": 0.9890751396880993,
+      "team_acc_gt_alive": 0.9588791245232963,
+      "team_acc_both_alive": 0.9752107925801011,
+      "gt_home_share": 0.5727076770021555,
+      "pred_home_share": 0.5634228187919463,
+      "share_err": 0.00928485821020919,
+      "share_defined": true,
+      "n_gt_segments": 21,
+      "n_pred_segments": 18,
+      "fragmentation": 0.8571428571428571,
+      "n_frames": 199319,
+      "n_graded": 7500,
+      "n_abstain_on_graded": 0,
+      "bootstrap_low": null,
+      "bootstrap_high": null,
+      "bootstrap_n": 0,
+      "confusion": [
+        [
+          3276,
+          87,
+          91,
+          0
+        ],
+        [
+          60,
+          2507,
+          10,
+          0
+        ],
+        [
+          22,
+          8,
+          1439,
+          0
+        ],
+        [
+          48398,
+          31589,
+          71370,
+          40462
+        ]
+      ],
+      "per_class": {
+        "H": {
+          "precision": 0.9755807027992853,
+          "recall": 0.9484655471916619,
+          "f1": 0.9618320610687023,
+          "support": 3454
+        },
+        "A": {
+          "precision": 0.963489623366641,
+          "recall": 0.972836631742336,
+          "f1": 0.9681405676771577,
+          "support": 2577
+        },
+        "D": {
+          "precision": 0.9344155844155844,
+          "recall": 0.9795779441797141,
+          "f1": 0.956463941508807,
+          "support": 1469
+        }
+      },
+      "transitions": {
+        "12": {
+          "precision": 0.6470588235294118,
+          "recall": 0.55,
+          "f1": 0.5945945945945946,
+          "n_gt": 20,
+          "n_pred": 17,
+          "n_matched": 11,
+          "n_missed": 9,
+          "n_spurious": 6,
+          "n_ambiguous": 0,
+          "mean_latency": 0.0,
+          "median_latency": 0.0,
+          "mean_abs_latency": 4.363636363636363,
+          "p90_abs_latency": 9.0
+        },
+        "25": {
+          "precision": 0.8823529411764706,
+          "recall": 0.75,
+          "f1": 0.8108108108108107,
+          "n_gt": 20,
+          "n_pred": 17,
+          "n_matched": 15,
+          "n_missed": 5,
+          "n_spurious": 2,
+          "n_ambiguous": 0,
+          "mean_latency": -0.6666666666666666,
+          "median_latency": 0.0,
+          "mean_abs_latency": 7.866666666666666,
+          "p90_abs_latency": 17.2
+        }
+      },
+      "spell_f1": {
+        "0.3": {
+          "precision": 1.0,
+          "recall": 0.8235294117647058,
+          "f1": 0.9032258064516129,
+          "n_matched": 14,
+          "n_spurious": 0,
+          "n_missed": 3
+        },
+        "0.4": {
+          "precision": 1.0,
+          "recall": 0.8235294117647058,
+          "f1": 0.9032258064516129,
+          "n_matched": 14,
+          "n_spurious": 0,
+          "n_missed": 3
+        },
+        "0.5": {
+          "precision": 1.0,
+          "recall": 0.8235294117647058,
+          "f1": 0.9032258064516129,
+          "n_matched": 14,
+          "n_spurious": 0,
+          "n_missed": 3
+        },
+        "0.6": {
+          "precision": 1.0,
+          "recall": 0.8235294117647058,
+          "f1": 0.9032258064516129,
+          "n_matched": 14,
+          "n_spurious": 0,
+          "n_missed": 3
+        },
+        "0.7": {
+          "precision": 1.0,
+          "recall": 0.8235294117647058,
+          "f1": 0.9032258064516129,
+          "n_matched": 14,
+          "n_spurious": 0,
+          "n_missed": 3
+        }
+      },
+      "gt_home_share_spells": 0.5727076770021555
+    },
+    "full": {
+      "possessions": 400,
+      "dead_spells": 130,
+      "graded_frames": 158857,
+      "label_counts": {
+        "H": 51756,
+        "A": 34191,
+        "D": 72910,
+        "X": 40462
+      },
+      "mean_duration_s": 8.5947,
+      "home_alive_share": 0.6021850675416245,
+      "away_alive_share": 0.3978149324583755,
+      "dead_share": 0.45896624007755404,
+      "teams": {
+        "H": {
+          "possessions": 197,
+          "mean_duration_s": 10.508832487309643
+        },
+        "A": {
+          "possessions": 203,
+          "mean_duration_s": 6.7371428571428575
+        }
+      }
+    },
+    "halves": [
+      {
+        "half": 1,
+        "graded_frames": 79467,
+        "possessions": 202,
+        "mean_duration_s": 8.816633663366337,
+        "home_alive_share": 0.6161845296918516,
+        "away_alive_share": 0.3838154703081484,
+        "dead_share": 0.43971711528055674,
+        "dead_spells": 62,
+        "label_counts": {
+          "H": 27435,
+          "A": 17089,
+          "D": 34943,
+          "X": 0
+        },
+        "teams": {
+          "H": {
+            "possessions": 100,
+            "mean_duration_s": 10.974
+          },
+          "A": {
+            "possessions": 102,
+            "mean_duration_s": 6.70156862745098
+          }
+        }
+      },
+      {
+        "half": 2,
+        "graded_frames": 79390,
+        "possessions": 198,
+        "mean_duration_s": 8.368282828282828,
+        "home_alive_share": 0.5871375805711803,
+        "away_alive_share": 0.41286241942881974,
+        "dead_share": 0.4782340345131629,
+        "dead_spells": 68,
+        "label_counts": {
+          "H": 24321,
+          "A": 17102,
+          "D": 37967,
+          "X": 0
+        },
+        "teams": {
+          "H": {
+            "possessions": 97,
+            "mean_duration_s": 10.029278350515463
+          },
+          "A": {
+            "possessions": 101,
+            "mean_duration_s": 6.773069306930694
+          }
+        }
+      }
+    ],
+    "changes": {
+      "total": 299,
+      "public": 32,
+      "dead": 299
+    },
+    "csv_sha256": "96e37d1abc9985fbe73fcbb159fa048db81aa7de5966346cb831609bb4af648a",
+    "artifact_sha256": "d0fbd7bdd7ed75b9b1f0cc3900e617d99a856caeaffe27c7efc97eb692cd6430"
+  },
+  "sensitivity": {
+    "selection_used_public": true,
+    "same_public_possessions": true,
+    "params": {
+      "baseline": {
+        "player_margin": 5.0,
+        "max_player_speed": 12.0,
+        "vel_k": 2,
+        "ball_spike_speed": 45.0,
+        "ball_island_len": 3,
+        "ball_island_gap": 50,
+        "max_gap": 12,
+        "ball_source": "fused_full",
+        "ctrl_radius": 1.3,
+        "ctrl_softness": 0.35,
+        "sync_free": 2.5,
+        "sync_scale": 3.0,
+        "filled_trust": 0.6,
+        "corner_zone": 3.0,
+        "still_speed": 1.2,
+        "slow_window": 50,
+        "ball_smooth": 9,
+        "touch_k": 3,
+        "touch_dv": 3.5,
+        "touch_spacing": 6,
+        "touch_radius": 2.0,
+        "touch_margin": 1.5,
+        "duel_radius": 1.5,
+        "seq_max_gap": 100,
+        "pass_min_travel": 5.0,
+        "shot_speed": 18.0,
+        "shot_range": 35.0,
+        "out_margin": 0.5,
+        "out_min_frames": 3,
+        "vanish_min_frames": 50,
+        "vanish_horizon": 0.4,
+        "decel_window": 25,
+        "decel_drop": 1.2,
+        "decel_to": 1.6,
+        "decel_lead": 20,
+        "rest_speed": 1.8,
+        "placed_min_frames": 25,
+        "placed_calm_speed": 1.8,
+        "restart_kick_speed": 5.0,
+        "kick_within": 20,
+        "reappear_min_frames": 75,
+        "dead_min_gap": 50,
+        "dead_max_gap": 2250,
+        "hold_kinds": "goal_line,touchline,vanish",
+        "hold_goal_line": 200,
+        "hold_touchline": 75,
+        "shape_folds": 8,
+        "shape_guard": 250,
+        "shape_stride": 3,
+        "shape_iter": 150,
+        "shape_eps": 0.05,
+        "pretrained_shape": "",
+        "pretrained_mix": 1.0,
+        "shape_rounds": 2,
+        "shape_conf": 0.0,
+        "ownership_model": "pretrain_data/ownership_v2/ownership_all.joblib",
+        "supervised_shape_model": "pretrain_data/ownership_v2/shape_all.joblib",
+        "w_owner": 1.0,
+        "w_owner_switch": 12.0,
+        "w_contact": 1.0,
+        "contact_alpha": 0.5,
+        "contact_window": 125,
+        "contact_lock_dead": 1,
+        "contact_switch_cost": 4.0,
+        "contact_min_frames": 12,
+        "contact_local_switch": 0,
+        "hybrid_model": "pretrain_data/macro_v7/ensemble.joblib",
+        "hybrid_weight": 0.5,
+        "hybrid_lock_dead": 1,
+        "hybrid_prune_max_frames": 100,
+        "hybrid_prune_min_confidence": 0.5,
+        "hybrid_loose_threshold": 0.0,
+        "hybrid_dead_margin": 12,
+        "hybrid_dead_weight": 2.0,
+        "ctrl_eps": 0.05,
+        "near_radius": 1.3,
+        "near_margin": 0.5,
+        "w_near": 0.0,
+        "near_rounds": 0,
+        "w_ball": 1.0,
+        "w_shape": 1.0,
+        "w_shape_known": 0.0,
+        "w_tag": 0.0,
+        "w_dead": 1.0,
+        "d_bias": 0.0,
+        "w_out": 6.0,
+        "w_out_carry": 3.0,
+        "slow_speed": 1.3,
+        "slow_scale": 0.3,
+        "w_slow": 1.0,
+        "dead_gap": 75,
+        "w_missing": 0.0,
+        "w_missing_slow": 0.5,
+        "w_still": 2.0,
+        "w_shape_dead": 0.5,
+        "alive_ball_speed": 6.0,
+        "w_alive": 3.0,
+        "w_hold": 5.0,
+        "w_post_restart": 2.0,
+        "inner_restarts": 0,
+        "post_restart_frames": 50,
+        "w_tag_dead": 1.0,
+        "tag_dead_frames": 25,
+        "z_max": 4.0,
+        "pre_kickoff_dead": 1,
+        "goal_dead": 1,
+        "w_whistle": 10.0,
+        "w_whistle_dead": 2.0,
+        "whistle_thresh": 24.0,
+        "whistle_before": 5,
+        "whistle_after": 20,
+        "whistle_hold": 150,
+        "w_whistle_confirmed": 16.0,
+        "whistle_confirm_speed": 1.5,
+        "whistle_confirm_window": 125,
+        "whistle_lag": 10,
+        "whistle_min_speed": 1.8,
+        "loose_cost": 1.0,
+        "switch_cost": 16.0,
+        "tackle_extra": 5.0,
+        "dead_entry_cost": 20.0,
+        "dead_exit_cost": 30.0,
+        "dead_min_frames": 100,
+        "w_turnover": 8.0,
+        "w_touch": 4.0,
+        "w_duel": 2.0,
+        "w_deflection": 0.0,
+        "touch_before": 2,
+        "touch_after": 10,
+        "w_near_switch": 0.0,
+        "w_stoppage": 8.0,
+        "stop_before": 10,
+        "stop_after": 25,
+        "w_shot_dead": 3.0,
+        "shot_window": 75,
+        "w_restart": 8.0,
+        "restart_before": 10,
+        "restart_after": 10
+      },
+      "candidate": {
+        "player_margin": 5.0,
+        "max_player_speed": 12.0,
+        "vel_k": 2,
+        "ball_spike_speed": 45.0,
+        "ball_island_len": 3,
+        "ball_island_gap": 50,
+        "max_gap": 12,
+        "ball_source": "fused_full",
+        "ctrl_radius": 1.3,
+        "ctrl_softness": 0.35,
+        "sync_free": 2.5,
+        "sync_scale": 3.0,
+        "filled_trust": 0.6,
+        "corner_zone": 3.0,
+        "still_speed": 1.2,
+        "slow_window": 50,
+        "ball_smooth": 9,
+        "touch_k": 3,
+        "touch_dv": 3.5,
+        "touch_spacing": 6,
+        "touch_radius": 2.0,
+        "touch_margin": 1.5,
+        "duel_radius": 1.5,
+        "seq_max_gap": 100,
+        "pass_min_travel": 5.0,
+        "shot_speed": 18.0,
+        "shot_range": 35.0,
+        "out_margin": 0.5,
+        "out_min_frames": 3,
+        "vanish_min_frames": 50,
+        "vanish_horizon": 0.4,
+        "decel_window": 25,
+        "decel_drop": 1.2,
+        "decel_to": 1.6,
+        "decel_lead": 20,
+        "rest_speed": 1.8,
+        "placed_min_frames": 25,
+        "placed_calm_speed": 1.8,
+        "restart_kick_speed": 5.0,
+        "kick_within": 20,
+        "reappear_min_frames": 75,
+        "dead_min_gap": 50,
+        "dead_max_gap": 2250,
+        "hold_kinds": "goal_line,touchline,vanish",
+        "hold_goal_line": 200,
+        "hold_touchline": 75,
+        "shape_folds": 8,
+        "shape_guard": 250,
+        "shape_stride": 3,
+        "shape_iter": 150,
+        "shape_eps": 0.05,
+        "pretrained_shape": "",
+        "pretrained_mix": 1.0,
+        "shape_rounds": 2,
+        "shape_conf": 0.0,
+        "ownership_model": "pretrain_data/ownership_v2/ownership_all.joblib",
+        "supervised_shape_model": "pretrain_data/ownership_v2/shape_all.joblib",
+        "w_owner": 1.0,
+        "w_owner_switch": 12.0,
+        "w_contact": 1.0,
+        "contact_alpha": 0.5,
+        "contact_window": 125,
+        "contact_lock_dead": 1,
+        "contact_switch_cost": 4.0,
+        "contact_min_frames": 12,
+        "contact_local_switch": 0,
+        "hybrid_model": "pretrain_data/macro_v8/ensemble.joblib",
+        "hybrid_weight": 0.5,
+        "hybrid_lock_dead": 1,
+        "hybrid_prune_max_frames": 100,
+        "hybrid_prune_min_confidence": 0.5,
+        "hybrid_loose_threshold": 0.0,
+        "hybrid_dead_margin": 12,
+        "hybrid_dead_weight": 2.0,
+        "ctrl_eps": 0.05,
+        "near_radius": 1.3,
+        "near_margin": 0.5,
+        "w_near": 0.0,
+        "near_rounds": 0,
+        "w_ball": 1.0,
+        "w_shape": 1.0,
+        "w_shape_known": 0.0,
+        "w_tag": 0.0,
+        "w_dead": 1.0,
+        "d_bias": 0.0,
+        "w_out": 6.0,
+        "w_out_carry": 3.0,
+        "slow_speed": 1.3,
+        "slow_scale": 0.3,
+        "w_slow": 1.0,
+        "dead_gap": 75,
+        "w_missing": 0.0,
+        "w_missing_slow": 0.5,
+        "w_still": 2.0,
+        "w_shape_dead": 0.5,
+        "alive_ball_speed": 6.0,
+        "w_alive": 3.0,
+        "w_hold": 5.0,
+        "w_post_restart": 2.0,
+        "inner_restarts": 0,
+        "post_restart_frames": 50,
+        "w_tag_dead": 1.0,
+        "tag_dead_frames": 25,
+        "z_max": 4.0,
+        "pre_kickoff_dead": 1,
+        "goal_dead": 1,
+        "w_whistle": 10.0,
+        "w_whistle_dead": 2.0,
+        "whistle_thresh": 24.0,
+        "whistle_before": 5,
+        "whistle_after": 20,
+        "whistle_hold": 150,
+        "w_whistle_confirmed": 16.0,
+        "whistle_confirm_speed": 1.5,
+        "whistle_confirm_window": 125,
+        "whistle_lag": 10,
+        "whistle_min_speed": 1.8,
+        "loose_cost": 1.0,
+        "switch_cost": 16.0,
+        "tackle_extra": 5.0,
+        "dead_entry_cost": 20.0,
+        "dead_exit_cost": 30.0,
+        "dead_min_frames": 100,
+        "w_turnover": 8.0,
+        "w_touch": 4.0,
+        "w_duel": 2.0,
+        "w_deflection": 0.0,
+        "touch_before": 2,
+        "touch_after": 10,
+        "w_near_switch": 0.0,
+        "w_stoppage": 8.0,
+        "stop_before": 10,
+        "stop_after": 25,
+        "w_shot_dead": 3.0,
+        "shot_window": 75,
+        "w_restart": 8.0,
+        "restart_before": 10,
+        "restart_after": 10
+      }
+    },
+    "classifier_sha256": {
+      "baseline": "c6f59332ab040defd9f5d106ecc2158fa242ac5a57f15774ba13ab755a89bd56",
+      "candidate": "d0fbd7bdd7ed75b9b1f0cc3900e617d99a856caeaffe27c7efc97eb692cd6430"
+    },
+    "results": [
+      {
+        "folds": 3,
+        "objective": "baseline",
+        "macroF1": 0.9408170866044464,
+        "spellF1": 0.7294117647058823,
+        "possessions": 17,
+        "per_class": {
+          "H": {
+            "precision": 0.9661538461538461,
+            "recall": 0.9090909090909091,
+            "f1": 0.9367541766109786,
+            "support": 3454
+          },
+          "A": {
+            "precision": 0.9114658925979681,
+            "recall": 0.9747768723321691,
+            "f1": 0.9420588786799174,
+            "support": 2577
+          },
+          "D": {
+            "precision": 0.9357429718875502,
+            "recall": 0.9516678012253234,
+            "f1": 0.9436382045224435,
+            "support": 1469
+          }
+        }
+      },
+      {
+        "folds": 3,
+        "objective": "candidate",
+        "macroF1": 0.9434398931233311,
+        "spellF1": 0.7294117647058823,
+        "possessions": 17,
+        "per_class": {
+          "H": {
+            "precision": 0.9635036496350365,
+            "recall": 0.9171974522292994,
+            "f1": 0.939780480569564,
+            "support": 3454
+          },
+          "A": {
+            "precision": 0.9071274298056156,
+            "recall": 0.9778812572759022,
+            "f1": 0.9411764705882352,
+            "support": 2577
+          },
+          "D": {
+            "precision": 0.9609483960948396,
+            "recall": 0.9380530973451328,
+            "f1": 0.9493627282121944,
+            "support": 1469
+          }
+        }
+      },
+      {
+        "folds": 4,
+        "objective": "baseline",
+        "macroF1": 0.9421511492888955,
+        "spellF1": 0.7529411764705882,
+        "possessions": 17,
+        "per_class": {
+          "H": {
+            "precision": 0.9330675021361435,
+            "recall": 0.9484655471916619,
+            "f1": 0.9407035175879397,
+            "support": 3454
+          },
+          "A": {
+            "precision": 0.9630981346309814,
+            "recall": 0.9216142801707412,
+            "f1": 0.9418996628990679,
+            "support": 2577
+          },
+          "D": {
+            "precision": 0.9271175311884439,
+            "recall": 0.9611980939414567,
+            "f1": 0.943850267379679,
+            "support": 1469
+          }
+        }
+      },
+      {
+        "folds": 4,
+        "objective": "candidate",
+        "macroF1": 0.946871466813105,
+        "spellF1": 0.7757575757575758,
+        "possessions": 16,
+        "per_class": {
+          "H": {
+            "precision": 0.9394895325494694,
+            "recall": 0.9484655471916619,
+            "f1": 0.943956202276329,
+            "support": 3454
+          },
+          "A": {
+            "precision": 0.9611650485436893,
+            "recall": 0.9220023282887078,
+            "f1": 0.9411764705882353,
+            "support": 2577
+          },
+          "D": {
+            "precision": 0.9331602855288773,
+            "recall": 0.9788972089857045,
+            "f1": 0.9554817275747508,
+            "support": 1469
+          }
+        }
+      },
+      {
+        "folds": 5,
+        "objective": "baseline",
+        "macroF1": 0.9576036123814177,
+        "spellF1": 0.8749999999999998,
+        "possessions": 15,
+        "per_class": {
+          "H": {
+            "precision": 0.9686575990538143,
+            "recall": 0.9484655471916619,
+            "f1": 0.9584552369806904,
+            "support": 3454
+          },
+          "A": {
+            "precision": 0.9649730561970746,
+            "recall": 0.972836631742336,
+            "f1": 0.9688888888888889,
+            "support": 2577
+          },
+          "D": {
+            "precision": 0.9296052631578947,
+            "recall": 0.9618788291354663,
+            "f1": 0.9454667112746737,
+            "support": 1469
+          }
+        }
+      },
+      {
+        "folds": 5,
+        "objective": "candidate",
+        "macroF1": 0.9621455234182225,
+        "spellF1": 0.9032258064516128,
+        "possessions": 14,
+        "per_class": {
+          "H": {
+            "precision": 0.9755807027992853,
+            "recall": 0.9484655471916619,
+            "f1": 0.9618320610687023,
+            "support": 3454
+          },
+          "A": {
+            "precision": 0.963489623366641,
+            "recall": 0.972836631742336,
+            "f1": 0.9681405676771577,
+            "support": 2577
+          },
+          "D": {
+            "precision": 0.9344155844155844,
+            "recall": 0.9795779441797141,
+            "f1": 0.956463941508807,
+            "support": 1469
+          }
+        }
+      },
+      {
+        "folds": 6,
+        "objective": "baseline",
+        "macroF1": 0.9512505021080155,
+        "spellF1": 0.825,
+        "possessions": 15,
+        "per_class": {
+          "H": {
+            "precision": 0.9564454837766735,
+            "recall": 0.9473074696004632,
+            "f1": 0.9518545454545454,
+            "support": 3454
+          },
+          "A": {
+            "precision": 0.9629773967264225,
+            "recall": 0.9588668994955375,
+            "f1": 0.9609177522846588,
+            "support": 2577
+          },
+          "D": {
+            "precision": 0.9272967614011897,
+            "recall": 0.955071477195371,
+            "f1": 0.9409792085848423,
+            "support": 1469
+          }
+        }
+      },
+      {
+        "folds": 6,
+        "objective": "candidate",
+        "macroF1": 0.9494534474510625,
+        "spellF1": 0.825,
+        "possessions": 15,
+        "per_class": {
+          "H": {
+            "precision": 0.9564454837766735,
+            "recall": 0.9473074696004632,
+            "f1": 0.9518545454545454,
+            "support": 3454
+          },
+          "A": {
+            "precision": 0.9538283955367449,
+            "recall": 0.9619712844392705,
+            "f1": 0.9578825347758888,
+            "support": 2577
+          },
+          "D": {
+            "precision": 0.9351351351351351,
+            "recall": 0.94213750850919,
+            "f1": 0.9386232621227535,
+            "support": 1469
+          }
+        }
+      }
+    ]
+  },
+  "broadcast": {
+    "provenance": {
+      "version": 1,
+      "inputs": {
+        "version": 1,
+        "sources": {
+          "atd_meta": "53d387bcdef718c2034ee2e05c3036c7edfa3cfcd5bbe8270a43695bd252dbe9",
+          "atd_raw": "a71c1c9391e564032446be91ffbd7564205b47966060181532d80a338685e458",
+          "homography": "9ed07e7085bb0f200e171929948ae378cdba760d844bd18266c0b7caa4ba4afb"
+        },
+        "tactical_ball_sha256": "81040b87ba3b71bbc847396035b8b1b82b0d58ab59b301efc6af9d1da6bbd0e2",
+        "tactical_players_sha256": "45af2a674e075d9e9ef00b1f4d0a4c8b0c60d4e4634edaf08b7c643071cf6900",
+        "fused_ball_sha256": "fe31bca8048c63663c87ccd7b997ecfcb48fdbe916ddf9926a3fd6732afd841d",
+        "pitch": [
+          105.3,
+          68.0
+        ],
+        "blocks": [
+          [
+            1,
+            11185,
+            90651
+          ],
+          [
+            2,
+            110808,
+            190197
+          ]
+        ],
+        "params": {
+          "player_margin": 5.0,
+          "max_player_speed": 12.0,
+          "vel_k": 2,
+          "ball_spike_speed": 45.0,
+          "ball_island_len": 3,
+          "ball_island_gap": 50,
+          "max_gap": 12,
+          "ball_source": "fused_full",
+          "ctrl_radius": 1.3,
+          "ctrl_softness": 0.35,
+          "sync_free": 2.5,
+          "sync_scale": 3.0,
+          "filled_trust": 0.6,
+          "corner_zone": 3.0,
+          "still_speed": 1.2,
+          "slow_window": 50,
+          "ball_smooth": 9,
+          "touch_k": 3,
+          "touch_dv": 3.5,
+          "touch_spacing": 6,
+          "touch_radius": 2.0,
+          "touch_margin": 1.5,
+          "duel_radius": 1.5,
+          "seq_max_gap": 100,
+          "pass_min_travel": 5.0,
+          "shot_speed": 18.0,
+          "shot_range": 35.0,
+          "out_margin": 0.5,
+          "out_min_frames": 3,
+          "vanish_min_frames": 50,
+          "vanish_horizon": 0.4,
+          "decel_window": 25,
+          "decel_drop": 1.2,
+          "decel_to": 1.6,
+          "decel_lead": 20,
+          "rest_speed": 1.8,
+          "placed_min_frames": 25,
+          "placed_calm_speed": 1.8,
+          "restart_kick_speed": 5.0,
+          "kick_within": 20,
+          "reappear_min_frames": 75,
+          "dead_min_gap": 50,
+          "dead_max_gap": 2250,
+          "hold_kinds": "goal_line,touchline,vanish",
+          "hold_goal_line": 200,
+          "hold_touchline": 75,
+          "shape_folds": 8,
+          "shape_guard": 250,
+          "shape_stride": 3,
+          "shape_iter": 150,
+          "shape_eps": 0.05,
+          "pretrained_shape": "",
+          "pretrained_mix": 1.0,
+          "shape_rounds": 2,
+          "shape_conf": 0.0,
+          "ownership_model": "pretrain_data/ownership_v2/ownership_all.joblib",
+          "supervised_shape_model": "pretrain_data/ownership_v2/shape_all.joblib",
+          "w_owner": 1.0,
+          "w_owner_switch": 12.0,
+          "w_contact": 1.0,
+          "contact_alpha": 0.5,
+          "contact_window": 125,
+          "contact_lock_dead": 1,
+          "contact_switch_cost": 4.0,
+          "contact_min_frames": 12,
+          "contact_local_switch": 0,
+          "ctrl_eps": 0.05,
+          "near_radius": 1.3,
+          "near_margin": 0.5,
+          "w_near": 0.0,
+          "near_rounds": 0,
+          "w_ball": 1.0,
+          "w_shape": 1.0,
+          "w_shape_known": 0.0,
+          "w_tag": 0.0,
+          "w_dead": 1.0,
+          "d_bias": 0.0,
+          "w_out": 6.0,
+          "w_out_carry": 3.0,
+          "slow_speed": 1.3,
+          "slow_scale": 0.3,
+          "w_slow": 1.0,
+          "dead_gap": 75,
+          "w_missing": 0.0,
+          "w_missing_slow": 0.5,
+          "w_still": 2.0,
+          "w_shape_dead": 0.5,
+          "alive_ball_speed": 6.0,
+          "w_alive": 3.0,
+          "w_hold": 5.0,
+          "w_post_restart": 2.0,
+          "inner_restarts": 0,
+          "post_restart_frames": 50,
+          "w_tag_dead": 1.0,
+          "tag_dead_frames": 25,
+          "z_max": 4.0,
+          "pre_kickoff_dead": 1,
+          "goal_dead": 1,
+          "w_whistle": 10.0,
+          "w_whistle_dead": 2.0,
+          "whistle_thresh": 24.0,
+          "whistle_before": 5,
+          "whistle_after": 20,
+          "whistle_hold": 150,
+          "w_whistle_confirmed": 16.0,
+          "whistle_confirm_speed": 1.5,
+          "whistle_confirm_window": 125,
+          "whistle_lag": 10,
+          "whistle_min_speed": 1.8,
+          "loose_cost": 1.0,
+          "switch_cost": 16.0,
+          "tackle_extra": 5.0,
+          "dead_entry_cost": 20.0,
+          "dead_exit_cost": 30.0,
+          "dead_min_frames": 100,
+          "w_turnover": 8.0,
+          "w_touch": 4.0,
+          "w_duel": 2.0,
+          "w_deflection": 0.0,
+          "touch_before": 2,
+          "touch_after": 10,
+          "w_near_switch": 0.0,
+          "w_stoppage": 8.0,
+          "stop_before": 10,
+          "stop_after": 25,
+          "w_shot_dead": 3.0,
+          "shot_window": 75,
+          "w_restart": 8.0,
+          "restart_before": 10,
+          "restart_after": 10
+        }
+      },
+      "alignment": [
+        {
+          "half": 1,
+          "offset": -4014,
+          "anchors": 10,
+          "offset_range": 3
+        },
+        {
+          "half": 2,
+          "offset": -26919,
+          "anchors": 10,
+          "offset_range": 2
+        }
+      ],
+      "feature_cache_sha256": "40e29470fe661b039eac38c8180c13e6a1f93cf14755c4bde2f428e9f0df4534",
+      "public_labels_used": false,
+      "columns": [
+        "broadcast_quality",
+        "broadcast_player_match",
+        "broadcast_players",
+        "broadcast_ball_seen",
+        "broadcast_since_ball",
+        "broadcast_ball_speed",
+        "broadcast_contact_team",
+        "broadcast_dist_home",
+        "broadcast_relative_home",
+        "broadcast_player_speed_home",
+        "broadcast_count_home",
+        "broadcast_dist_away",
+        "broadcast_relative_away",
+        "broadcast_player_speed_away",
+        "broadcast_count_away",
+        "broadcast_team_distance",
+        "broadcast_ball_disagreement"
+      ]
+    },
+    "quality_supported_frames": 94058,
+    "public_quality_supported_frames": 5590,
+    "public_ball_observed_frames": 4899,
+    "median_player_alignment_m": 0.28817859292030334,
+    "native_training_rows": 223,
+    "public_labels_used_for_alignment_or_feature_extraction": false
+  },
+  "experiments": {
+    "classifier_trials": [
+      {
+        "group": "broadcast_only",
+        "C": 0.3,
+        "mode": "expert",
+        "baseline": "macro_v7",
+        "training_rows": 223,
+        "macroF1": 0.957264102760384,
+        "spellF1": 0.8749999999999998,
+        "possessions": 15,
+        "class_f1": {
+          "H": 0.9580348004094167,
+          "A": 0.9682907965970611,
+          "D": 0.9454667112746737
+        },
+        "changed_frames": 148
+      },
+      {
+        "group": "broadcast_only",
+        "C": 0.3,
+        "mode": "team25",
+        "baseline": "macro_v7",
+        "training_rows": 223,
+        "macroF1": 0.9473040499787575,
+        "spellF1": 0.7500000000000001,
+        "possessions": 15,
+        "class_f1": {
+          "H": 0.9454865181711605,
+          "A": 0.9515911282545805,
+          "D": 0.9448345035105316
+        },
+        "changed_frames": 342
+      },
+      {
+        "group": "broadcast_only",
+        "C": 0.3,
+        "mode": "contact_expert",
+        "baseline": "macro_v7",
+        "training_rows": 223,
+        "macroF1": 0.925002322191733,
+        "spellF1": 0.65,
+        "possessions": 15,
+        "class_f1": {
+          "H": 0.9190266116408139,
+          "A": 0.9105136436597111,
+          "D": 0.9454667112746737
+        },
+        "changed_frames": 785
+      },
+      {
+        "group": "broadcast_only",
+        "C": 1.0,
+        "mode": "expert",
+        "baseline": "macro_v7",
+        "training_rows": 223,
+        "macroF1": 0.9459451357980463,
+        "spellF1": 0.7500000000000001,
+        "possessions": 15,
+        "class_f1": {
+          "H": 0.9434127796461471,
+          "A": 0.9489559164733178,
+          "D": 0.9454667112746737
+        },
+        "changed_frames": 248
+      },
+      {
+        "group": "broadcast_only",
+        "C": 1.0,
+        "mode": "team25",
+        "baseline": "macro_v7",
+        "training_rows": 223,
+        "macroF1": 0.9476495341646128,
+        "spellF1": 0.7500000000000001,
+        "possessions": 15,
+        "class_f1": {
+          "H": 0.9454865181711605,
+          "A": 0.9519953730480046,
+          "D": 0.9454667112746737
+        },
+        "changed_frames": 269
+      },
+      {
+        "group": "broadcast_only",
+        "C": 1.0,
+        "mode": "contact_expert",
+        "baseline": "macro_v7",
+        "training_rows": 223,
+        "macroF1": 0.925002322191733,
+        "spellF1": 0.65,
+        "possessions": 15,
+        "class_f1": {
+          "H": 0.9190266116408139,
+          "A": 0.9105136436597111,
+          "D": 0.9454667112746737
+        },
+        "changed_frames": 798
+      },
+      {
+        "group": "soft_broadcast",
+        "C": 0.3,
+        "mode": "expert",
+        "baseline": "macro_v7",
+        "training_rows": 223,
+        "macroF1": 0.957264102760384,
+        "spellF1": 0.8749999999999998,
+        "possessions": 15,
+        "class_f1": {
+          "H": 0.9580348004094167,
+          "A": 0.9682907965970611,
+          "D": 0.9454667112746737
+        },
+        "changed_frames": 148
+      },
+      {
+        "group": "soft_broadcast",
+        "C": 0.3,
+        "mode": "team25",
+        "baseline": "macro_v7",
+        "training_rows": 223,
+        "macroF1": 0.9459401327036331,
+        "spellF1": 0.7500000000000001,
+        "possessions": 15,
+        "class_f1": {
+          "H": 0.9438267992978351,
+          "A": 0.9491590953025324,
+          "D": 0.9448345035105316
+        },
+        "changed_frames": 247
+      },
+      {
+        "group": "soft_broadcast",
+        "C": 0.3,
+        "mode": "contact_expert",
+        "baseline": "macro_v7",
+        "training_rows": 223,
+        "macroF1": 0.950331429523504,
+        "spellF1": 0.8588235294117647,
+        "possessions": 17,
+        "class_f1": {
+          "H": 0.9499782514136581,
+          "A": 0.9561815336463224,
+          "D": 0.9448345035105316
+        },
+        "changed_frames": 291
+      },
+      {
+        "group": "soft_broadcast",
+        "C": 1.0,
+        "mode": "expert",
+        "baseline": "macro_v7",
+        "training_rows": 223,
+        "macroF1": 0.957264102760384,
+        "spellF1": 0.8749999999999998,
+        "possessions": 15,
+        "class_f1": {
+          "H": 0.9580348004094167,
+          "A": 0.9682907965970611,
+          "D": 0.9454667112746737
+        },
+        "changed_frames": 150
+      },
+      {
+        "group": "soft_broadcast",
+        "C": 1.0,
+        "mode": "team25",
+        "baseline": "macro_v7",
+        "training_rows": 223,
+        "macroF1": 0.9462862426546043,
+        "spellF1": 0.7500000000000001,
+        "possessions": 15,
+        "class_f1": {
+          "H": 0.9438267992978351,
+          "A": 0.9495652173913043,
+          "D": 0.9454667112746737
+        },
+        "changed_frames": 244
+      },
+      {
+        "group": "soft_broadcast",
+        "C": 1.0,
+        "mode": "contact_expert",
+        "baseline": "macro_v7",
+        "training_rows": 223,
+        "macroF1": 0.9425230583886409,
+        "spellF1": 0.7294117647058824,
+        "possessions": 17,
+        "class_f1": {
+          "H": 0.9393454545454546,
+          "A": 0.9427570093457943,
+          "D": 0.9454667112746737
+        },
+        "changed_frames": 404
+      },
+      {
+        "group": "broadcast_only_dead",
+        "C": 0.3,
+        "mode": "dead50",
+        "baseline": "macro_v7",
+        "training_rows": 223,
+        "macroF1": 0.9545771173714709,
+        "spellF1": 0.8235294117647058,
+        "possessions": 17,
+        "class_f1": {
+          "H": 0.9544064093226511,
+          "A": 0.9619565217391304,
+          "D": 0.9473684210526316
+        },
+        "changed_frames": 212
+      },
+      {
+        "group": "broadcast_only_dead",
+        "C": 0.3,
+        "mode": "dead100",
+        "baseline": "macro_v7",
+        "training_rows": 223,
+        "macroF1": 0.9536524699701422,
+        "spellF1": 0.7999999999999999,
+        "possessions": 18,
+        "class_f1": {
+          "H": 0.9551673944687045,
+          "A": 0.9587768531062512,
+          "D": 0.9470131623354708
+        },
+        "changed_frames": 338
+      },
+      {
+        "group": "broadcast_only_dead",
+        "C": 1.0,
+        "mode": "dead50",
+        "baseline": "macro_v7",
+        "training_rows": 223,
+        "macroF1": 0.9578482315834972,
+        "spellF1": 0.8749999999999998,
+        "possessions": 15,
+        "class_f1": {
+          "H": 0.9584552369806904,
+          "A": 0.967791706846673,
+          "D": 0.9472977509231285
+        },
+        "changed_frames": 183
+      },
+      {
+        "group": "broadcast_only_dead",
+        "C": 1.0,
+        "mode": "dead100",
+        "baseline": "macro_v7",
+        "training_rows": 223,
+        "macroF1": 0.9568869709920941,
+        "spellF1": 0.8484848484848484,
+        "possessions": 16,
+        "class_f1": {
+          "H": 0.9594970024857435,
+          "A": 0.9642582628747118,
+          "D": 0.9469056476158269
+        },
+        "changed_frames": 325
+      },
+      {
+        "group": "video_broadcast_dead",
+        "C": 0.3,
+        "mode": "dead50",
+        "baseline": "macro_v7",
+        "training_rows": 223,
+        "macroF1": 0.953858796870663,
+        "spellF1": 0.8235294117647058,
+        "possessions": 17,
+        "class_f1": {
+          "H": 0.9542674046023886,
+          "A": 0.961426633068424,
+          "D": 0.9458823529411765
+        },
+        "changed_frames": 222
+      },
+      {
+        "group": "video_broadcast_dead",
+        "C": 0.3,
+        "mode": "dead100",
+        "baseline": "macro_v7",
+        "training_rows": 223,
+        "macroF1": 0.9522789504863316,
+        "spellF1": 0.7999999999999999,
+        "possessions": 18,
+        "class_f1": {
+          "H": 0.9543339150668994,
+          "A": 0.9584541062801931,
+          "D": 0.9440488301119023
+        },
+        "changed_frames": 339
+      },
+      {
+        "group": "video_broadcast_dead",
+        "C": 1.0,
+        "mode": "dead50",
+        "baseline": "macro_v7",
+        "training_rows": 223,
+        "macroF1": 0.9573079567124791,
+        "spellF1": 0.8749999999999998,
+        "possessions": 15,
+        "class_f1": {
+          "H": 0.9584552369806904,
+          "A": 0.9672320740169621,
+          "D": 0.9462365591397849
+        },
+        "changed_frames": 194
+      },
+      {
+        "group": "video_broadcast_dead",
+        "C": 1.0,
+        "mode": "dead100",
+        "baseline": "macro_v7",
+        "training_rows": 223,
+        "macroF1": 0.9565558816977172,
+        "spellF1": 0.8484848484848484,
+        "possessions": 16,
+        "class_f1": {
+          "H": 0.9592164888174243,
+          "A": 0.9642582628747118,
+          "D": 0.9461928934010152
+        },
+        "changed_frames": 325
+      }
+    ],
+    "wider_phase_trials": [
+      {
+        "group": "control_v7",
+        "margin": 50,
+        "macroF1": 0.9576036123814177,
+        "spellF1": 0.8749999999999998,
+        "possessions": 15,
+        "class_f1": {
+          "H": 0.9584552369806904,
+          "A": 0.9688888888888889,
+          "D": 0.9454667112746737
+        },
+        "changed_frames": 272
+      },
+      {
+        "group": "control_v7",
+        "margin": 75,
+        "macroF1": 0.9576036123814177,
+        "spellF1": 0.8749999999999998,
+        "possessions": 15,
+        "class_f1": {
+          "H": 0.9584552369806904,
+          "A": 0.9688888888888889,
+          "D": 0.9454667112746737
+        },
+        "changed_frames": 339
+      },
+      {
+        "group": "broadcast_only_dead",
+        "C": 0.3,
+        "weight": 0.5,
+        "margin": 50,
+        "macroF1": 0.9588495842730843,
+        "spellF1": 0.8484848484848484,
+        "possessions": 16,
+        "class_f1": {
+          "H": 0.9577547142230669,
+          "A": 0.9623300970873786,
+          "D": 0.956463941508807
+        },
+        "changed_frames": 459
+      },
+      {
+        "group": "broadcast_only_dead",
+        "C": 0.3,
+        "weight": 1.0,
+        "margin": 50,
+        "macroF1": 0.957913128093392,
+        "spellF1": 0.8484848484848484,
+        "possessions": 16,
+        "class_f1": {
+          "H": 0.9577547142230669,
+          "A": 0.9499520613614574,
+          "D": 0.9660326086956521
+        },
+        "changed_frames": 809
+      },
+      {
+        "group": "broadcast_only_dead",
+        "C": 1.0,
+        "weight": 0.5,
+        "margin": 50,
+        "macroF1": 0.9619619738998096,
+        "spellF1": 0.9032258064516128,
+        "possessions": 14,
+        "class_f1": {
+          "H": 0.9618320610687023,
+          "A": 0.9679660362794289,
+          "D": 0.9560878243512974
+        },
+        "changed_frames": 418
+      },
+      {
+        "group": "broadcast_only_dead",
+        "C": 1.0,
+        "weight": 1.0,
+        "margin": 50,
+        "macroF1": 0.9608454870696629,
+        "spellF1": 0.9032258064516128,
+        "possessions": 14,
+        "class_f1": {
+          "H": 0.9618320610687023,
+          "A": 0.9554455445544554,
+          "D": 0.9652588555858311
+        },
+        "changed_frames": 846
+      },
+      {
+        "group": "video_broadcast_dead",
+        "C": 0.3,
+        "weight": 0.5,
+        "margin": 50,
+        "macroF1": 0.953858796870663,
+        "spellF1": 0.8235294117647058,
+        "possessions": 17,
+        "class_f1": {
+          "H": 0.9542674046023886,
+          "A": 0.961426633068424,
+          "D": 0.9458823529411765
+        },
+        "changed_frames": 432
+      },
+      {
+        "group": "video_broadcast_dead",
+        "C": 0.3,
+        "weight": 1.0,
+        "margin": 50,
+        "macroF1": 0.9522373446274189,
+        "spellF1": 0.8235294117647058,
+        "possessions": 17,
+        "class_f1": {
+          "H": 0.9535729879202445,
+          "A": 0.9492822966507176,
+          "D": 0.9538567493112948
+        },
+        "changed_frames": 840
+      },
+      {
+        "group": "video_broadcast_dead",
+        "C": 1.0,
+        "weight": 0.5,
+        "margin": 50,
+        "macroF1": 0.9573079567124791,
+        "spellF1": 0.8749999999999998,
+        "possessions": 15,
+        "class_f1": {
+          "H": 0.9584552369806904,
+          "A": 0.9672320740169621,
+          "D": 0.9462365591397849
+        },
+        "changed_frames": 433
+      },
+      {
+        "group": "video_broadcast_dead",
+        "C": 1.0,
+        "weight": 1.0,
+        "margin": 50,
+        "macroF1": 0.9565169416969813,
+        "spellF1": 0.8749999999999998,
+        "possessions": 15,
+        "class_f1": {
+          "H": 0.9584552369806904,
+          "A": 0.9550818424057862,
+          "D": 0.9560137457044673
+        },
+        "changed_frames": 848
+      }
+    ],
+    "pointwise_team_retention": [
+      {
+        "group": "broadcast_only_dead",
+        "C": 0.3,
+        "mode": "dead50",
+        "baseline": "macro_v7",
+        "fusion": "pointwise_dead_mask",
+        "macroF1": 0.9578634994705425,
+        "spellF1": 0.8749999999999998,
+        "possessions": 15,
+        "class_f1": {
+          "H": 0.9584552369806904,
+          "A": 0.9677668403783053,
+          "D": 0.9473684210526316
+        },
+        "changed_frames": 184
+      },
+      {
+        "group": "broadcast_only_dead",
+        "C": 0.3,
+        "mode": "dead100",
+        "baseline": "macro_v7",
+        "fusion": "pointwise_dead_mask",
+        "macroF1": 0.9569392652932027,
+        "spellF1": 0.8484848484848484,
+        "possessions": 16,
+        "class_f1": {
+          "H": 0.9592164888174243,
+          "A": 0.964588144726713,
+          "D": 0.9470131623354708
+        },
+        "changed_frames": 310
+      },
+      {
+        "group": "broadcast_only_dead",
+        "C": 0.3,
+        "mode": "wide50",
+        "baseline": "macro_v7",
+        "fusion": "pointwise_dead_mask",
+        "macroF1": 0.9621455234182225,
+        "spellF1": 0.9032258064516128,
+        "possessions": 14,
+        "class_f1": {
+          "H": 0.9618320610687023,
+          "A": 0.9681405676771577,
+          "D": 0.956463941508807
+        },
+        "changed_frames": 431
+      },
+      {
+        "group": "broadcast_only_dead",
+        "C": 0.3,
+        "mode": "wide100",
+        "baseline": "macro_v7",
+        "fusion": "pointwise_dead_mask",
+        "macroF1": 0.9612078774627685,
+        "spellF1": 0.9032258064516128,
+        "possessions": 14,
+        "class_f1": {
+          "H": 0.9618320610687023,
+          "A": 0.9557589626239512,
+          "D": 0.9660326086956521
+        },
+        "changed_frames": 781
+      },
+      {
+        "group": "broadcast_only_dead",
+        "C": 1.0,
+        "mode": "dead50",
+        "baseline": "macro_v7",
+        "fusion": "pointwise_dead_mask",
+        "macroF1": 0.9578482315834972,
+        "spellF1": 0.8749999999999998,
+        "possessions": 15,
+        "class_f1": {
+          "H": 0.9584552369806904,
+          "A": 0.967791706846673,
+          "D": 0.9472977509231285
+        },
+        "changed_frames": 184
+      },
+      {
+        "group": "broadcast_only_dead",
+        "C": 1.0,
+        "mode": "dead100",
+        "baseline": "macro_v7",
+        "fusion": "pointwise_dead_mask",
+        "macroF1": 0.9568869709920941,
+        "spellF1": 0.8484848484848484,
+        "possessions": 16,
+        "class_f1": {
+          "H": 0.9594970024857435,
+          "A": 0.9642582628747118,
+          "D": 0.9469056476158269
+        },
+        "changed_frames": 326
+      },
+      {
+        "group": "broadcast_only_dead",
+        "C": 1.0,
+        "mode": "wide50",
+        "baseline": "macro_v7",
+        "fusion": "pointwise_dead_mask",
+        "macroF1": 0.9619619738998096,
+        "spellF1": 0.9032258064516128,
+        "possessions": 14,
+        "class_f1": {
+          "H": 0.9618320610687023,
+          "A": 0.9679660362794289,
+          "D": 0.9560878243512974
+        },
+        "changed_frames": 419
+      },
+      {
+        "group": "broadcast_only_dead",
+        "C": 1.0,
+        "mode": "wide100",
+        "baseline": "macro_v7",
+        "fusion": "pointwise_dead_mask",
+        "macroF1": 0.9608454870696629,
+        "spellF1": 0.9032258064516128,
+        "possessions": 14,
+        "class_f1": {
+          "H": 0.9618320610687023,
+          "A": 0.9554455445544554,
+          "D": 0.9652588555858311
+        },
+        "changed_frames": 847
+      },
+      {
+        "group": "video_broadcast_dead",
+        "C": 0.3,
+        "mode": "dead50",
+        "baseline": "macro_v7",
+        "fusion": "pointwise_dead_mask",
+        "macroF1": 0.9571431591396222,
+        "spellF1": 0.8749999999999998,
+        "possessions": 15,
+        "class_f1": {
+          "H": 0.9583150504607283,
+          "A": 0.9672320740169621,
+          "D": 0.9458823529411765
+        },
+        "changed_frames": 194
+      },
+      {
+        "group": "video_broadcast_dead",
+        "C": 0.3,
+        "mode": "dead100",
+        "baseline": "macro_v7",
+        "fusion": "pointwise_dead_mask",
+        "macroF1": 0.9555610080171046,
+        "spellF1": 0.8484848484848484,
+        "possessions": 16,
+        "class_f1": {
+          "H": 0.9583759310646998,
+          "A": 0.9642582628747118,
+          "D": 0.9440488301119023
+        },
+        "changed_frames": 311
+      },
+      {
+        "group": "video_broadcast_dead",
+        "C": 0.3,
+        "mode": "wide50",
+        "baseline": "macro_v7",
+        "fusion": "pointwise_dead_mask",
+        "macroF1": 0.9571431591396222,
+        "spellF1": 0.8749999999999998,
+        "possessions": 15,
+        "class_f1": {
+          "H": 0.9583150504607283,
+          "A": 0.9672320740169621,
+          "D": 0.9458823529411765
+        },
+        "changed_frames": 404
+      },
+      {
+        "group": "video_broadcast_dead",
+        "C": 0.3,
+        "mode": "wide100",
+        "baseline": "macro_v7",
+        "fusion": "pointwise_dead_mask",
+        "macroF1": 0.9555177747504758,
+        "spellF1": 0.8749999999999998,
+        "possessions": 15,
+        "class_f1": {
+          "H": 0.9576147325343467,
+          "A": 0.9550818424057862,
+          "D": 0.9538567493112948
+        },
+        "changed_frames": 812
+      },
+      {
+        "group": "video_broadcast_dead",
+        "C": 1.0,
+        "mode": "dead50",
+        "baseline": "macro_v7",
+        "fusion": "pointwise_dead_mask",
+        "macroF1": 0.9573079567124791,
+        "spellF1": 0.8749999999999998,
+        "possessions": 15,
+        "class_f1": {
+          "H": 0.9584552369806904,
+          "A": 0.9672320740169621,
+          "D": 0.9462365591397849
+        },
+        "changed_frames": 195
+      },
+      {
+        "group": "video_broadcast_dead",
+        "C": 1.0,
+        "mode": "dead100",
+        "baseline": "macro_v7",
+        "fusion": "pointwise_dead_mask",
+        "macroF1": 0.9565558816977172,
+        "spellF1": 0.8484848484848484,
+        "possessions": 16,
+        "class_f1": {
+          "H": 0.9592164888174243,
+          "A": 0.9642582628747118,
+          "D": 0.9461928934010152
+        },
+        "changed_frames": 326
+      },
+      {
+        "group": "video_broadcast_dead",
+        "C": 1.0,
+        "mode": "wide50",
+        "baseline": "macro_v7",
+        "fusion": "pointwise_dead_mask",
+        "macroF1": 0.9573079567124791,
+        "spellF1": 0.8749999999999998,
+        "possessions": 15,
+        "class_f1": {
+          "H": 0.9584552369806904,
+          "A": 0.9672320740169621,
+          "D": 0.9462365591397849
+        },
+        "changed_frames": 434
+      },
+      {
+        "group": "video_broadcast_dead",
+        "C": 1.0,
+        "mode": "wide100",
+        "baseline": "macro_v7",
+        "fusion": "pointwise_dead_mask",
+        "macroF1": 0.9565169416969813,
+        "spellF1": 0.8749999999999998,
+        "possessions": 15,
+        "class_f1": {
+          "H": 0.9584552369806904,
+          "A": 0.9550818424057862,
+          "D": 0.9560137457044673
+        },
+        "changed_frames": 849
+      }
+    ],
+    "prototype_fold_audit": [
+      {
+        "folds": 3,
+        "mode": "baseline",
+        "baseline": "macro_v7",
+        "macroF1": 0.9408170866044464,
+        "spellF1": 0.7294117647058823,
+        "possessions": 17,
+        "class_f1": {
+          "H": 0.9367541766109786,
+          "A": 0.9420588786799174,
+          "D": 0.9436382045224435
+        },
+        "changed_frames": 0
+      },
+      {
+        "folds": 3,
+        "mode": "C0.3_normal",
+        "baseline": "macro_v7",
+        "macroF1": 0.9434398931233311,
+        "spellF1": 0.7294117647058823,
+        "possessions": 17,
+        "class_f1": {
+          "H": 0.939780480569564,
+          "A": 0.9411764705882352,
+          "D": 0.9493627282121944
+        },
+        "changed_frames": 328
+      },
+      {
+        "folds": 3,
+        "mode": "C0.3_overlay",
+        "baseline": "macro_v7",
+        "macroF1": 0.9434398931233311,
+        "spellF1": 0.7294117647058823,
+        "possessions": 17,
+        "class_f1": {
+          "H": 0.939780480569564,
+          "A": 0.9411764705882352,
+          "D": 0.9493627282121944
+        },
+        "changed_frames": 327
+      },
+      {
+        "folds": 3,
+        "mode": "C1.0_normal",
+        "baseline": "macro_v7",
+        "macroF1": 0.9451074628272181,
+        "spellF1": 0.7294117647058823,
+        "possessions": 17,
+        "class_f1": {
+          "H": 0.9411764705882353,
+          "A": 0.9411764705882352,
+          "D": 0.9529694473051837
+        },
+        "changed_frames": 323
+      },
+      {
+        "folds": 3,
+        "mode": "C1.0_overlay",
+        "baseline": "macro_v7",
+        "macroF1": 0.9451074628272181,
+        "spellF1": 0.7294117647058823,
+        "possessions": 17,
+        "class_f1": {
+          "H": 0.9411764705882353,
+          "A": 0.9411764705882352,
+          "D": 0.9529694473051837
+        },
+        "changed_frames": 322
+      },
+      {
+        "folds": 4,
+        "mode": "baseline",
+        "baseline": "macro_v7",
+        "macroF1": 0.9421511492888955,
+        "spellF1": 0.7529411764705882,
+        "possessions": 17,
+        "class_f1": {
+          "H": 0.9407035175879397,
+          "A": 0.9418996628990679,
+          "D": 0.943850267379679
+        },
+        "changed_frames": 0
+      },
+      {
+        "folds": 4,
+        "mode": "C0.3_normal",
+        "baseline": "macro_v7",
+        "macroF1": 0.946871466813105,
+        "spellF1": 0.7757575757575758,
+        "possessions": 16,
+        "class_f1": {
+          "H": 0.943956202276329,
+          "A": 0.9411764705882353,
+          "D": 0.9554817275747508
+        },
+        "changed_frames": 302
+      },
+      {
+        "folds": 4,
+        "mode": "C0.3_overlay",
+        "baseline": "macro_v7",
+        "macroF1": 0.946871466813105,
+        "spellF1": 0.7757575757575758,
+        "possessions": 16,
+        "class_f1": {
+          "H": 0.943956202276329,
+          "A": 0.9411764705882353,
+          "D": 0.9554817275747508
+        },
+        "changed_frames": 301
+      },
+      {
+        "folds": 4,
+        "mode": "C1.0_normal",
+        "baseline": "macro_v7",
+        "macroF1": 0.9466957729931423,
+        "spellF1": 0.7757575757575758,
+        "possessions": 16,
+        "class_f1": {
+          "H": 0.943956202276329,
+          "A": 0.9409667194928686,
+          "D": 0.9551643972102292
+        },
+        "changed_frames": 288
+      },
+      {
+        "folds": 4,
+        "mode": "C1.0_overlay",
+        "baseline": "macro_v7",
+        "macroF1": 0.9466957729931423,
+        "spellF1": 0.7757575757575758,
+        "possessions": 16,
+        "class_f1": {
+          "H": 0.943956202276329,
+          "A": 0.9409667194928686,
+          "D": 0.9551643972102292
+        },
+        "changed_frames": 287
+      },
+      {
+        "folds": 5,
+        "mode": "baseline",
+        "baseline": "macro_v7",
+        "macroF1": 0.9576036123814177,
+        "spellF1": 0.8749999999999998,
+        "possessions": 15,
+        "class_f1": {
+          "H": 0.9584552369806904,
+          "A": 0.9688888888888889,
+          "D": 0.9454667112746737
+        },
+        "changed_frames": 0
+      },
+      {
+        "folds": 5,
+        "mode": "C0.3_normal",
+        "baseline": "macro_v7",
+        "macroF1": 0.9588495842730843,
+        "spellF1": 0.8484848484848484,
+        "possessions": 16,
+        "class_f1": {
+          "H": 0.9577547142230669,
+          "A": 0.9623300970873786,
+          "D": 0.956463941508807
+        },
+        "changed_frames": 329
+      },
+      {
+        "folds": 5,
+        "mode": "C0.3_overlay",
+        "baseline": "macro_v7",
+        "macroF1": 0.9621455234182225,
+        "spellF1": 0.9032258064516128,
+        "possessions": 14,
+        "class_f1": {
+          "H": 0.9618320610687023,
+          "A": 0.9681405676771577,
+          "D": 0.956463941508807
+        },
+        "changed_frames": 299
+      },
+      {
+        "folds": 5,
+        "mode": "C1.0_normal",
+        "baseline": "macro_v7",
+        "macroF1": 0.9619619738998096,
+        "spellF1": 0.9032258064516128,
+        "possessions": 14,
+        "class_f1": {
+          "H": 0.9618320610687023,
+          "A": 0.9679660362794289,
+          "D": 0.9560878243512974
+        },
+        "changed_frames": 290
+      },
+      {
+        "folds": 5,
+        "mode": "C1.0_overlay",
+        "baseline": "macro_v7",
+        "macroF1": 0.9619619738998096,
+        "spellF1": 0.9032258064516128,
+        "possessions": 14,
+        "class_f1": {
+          "H": 0.9618320610687023,
+          "A": 0.9679660362794289,
+          "D": 0.9560878243512974
+        },
+        "changed_frames": 289
+      },
+      {
+        "folds": 6,
+        "mode": "baseline",
+        "baseline": "macro_v7",
+        "macroF1": 0.9512505021080155,
+        "spellF1": 0.825,
+        "possessions": 15,
+        "class_f1": {
+          "H": 0.9518545454545454,
+          "A": 0.9609177522846588,
+          "D": 0.9409792085848423
+        },
+        "changed_frames": 0
+      },
+      {
+        "folds": 6,
+        "mode": "C0.3_normal",
+        "baseline": "macro_v7",
+        "macroF1": 0.9494534474510625,
+        "spellF1": 0.825,
+        "possessions": 15,
+        "class_f1": {
+          "H": 0.9518545454545454,
+          "A": 0.9578825347758888,
+          "D": 0.9386232621227535
+        },
+        "changed_frames": 301
+      },
+      {
+        "folds": 6,
+        "mode": "C0.3_overlay",
+        "baseline": "macro_v7",
+        "macroF1": 0.9494534474510625,
+        "spellF1": 0.825,
+        "possessions": 15,
+        "class_f1": {
+          "H": 0.9518545454545454,
+          "A": 0.9578825347758888,
+          "D": 0.9386232621227535
+        },
+        "changed_frames": 300
+      },
+      {
+        "folds": 6,
+        "mode": "C1.0_normal",
+        "baseline": "macro_v7",
+        "macroF1": 0.9479713453627173,
+        "spellF1": 0.825,
+        "possessions": 15,
+        "class_f1": {
+          "H": 0.9518545454545454,
+          "A": 0.9564547206165703,
+          "D": 0.9356047700170358
+        },
+        "changed_frames": 300
+      },
+      {
+        "folds": 6,
+        "mode": "C1.0_overlay",
+        "baseline": "macro_v7",
+        "macroF1": 0.9479713453627173,
+        "spellF1": 0.825,
+        "possessions": 15,
+        "class_f1": {
+          "H": 0.9518545454545454,
+          "A": 0.9564547206165703,
+          "D": 0.9356047700170358
+        },
+        "changed_frames": 299
+      }
+    ],
+    "frame_change_reference_for_initial_screens": "macro_v5; paired audit uses each corresponding macro_v7 baseline"
+  },
+  "validation": {
+    "tests_passed": 55,
+    "tests_failed": 0,
+    "all_17_features_and_coverage_identical_to_prototype": true,
+    "all_six_phase_classifiers_identical_to_prototype": true,
+    "official_validator_valid": true,
+    "official_scorer_confirmed": true,
+    "public_errors_fixed": 26,
+    "public_correct_frames_regressed": 0,
+    "rows": 199319,
+    "prototype_builder_production_tuner_identical": true,
+    "macro_v7_reproduced_exactly": true,
+    "uncovered_video_preserved": true,
+    "dead_changes_within_flexibility": true,
+    "primary_video_frames": 21175,
+    "phase_expert_frames": 15419,
+    "legacy_csv_sha256": "e09c0524b08d88b8c198c00321bd63a90dd727331383350aec31d156dc86055c"
+  },
+  "sha256": {
+    "pretrain_data/macro_v8/ensemble.joblib": "d0fbd7bdd7ed75b9b1f0cc3900e617d99a856caeaffe27c7efc97eb692cd6430",
+    "pretrain_data/broadcast_dead/broadcast_dead_dead_logreg.joblib": "4b946e042756767d84be820637cb07e71488ab41b129b02d4fb4325fdaf8b1f0",
+    "evaluation/results/barca.csv": "96e37d1abc9985fbe73fcbb159fa048db81aa7de5966346cb831609bb4af648a",
+    "evaluation/results/Borrow_Khan.csv": "96e37d1abc9985fbe73fcbb159fa048db81aa7de5966346cb831609bb4af648a",
+    "evaluation/results/macro_v8.csv": "96e37d1abc9985fbe73fcbb159fa048db81aa7de5966346cb831609bb4af648a",
+    "src/params.json": "cb3f73f876051033c8d1f7814fed93fed13273f712c6f9bd6f7d1749d9c333e5"
+  },
+  "feature_inputs": {
+    "baseline_sha256": "043fd4e2c071769c1793662d33f8c0a424f0e3a5b32cfdf092ad7d5bdc1f8b3c",
+    "raw_ball_sha256": "81040b87ba3b71bbc847396035b8b1b82b0d58ab59b301efc6af9d1da6bbd0e2",
+    "fused_ball_sha256": "fe31bca8048c63663c87ccd7b997ecfcb48fdbe916ddf9926a3fd6732afd841d",
+    "fused_columns": [
+      "v2_team",
+      "v2_dead",
+      "v2_is_H",
+      "v2_is_A",
+      "v2_is_D",
+      "v2_since_change",
+      "v2_until_change",
+      "dist_home",
+      "dist_away",
+      "ball_seen",
+      "ball_filled",
+      "since_seen",
+      "last_edge_m",
+      "z_player_speed",
+      "pan_speed",
+      "dead_memory",
+      "quality",
+      "players_in_view"
+    ],
+    "baseline_verified": true
+  },
+  "document_ablation": [
+    {
+      "configuration": "V7 baseline",
+      "macroF1": 0.9576036123814177,
+      "spellF1": 0.8749999999999998
+    },
+    {
+      "configuration": "V7 with wider D edges",
+      "macroF1": 0.9576036123814177,
+      "spellF1": 0.8749999999999998
+    },
+    {
+      "configuration": "Broadcast head, 12f edges",
+      "macroF1": 0.9545771173714709,
+      "spellF1": 0.8235294117647058
+    },
+    {
+      "configuration": "Broadcast, 50f, joint teams",
+      "macroF1": 0.9588495842730843,
+      "spellF1": 0.8484848484848484
+    },
+    {
+      "configuration": "Broadcast C=1, joint teams",
+      "macroF1": 0.9619619738998096,
+      "spellF1": 0.9032258064516128
+    },
+    {
+      "configuration": "Final: preserve V7 teams",
+      "macroF1": 0.9621455234182225,
+      "spellF1": 0.9032258064516128
+    }
+  ],
+  "document_baseline": "Previous (v7)",
+  "limitations": [
+    "All model and method selection reuses the same 17 public possessions.",
+    "Six-fold macro-F1 falls by 0.001797; three/four/five-fold macro-F1 rises.",
+    "Spell-F1 improves at four/five folds and stays equal at three/six.",
+    "Repartitioning is sensitivity on the same slice, not independent validation.",
+    "Three ground-truth possessions remain missed; the spell gain removes a spurious prediction.",
+    "Away class F1 decreases slightly at five folds while H and D improve.",
+    "Broadcast geometry and clock matching are imperfect; the quality gate rejects inconsistent views.",
+    "The 50-frame phase bound preserves fixed D cores and primary video coverage.",
+    "No private, unseen-match or full-match accuracy is known.",
+    "Full-match statistics describe predictions.",
+    "Models, raw geometry, alignment maps, features and output labels remain gitignored."
+  ]
+}

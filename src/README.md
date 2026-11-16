@@ -5,11 +5,12 @@ repository (remote `upstream`), kept as is so `git pull upstream main` keeps wor
 the possession rules and what was tried and dropped are in [TECHNICAL.md](TECHNICAL.md).
 
 Latest (November 17): the default prioritises **macroF1**, as requested. Two video-cadence
-heads, ordered motion/aligned-crop experts, temporal agreement and a binary dead-ball head
-reach public macroF1 **0.95760**, spellF1 **0.8750**. Approach, statistics and validation:
-[MACRO_V7.md](MACRO_V7.md), `configs/macro_v7.json`. V7 loosens the binary head's regularisation
-and corrects only three public frames versus v6. It regresses slightly at three folds;
-all partitions reuse the same public possessions. The **0.95709 / 0.8750** checkpoint is
+heads, ordered motion/aligned-crop experts, temporal agreement and aligned broadcast phase
+evidence reach public macroF1 **0.96215**, spellF1 **0.9032**. Approach, statistics and validation:
+[MACRO_V8.md](MACRO_V8.md), `configs/macro_v8.json`. Paired macroF1 rises at 3/4/5 folds
+and falls at 6; all partitions reuse the same public possessions. The previous
+**0.95760 / 0.8750** model remains in `configs/macro_v7.json`, described in [MACRO_V7.md](MACRO_V7.md).
+The **0.95709 / 0.8750** checkpoint is
 retained in `configs/macro_v6.json`, described in [MACRO_V6.md](MACRO_V6.md).
 The **0.95613 / 0.8750**
 checkpoint remains in `configs/macro_v5.json`, described in [MACRO_V5.md](MACRO_V5.md).

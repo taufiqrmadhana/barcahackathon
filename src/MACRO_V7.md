@@ -5,6 +5,9 @@ dead-ball logistic head's C from 1 to 10. The 50:50 P(D) blend, 28 features,
 301 native training rows, purged folds and temporal operations are unchanged.
 V6 remains available in `configs/macro_v6.json`.
 
+[Macro v8](MACRO_V8.md) subsequently adds aligned broadcast phase evidence;
+this checkpoint remains available in `configs/macro_v7.json`.
+
 | Public metric | v6 | v7 |
 |---|---:|---:|
 | MacroF1 | 0.957088 | **0.957604** |

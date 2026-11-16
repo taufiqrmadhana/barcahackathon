@@ -7,6 +7,20 @@ public slices are stitched; a stitched auxiliary sequence would leak across fold
 import numpy as np
 
 
+def overlay_dead_mask(primary, phase, mask):
+    """Take phase D decisions while retaining established alive-team labels.
+
+    Newly exposed alive frames use the phase branch's team. This pointwise
+    operation runs inside each matching held-out head and preserves X/coverage.
+    """
+    out = primary.copy()
+    valid = mask & np.isin(primary, ['H', 'A', 'D']) & np.isin(phase, ['H', 'A', 'D'])
+    out[valid & (phase == 'D')] = 'D'
+    removed = valid & (primary == 'D') & (phase != 'D')
+    out[removed] = phase[removed]
+    return out
+
+
 def _edges(labels, first, last):
     return np.r_[first, np.flatnonzero(
         labels[first + 1:last + 1] != labels[first:last]) + first + 1, last + 1]
