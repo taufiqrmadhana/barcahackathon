@@ -6,9 +6,12 @@ the possession rules and what was tried and dropped are in [TECHNICAL.md](TECHNI
 
 Latest (November 17): the default prioritises **macroF1**, as requested. Two video-cadence
 heads, ordered motion/aligned-crop experts, temporal agreement and a binary dead-ball head
-reach public macroF1 **0.95709**, spellF1 **0.8750**. Approach, statistics and validation:
-[MACRO_V6.md](MACRO_V6.md), `configs/macro_v6.json`. The gain is small and regresses slightly
-at three folds; all partitions reuse the same public possessions. The **0.95613 / 0.8750**
+reach public macroF1 **0.95760**, spellF1 **0.8750**. Approach, statistics and validation:
+[MACRO_V7.md](MACRO_V7.md), `configs/macro_v7.json`. V7 loosens the binary head's regularisation
+and corrects only three public frames versus v6. It regresses slightly at three folds;
+all partitions reuse the same public possessions. The **0.95709 / 0.8750** checkpoint is
+retained in `configs/macro_v6.json`, described in [MACRO_V6.md](MACRO_V6.md).
+The **0.95613 / 0.8750**
 checkpoint remains in `configs/macro_v5.json`, described in [MACRO_V5.md](MACRO_V5.md).
 The previous **0.95000 / 0.7529**
 checkpoint is retained in `configs/macro_v4.json`; its method is in [MACRO_V4.md](MACRO_V4.md).

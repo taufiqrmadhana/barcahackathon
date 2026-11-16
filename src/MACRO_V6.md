@@ -1,9 +1,12 @@
 # Binary dead-ball head: public macroF1 0.957088, spellF1 0.875000
 
-The November 17 default adds a binary alive/dead classifier to
+This November 17 checkpoint adds a binary alive/dead classifier to
 [macro v5](MACRO_V5.md). Its public macroF1 increases from 0.956130 to
 **0.957088**, while spellF1 stays **0.875000**. The earlier model and
 `configs/macro_v5.json` remain available.
+
+[Macro v7](MACRO_V7.md) subsequently changes only the specialist's regularisation;
+this C=1 checkpoint remains available in `configs/macro_v6.json`.
 
 All selection reuses the same 7,500 public frames and 17 GT possessions.
 These numbers are held-out classifier predictions, with public-selected

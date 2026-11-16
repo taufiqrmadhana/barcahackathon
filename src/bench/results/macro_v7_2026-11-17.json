@@ -1,0 +1,2288 @@
+{
+  "date": "2026-11-17",
+  "objective": "macroF1",
+  "baseline_commit": "720add4",
+  "selected_on_public": true,
+  "private_score_known": false,
+  "same_public_possessions": true,
+  "public_frames": 7500,
+  "public_ground_truth_possessions": 17,
+  "method": "Macro v6 with binary dead-head C increased from 1 to 10; all feature, fold, blending and decoding settings unchanged.",
+  "params": {
+    "player_margin": 5.0,
+    "max_player_speed": 12.0,
+    "vel_k": 2,
+    "ball_spike_speed": 45.0,
+    "ball_island_len": 3,
+    "ball_island_gap": 50,
+    "max_gap": 12,
+    "ball_source": "fused_full",
+    "ctrl_radius": 1.3,
+    "ctrl_softness": 0.35,
+    "sync_free": 2.5,
+    "sync_scale": 3.0,
+    "filled_trust": 0.6,
+    "corner_zone": 3.0,
+    "still_speed": 1.2,
+    "slow_window": 50,
+    "ball_smooth": 9,
+    "touch_k": 3,
+    "touch_dv": 3.5,
+    "touch_spacing": 6,
+    "touch_radius": 2.0,
+    "touch_margin": 1.5,
+    "duel_radius": 1.5,
+    "seq_max_gap": 100,
+    "pass_min_travel": 5.0,
+    "shot_speed": 18.0,
+    "shot_range": 35.0,
+    "out_margin": 0.5,
+    "out_min_frames": 3,
+    "vanish_min_frames": 50,
+    "vanish_horizon": 0.4,
+    "decel_window": 25,
+    "decel_drop": 1.2,
+    "decel_to": 1.6,
+    "decel_lead": 20,
+    "rest_speed": 1.8,
+    "placed_min_frames": 25,
+    "placed_calm_speed": 1.8,
+    "restart_kick_speed": 5.0,
+    "kick_within": 20,
+    "reappear_min_frames": 75,
+    "dead_min_gap": 50,
+    "dead_max_gap": 2250,
+    "hold_kinds": "goal_line,touchline,vanish",
+    "hold_goal_line": 200,
+    "hold_touchline": 75,
+    "shape_folds": 8,
+    "shape_guard": 250,
+    "shape_stride": 3,
+    "shape_iter": 150,
+    "shape_eps": 0.05,
+    "pretrained_shape": "",
+    "pretrained_mix": 1.0,
+    "shape_rounds": 2,
+    "shape_conf": 0.0,
+    "ownership_model": "pretrain_data/ownership_v2/ownership_all.joblib",
+    "supervised_shape_model": "pretrain_data/ownership_v2/shape_all.joblib",
+    "w_owner": 1.0,
+    "w_owner_switch": 12.0,
+    "w_contact": 1.0,
+    "contact_alpha": 0.5,
+    "contact_window": 125,
+    "contact_lock_dead": 1,
+    "contact_switch_cost": 4.0,
+    "contact_min_frames": 12,
+    "contact_local_switch": 0,
+    "hybrid_model": "pretrain_data/macro_v7/ensemble.joblib",
+    "hybrid_weight": 0.5,
+    "hybrid_lock_dead": 1,
+    "hybrid_prune_max_frames": 100,
+    "hybrid_prune_min_confidence": 0.5,
+    "hybrid_loose_threshold": 0.0,
+    "hybrid_dead_margin": 12,
+    "hybrid_dead_weight": 2.0,
+    "ctrl_eps": 0.05,
+    "near_radius": 1.3,
+    "near_margin": 0.5,
+    "w_near": 0.0,
+    "near_rounds": 0,
+    "w_ball": 1.0,
+    "w_shape": 1.0,
+    "w_shape_known": 0.0,
+    "w_tag": 0.0,
+    "w_dead": 1.0,
+    "d_bias": 0.0,
+    "w_out": 6.0,
+    "w_out_carry": 3.0,
+    "slow_speed": 1.3,
+    "slow_scale": 0.3,
+    "w_slow": 1.0,
+    "dead_gap": 75,
+    "w_missing": 0.0,
+    "w_missing_slow": 0.5,
+    "w_still": 2.0,
+    "w_shape_dead": 0.5,
+    "alive_ball_speed": 6.0,
+    "w_alive": 3.0,
+    "w_hold": 5.0,
+    "w_post_restart": 2.0,
+    "inner_restarts": 0,
+    "post_restart_frames": 50,
+    "w_tag_dead": 1.0,
+    "tag_dead_frames": 25,
+    "z_max": 4.0,
+    "pre_kickoff_dead": 1,
+    "goal_dead": 1,
+    "w_whistle": 10.0,
+    "w_whistle_dead": 2.0,
+    "whistle_thresh": 24.0,
+    "whistle_before": 5,
+    "whistle_after": 20,
+    "whistle_hold": 150,
+    "w_whistle_confirmed": 16.0,
+    "whistle_confirm_speed": 1.5,
+    "whistle_confirm_window": 125,
+    "whistle_lag": 10,
+    "whistle_min_speed": 1.8,
+    "loose_cost": 1.0,
+    "switch_cost": 16.0,
+    "tackle_extra": 5.0,
+    "dead_entry_cost": 20.0,
+    "dead_exit_cost": 30.0,
+    "dead_min_frames": 100,
+    "w_turnover": 8.0,
+    "w_touch": 4.0,
+    "w_duel": 2.0,
+    "w_deflection": 0.0,
+    "touch_before": 2,
+    "touch_after": 10,
+    "w_near_switch": 0.0,
+    "w_stoppage": 8.0,
+    "stop_before": 10,
+    "stop_after": 25,
+    "w_shot_dead": 3.0,
+    "shot_window": 75,
+    "w_restart": 8.0,
+    "restart_before": 10,
+    "restart_after": 10
+  },
+  "dead_head": {
+    "model": "dead_logreg",
+    "C": 10.0,
+    "features": 28,
+    "feature_group": "film_dead_motion",
+    "training_rows": 301,
+    "folds": 5,
+    "purge_frames": 125,
+    "blend_weight": 0.5,
+    "primary_conditional_team_preserved": true
+  },
+  "checkpoint": {
+    "public": {
+      "macro_f1": 0.9576036123814177,
+      "spell_f1_mean": 0.8749999999999998,
+      "spell_f1_at_headline": 0.8749999999999999,
+      "spell_iou_headline": 0.5,
+      "spell_bootstrap_low": null,
+      "spell_bootstrap_high": null,
+      "n_gt_spells": 17,
+      "n_pred_spells": 15,
+      "spell_count_error": -2,
+      "mean_spell_duration_s": 15.946666666666667,
+      "gt_mean_spell_duration_s": 14.190588235294117,
+      "accuracy": 0.9594666666666667,
+      "kappa": 0.9360280955625777,
+      "alive_dead_f1": 0.9864291066522355,
+      "team_acc_gt_alive": 0.9588791245232963,
+      "team_acc_both_alive": 0.9761985145172181,
+      "gt_home_share": 0.5727076770021555,
+      "pred_home_share": 0.565551839464883,
+      "share_err": 0.007155837537272558,
+      "share_defined": true,
+      "n_gt_segments": 21,
+      "n_pred_segments": 19,
+      "fragmentation": 0.9047619047619048,
+      "n_frames": 199319,
+      "n_graded": 7500,
+      "n_abstain_on_graded": 0,
+      "bootstrap_low": null,
+      "bootstrap_high": null,
+      "bootstrap_n": 0,
+      "confusion": [
+        [
+          3276,
+          81,
+          97,
+          0
+        ],
+        [
+          60,
+          2507,
+          10,
+          0
+        ],
+        [
+          46,
+          10,
+          1413,
+          0
+        ],
+        [
+          48353,
+          31377,
+          71627,
+          40462
+        ]
+      ],
+      "per_class": {
+        "H": {
+          "precision": 0.9686575990538143,
+          "recall": 0.9484655471916619,
+          "f1": 0.9584552369806904,
+          "support": 3454
+        },
+        "A": {
+          "precision": 0.9649730561970746,
+          "recall": 0.972836631742336,
+          "f1": 0.9688888888888889,
+          "support": 2577
+        },
+        "D": {
+          "precision": 0.9296052631578947,
+          "recall": 0.9618788291354663,
+          "f1": 0.9454667112746737,
+          "support": 1469
+        }
+      },
+      "transitions": {
+        "12": {
+          "precision": 0.5555555555555556,
+          "recall": 0.5,
+          "f1": 0.5263157894736842,
+          "n_gt": 20,
+          "n_pred": 18,
+          "n_matched": 10,
+          "n_missed": 10,
+          "n_spurious": 8,
+          "n_ambiguous": 0,
+          "mean_latency": 0.0,
+          "median_latency": -0.5,
+          "mean_abs_latency": 4.8,
+          "p90_abs_latency": 9.0
+        },
+        "25": {
+          "precision": 0.7777777777777778,
+          "recall": 0.7,
+          "f1": 0.7368421052631577,
+          "n_gt": 20,
+          "n_pred": 18,
+          "n_matched": 14,
+          "n_missed": 6,
+          "n_spurious": 4,
+          "n_ambiguous": 0,
+          "mean_latency": -0.7142857142857143,
+          "median_latency": -0.5,
+          "mean_abs_latency": 8.428571428571429,
+          "p90_abs_latency": 17.400000000000002
+        }
+      },
+      "spell_f1": {
+        "0.3": {
+          "precision": 0.9333333333333333,
+          "recall": 0.8235294117647058,
+          "f1": 0.8749999999999999,
+          "n_matched": 14,
+          "n_spurious": 1,
+          "n_missed": 3
+        },
+        "0.4": {
+          "precision": 0.9333333333333333,
+          "recall": 0.8235294117647058,
+          "f1": 0.8749999999999999,
+          "n_matched": 14,
+          "n_spurious": 1,
+          "n_missed": 3
+        },
+        "0.5": {
+          "precision": 0.9333333333333333,
+          "recall": 0.8235294117647058,
+          "f1": 0.8749999999999999,
+          "n_matched": 14,
+          "n_spurious": 1,
+          "n_missed": 3
+        },
+        "0.6": {
+          "precision": 0.9333333333333333,
+          "recall": 0.8235294117647058,
+          "f1": 0.8749999999999999,
+          "n_matched": 14,
+          "n_spurious": 1,
+          "n_missed": 3
+        },
+        "0.7": {
+          "precision": 0.9333333333333333,
+          "recall": 0.8235294117647058,
+          "f1": 0.8749999999999999,
+          "n_matched": 14,
+          "n_spurious": 1,
+          "n_missed": 3
+        }
+      },
+      "gt_home_share_spells": 0.5727076770021555
+    },
+    "full": {
+      "possessions": 401,
+      "dead_spells": 130,
+      "graded_frames": 158857,
+      "label_counts": {
+        "H": 51735,
+        "A": 33975,
+        "D": 73147,
+        "X": 40462
+      },
+      "mean_duration_s": 8.549625935162094,
+      "home_alive_share": 0.603605180259013,
+      "away_alive_share": 0.396394819740987,
+      "dead_share": 0.4604581478940179,
+      "teams": {
+        "H": {
+          "possessions": 198,
+          "mean_duration_s": 10.451515151515151
+        },
+        "A": {
+          "possessions": 203,
+          "mean_duration_s": 6.694581280788177
+        }
+      }
+    },
+    "halves": [
+      {
+        "half": 1,
+        "graded_frames": 79467,
+        "possessions": 203,
+        "mean_duration_s": 8.753497536945813,
+        "home_alive_share": 0.6175940932829102,
+        "away_alive_share": 0.38240590671708985,
+        "dead_share": 0.4409754992638454,
+        "dead_spells": 62,
+        "label_counts": {
+          "H": 27436,
+          "A": 16988,
+          "D": 35043,
+          "X": 0
+        },
+        "teams": {
+          "H": {
+            "possessions": 101,
+            "mean_duration_s": 10.865742574257427
+          },
+          "A": {
+            "possessions": 102,
+            "mean_duration_s": 6.661960784313726
+          }
+        }
+      },
+      {
+        "half": 2,
+        "graded_frames": 79390,
+        "possessions": 198,
+        "mean_duration_s": 8.340606060606062,
+        "home_alive_share": 0.5885530203943226,
+        "away_alive_share": 0.41144697960567744,
+        "dead_share": 0.47995969265650584,
+        "dead_spells": 68,
+        "label_counts": {
+          "H": 24299,
+          "A": 16987,
+          "D": 38104,
+          "X": 0
+        },
+        "teams": {
+          "H": {
+            "possessions": 97,
+            "mean_duration_s": 10.02020618556701
+          },
+          "A": {
+            "possessions": 101,
+            "mean_duration_s": 6.727524752475247
+          }
+        }
+      }
+    ],
+    "changes": {
+      "total": 8,
+      "public": 3,
+      "dead": 8
+    },
+    "csv_sha256": "e09c0524b08d88b8c198c00321bd63a90dd727331383350aec31d156dc86055c",
+    "artifact_sha256": "c6f59332ab040defd9f5d106ecc2158fa242ac5a57f15774ba13ab755a89bd56"
+  },
+  "sensitivity": {
+    "selection_used_public": true,
+    "same_public_possessions": true,
+    "params": {
+      "baseline": {
+        "player_margin": 5.0,
+        "max_player_speed": 12.0,
+        "vel_k": 2,
+        "ball_spike_speed": 45.0,
+        "ball_island_len": 3,
+        "ball_island_gap": 50,
+        "max_gap": 12,
+        "ball_source": "fused_full",
+        "ctrl_radius": 1.3,
+        "ctrl_softness": 0.35,
+        "sync_free": 2.5,
+        "sync_scale": 3.0,
+        "filled_trust": 0.6,
+        "corner_zone": 3.0,
+        "still_speed": 1.2,
+        "slow_window": 50,
+        "ball_smooth": 9,
+        "touch_k": 3,
+        "touch_dv": 3.5,
+        "touch_spacing": 6,
+        "touch_radius": 2.0,
+        "touch_margin": 1.5,
+        "duel_radius": 1.5,
+        "seq_max_gap": 100,
+        "pass_min_travel": 5.0,
+        "shot_speed": 18.0,
+        "shot_range": 35.0,
+        "out_margin": 0.5,
+        "out_min_frames": 3,
+        "vanish_min_frames": 50,
+        "vanish_horizon": 0.4,
+        "decel_window": 25,
+        "decel_drop": 1.2,
+        "decel_to": 1.6,
+        "decel_lead": 20,
+        "rest_speed": 1.8,
+        "placed_min_frames": 25,
+        "placed_calm_speed": 1.8,
+        "restart_kick_speed": 5.0,
+        "kick_within": 20,
+        "reappear_min_frames": 75,
+        "dead_min_gap": 50,
+        "dead_max_gap": 2250,
+        "hold_kinds": "goal_line,touchline,vanish",
+        "hold_goal_line": 200,
+        "hold_touchline": 75,
+        "shape_folds": 8,
+        "shape_guard": 250,
+        "shape_stride": 3,
+        "shape_iter": 150,
+        "shape_eps": 0.05,
+        "pretrained_shape": "",
+        "pretrained_mix": 1.0,
+        "shape_rounds": 2,
+        "shape_conf": 0.0,
+        "ownership_model": "pretrain_data/ownership_v2/ownership_all.joblib",
+        "supervised_shape_model": "pretrain_data/ownership_v2/shape_all.joblib",
+        "w_owner": 1.0,
+        "w_owner_switch": 12.0,
+        "w_contact": 1.0,
+        "contact_alpha": 0.5,
+        "contact_window": 125,
+        "contact_lock_dead": 1,
+        "contact_switch_cost": 4.0,
+        "contact_min_frames": 12,
+        "contact_local_switch": 0,
+        "hybrid_model": "pretrain_data/macro_v6/ensemble.joblib",
+        "hybrid_weight": 0.5,
+        "hybrid_lock_dead": 1,
+        "hybrid_prune_max_frames": 100,
+        "hybrid_prune_min_confidence": 0.5,
+        "hybrid_loose_threshold": 0.0,
+        "hybrid_dead_margin": 12,
+        "hybrid_dead_weight": 2.0,
+        "ctrl_eps": 0.05,
+        "near_radius": 1.3,
+        "near_margin": 0.5,
+        "w_near": 0.0,
+        "near_rounds": 0,
+        "w_ball": 1.0,
+        "w_shape": 1.0,
+        "w_shape_known": 0.0,
+        "w_tag": 0.0,
+        "w_dead": 1.0,
+        "d_bias": 0.0,
+        "w_out": 6.0,
+        "w_out_carry": 3.0,
+        "slow_speed": 1.3,
+        "slow_scale": 0.3,
+        "w_slow": 1.0,
+        "dead_gap": 75,
+        "w_missing": 0.0,
+        "w_missing_slow": 0.5,
+        "w_still": 2.0,
+        "w_shape_dead": 0.5,
+        "alive_ball_speed": 6.0,
+        "w_alive": 3.0,
+        "w_hold": 5.0,
+        "w_post_restart": 2.0,
+        "inner_restarts": 0,
+        "post_restart_frames": 50,
+        "w_tag_dead": 1.0,
+        "tag_dead_frames": 25,
+        "z_max": 4.0,
+        "pre_kickoff_dead": 1,
+        "goal_dead": 1,
+        "w_whistle": 10.0,
+        "w_whistle_dead": 2.0,
+        "whistle_thresh": 24.0,
+        "whistle_before": 5,
+        "whistle_after": 20,
+        "whistle_hold": 150,
+        "w_whistle_confirmed": 16.0,
+        "whistle_confirm_speed": 1.5,
+        "whistle_confirm_window": 125,
+        "whistle_lag": 10,
+        "whistle_min_speed": 1.8,
+        "loose_cost": 1.0,
+        "switch_cost": 16.0,
+        "tackle_extra": 5.0,
+        "dead_entry_cost": 20.0,
+        "dead_exit_cost": 30.0,
+        "dead_min_frames": 100,
+        "w_turnover": 8.0,
+        "w_touch": 4.0,
+        "w_duel": 2.0,
+        "w_deflection": 0.0,
+        "touch_before": 2,
+        "touch_after": 10,
+        "w_near_switch": 0.0,
+        "w_stoppage": 8.0,
+        "stop_before": 10,
+        "stop_after": 25,
+        "w_shot_dead": 3.0,
+        "shot_window": 75,
+        "w_restart": 8.0,
+        "restart_before": 10,
+        "restart_after": 10
+      },
+      "candidate": {
+        "player_margin": 5.0,
+        "max_player_speed": 12.0,
+        "vel_k": 2,
+        "ball_spike_speed": 45.0,
+        "ball_island_len": 3,
+        "ball_island_gap": 50,
+        "max_gap": 12,
+        "ball_source": "fused_full",
+        "ctrl_radius": 1.3,
+        "ctrl_softness": 0.35,
+        "sync_free": 2.5,
+        "sync_scale": 3.0,
+        "filled_trust": 0.6,
+        "corner_zone": 3.0,
+        "still_speed": 1.2,
+        "slow_window": 50,
+        "ball_smooth": 9,
+        "touch_k": 3,
+        "touch_dv": 3.5,
+        "touch_spacing": 6,
+        "touch_radius": 2.0,
+        "touch_margin": 1.5,
+        "duel_radius": 1.5,
+        "seq_max_gap": 100,
+        "pass_min_travel": 5.0,
+        "shot_speed": 18.0,
+        "shot_range": 35.0,
+        "out_margin": 0.5,
+        "out_min_frames": 3,
+        "vanish_min_frames": 50,
+        "vanish_horizon": 0.4,
+        "decel_window": 25,
+        "decel_drop": 1.2,
+        "decel_to": 1.6,
+        "decel_lead": 20,
+        "rest_speed": 1.8,
+        "placed_min_frames": 25,
+        "placed_calm_speed": 1.8,
+        "restart_kick_speed": 5.0,
+        "kick_within": 20,
+        "reappear_min_frames": 75,
+        "dead_min_gap": 50,
+        "dead_max_gap": 2250,
+        "hold_kinds": "goal_line,touchline,vanish",
+        "hold_goal_line": 200,
+        "hold_touchline": 75,
+        "shape_folds": 8,
+        "shape_guard": 250,
+        "shape_stride": 3,
+        "shape_iter": 150,
+        "shape_eps": 0.05,
+        "pretrained_shape": "",
+        "pretrained_mix": 1.0,
+        "shape_rounds": 2,
+        "shape_conf": 0.0,
+        "ownership_model": "pretrain_data/ownership_v2/ownership_all.joblib",
+        "supervised_shape_model": "pretrain_data/ownership_v2/shape_all.joblib",
+        "w_owner": 1.0,
+        "w_owner_switch": 12.0,
+        "w_contact": 1.0,
+        "contact_alpha": 0.5,
+        "contact_window": 125,
+        "contact_lock_dead": 1,
+        "contact_switch_cost": 4.0,
+        "contact_min_frames": 12,
+        "contact_local_switch": 0,
+        "hybrid_model": "pretrain_data/macro_v7/ensemble.joblib",
+        "hybrid_weight": 0.5,
+        "hybrid_lock_dead": 1,
+        "hybrid_prune_max_frames": 100,
+        "hybrid_prune_min_confidence": 0.5,
+        "hybrid_loose_threshold": 0.0,
+        "hybrid_dead_margin": 12,
+        "hybrid_dead_weight": 2.0,
+        "ctrl_eps": 0.05,
+        "near_radius": 1.3,
+        "near_margin": 0.5,
+        "w_near": 0.0,
+        "near_rounds": 0,
+        "w_ball": 1.0,
+        "w_shape": 1.0,
+        "w_shape_known": 0.0,
+        "w_tag": 0.0,
+        "w_dead": 1.0,
+        "d_bias": 0.0,
+        "w_out": 6.0,
+        "w_out_carry": 3.0,
+        "slow_speed": 1.3,
+        "slow_scale": 0.3,
+        "w_slow": 1.0,
+        "dead_gap": 75,
+        "w_missing": 0.0,
+        "w_missing_slow": 0.5,
+        "w_still": 2.0,
+        "w_shape_dead": 0.5,
+        "alive_ball_speed": 6.0,
+        "w_alive": 3.0,
+        "w_hold": 5.0,
+        "w_post_restart": 2.0,
+        "inner_restarts": 0,
+        "post_restart_frames": 50,
+        "w_tag_dead": 1.0,
+        "tag_dead_frames": 25,
+        "z_max": 4.0,
+        "pre_kickoff_dead": 1,
+        "goal_dead": 1,
+        "w_whistle": 10.0,
+        "w_whistle_dead": 2.0,
+        "whistle_thresh": 24.0,
+        "whistle_before": 5,
+        "whistle_after": 20,
+        "whistle_hold": 150,
+        "w_whistle_confirmed": 16.0,
+        "whistle_confirm_speed": 1.5,
+        "whistle_confirm_window": 125,
+        "whistle_lag": 10,
+        "whistle_min_speed": 1.8,
+        "loose_cost": 1.0,
+        "switch_cost": 16.0,
+        "tackle_extra": 5.0,
+        "dead_entry_cost": 20.0,
+        "dead_exit_cost": 30.0,
+        "dead_min_frames": 100,
+        "w_turnover": 8.0,
+        "w_touch": 4.0,
+        "w_duel": 2.0,
+        "w_deflection": 0.0,
+        "touch_before": 2,
+        "touch_after": 10,
+        "w_near_switch": 0.0,
+        "w_stoppage": 8.0,
+        "stop_before": 10,
+        "stop_after": 25,
+        "w_shot_dead": 3.0,
+        "shot_window": 75,
+        "w_restart": 8.0,
+        "restart_before": 10,
+        "restart_after": 10
+      }
+    },
+    "classifier_sha256": {
+      "baseline": "430af7d389501eb1d1743576facc126b75aebdfe9a67de0b789c4f29af943786",
+      "candidate": "c6f59332ab040defd9f5d106ecc2158fa242ac5a57f15774ba13ab755a89bd56"
+    },
+    "results": [
+      {
+        "folds": 3,
+        "objective": "baseline",
+        "macroF1": 0.9410069395948382,
+        "spellF1": 0.7294117647058823,
+        "possessions": 17,
+        "per_class": {
+          "H": {
+            "precision": 0.9661538461538461,
+            "recall": 0.9090909090909091,
+            "f1": 0.9367541766109786,
+            "support": 3454
+          },
+          "A": {
+            "precision": 0.9101449275362319,
+            "recall": 0.9747768723321691,
+            "f1": 0.9413528199362937,
+            "support": 2577
+          },
+          "D": {
+            "precision": 0.938255033557047,
+            "recall": 0.9516678012253234,
+            "f1": 0.9449138222372423,
+            "support": 1469
+          }
+        }
+      },
+      {
+        "folds": 3,
+        "objective": "candidate",
+        "macroF1": 0.9408170866044464,
+        "spellF1": 0.7294117647058823,
+        "possessions": 17,
+        "per_class": {
+          "H": {
+            "precision": 0.9661538461538461,
+            "recall": 0.9090909090909091,
+            "f1": 0.9367541766109786,
+            "support": 3454
+          },
+          "A": {
+            "precision": 0.9114658925979681,
+            "recall": 0.9747768723321691,
+            "f1": 0.9420588786799174,
+            "support": 2577
+          },
+          "D": {
+            "precision": 0.9357429718875502,
+            "recall": 0.9516678012253234,
+            "f1": 0.9436382045224435,
+            "support": 1469
+          }
+        }
+      },
+      {
+        "folds": 4,
+        "objective": "baseline",
+        "macroF1": 0.9420313702437685,
+        "spellF1": 0.7529411764705882,
+        "possessions": 17,
+        "per_class": {
+          "H": {
+            "precision": 0.9328018223234624,
+            "recall": 0.9484655471916619,
+            "f1": 0.9405684754521964,
+            "support": 3454
+          },
+          "A": {
+            "precision": 0.9627077421970004,
+            "recall": 0.9216142801707412,
+            "f1": 0.9417129262490088,
+            "support": 2577
+          },
+          "D": {
+            "precision": 0.9276791584483892,
+            "recall": 0.9605173587474473,
+            "f1": 0.9438127090301003,
+            "support": 1469
+          }
+        }
+      },
+      {
+        "folds": 4,
+        "objective": "candidate",
+        "macroF1": 0.9421511492888955,
+        "spellF1": 0.7529411764705882,
+        "possessions": 17,
+        "per_class": {
+          "H": {
+            "precision": 0.9330675021361435,
+            "recall": 0.9484655471916619,
+            "f1": 0.9407035175879397,
+            "support": 3454
+          },
+          "A": {
+            "precision": 0.9630981346309814,
+            "recall": 0.9216142801707412,
+            "f1": 0.9418996628990679,
+            "support": 2577
+          },
+          "D": {
+            "precision": 0.9271175311884439,
+            "recall": 0.9611980939414567,
+            "f1": 0.943850267379679,
+            "support": 1469
+          }
+        }
+      },
+      {
+        "folds": 5,
+        "objective": "baseline",
+        "macroF1": 0.9570882500517638,
+        "spellF1": 0.8749999999999998,
+        "possessions": 15,
+        "per_class": {
+          "H": {
+            "precision": 0.9686575990538143,
+            "recall": 0.9484655471916619,
+            "f1": 0.9584552369806904,
+            "support": 3454
+          },
+          "A": {
+            "precision": 0.9649325626204239,
+            "recall": 0.9716724873884361,
+            "f1": 0.9682907965970611,
+            "support": 2577
+          },
+          "D": {
+            "precision": 0.927774130006566,
+            "recall": 0.9618788291354663,
+            "f1": 0.9445187165775399,
+            "support": 1469
+          }
+        }
+      },
+      {
+        "folds": 5,
+        "objective": "candidate",
+        "macroF1": 0.9576036123814177,
+        "spellF1": 0.8749999999999998,
+        "possessions": 15,
+        "per_class": {
+          "H": {
+            "precision": 0.9686575990538143,
+            "recall": 0.9484655471916619,
+            "f1": 0.9584552369806904,
+            "support": 3454
+          },
+          "A": {
+            "precision": 0.9649730561970746,
+            "recall": 0.972836631742336,
+            "f1": 0.9688888888888889,
+            "support": 2577
+          },
+          "D": {
+            "precision": 0.9296052631578947,
+            "recall": 0.9618788291354663,
+            "f1": 0.9454667112746737,
+            "support": 1469
+          }
+        }
+      },
+      {
+        "folds": 6,
+        "objective": "baseline",
+        "macroF1": 0.9512505021080155,
+        "spellF1": 0.825,
+        "possessions": 15,
+        "per_class": {
+          "H": {
+            "precision": 0.9564454837766735,
+            "recall": 0.9473074696004632,
+            "f1": 0.9518545454545454,
+            "support": 3454
+          },
+          "A": {
+            "precision": 0.9629773967264225,
+            "recall": 0.9588668994955375,
+            "f1": 0.9609177522846588,
+            "support": 2577
+          },
+          "D": {
+            "precision": 0.9272967614011897,
+            "recall": 0.955071477195371,
+            "f1": 0.9409792085848423,
+            "support": 1469
+          }
+        }
+      },
+      {
+        "folds": 6,
+        "objective": "candidate",
+        "macroF1": 0.9512505021080155,
+        "spellF1": 0.825,
+        "possessions": 15,
+        "per_class": {
+          "H": {
+            "precision": 0.9564454837766735,
+            "recall": 0.9473074696004632,
+            "f1": 0.9518545454545454,
+            "support": 3454
+          },
+          "A": {
+            "precision": 0.9629773967264225,
+            "recall": 0.9588668994955375,
+            "f1": 0.9609177522846588,
+            "support": 2577
+          },
+          "D": {
+            "precision": 0.9272967614011897,
+            "recall": 0.955071477195371,
+            "f1": 0.9409792085848423,
+            "support": 1469
+          }
+        }
+      }
+    ]
+  },
+  "experiments": {
+    "dead_symmetric": [
+      {
+        "group": "symmetric",
+        "C": 0.3,
+        "mode": "replace",
+        "baseline": "macro_v6",
+        "macroF1": 0.9537994635105763,
+        "spellF1": 0.8235294117647058,
+        "possessions": 17,
+        "class_f1": {
+          "H": 0.9544064093226511,
+          "A": 0.9624732646315379,
+          "D": 0.9445187165775399
+        },
+        "changed_frames": 195
+      },
+      {
+        "group": "symmetric",
+        "C": 0.3,
+        "mode": "mix25",
+        "baseline": "macro_v6",
+        "macroF1": 0.9570882500517638,
+        "spellF1": 0.8749999999999998,
+        "possessions": 15,
+        "class_f1": {
+          "H": 0.9584552369806904,
+          "A": 0.9682907965970611,
+          "D": 0.9445187165775399
+        },
+        "changed_frames": 142
+      },
+      {
+        "group": "symmetric",
+        "C": 1.0,
+        "mode": "replace",
+        "baseline": "macro_v6",
+        "macroF1": 0.9570882500517638,
+        "spellF1": 0.8749999999999998,
+        "possessions": 15,
+        "class_f1": {
+          "H": 0.9584552369806904,
+          "A": 0.9682907965970611,
+          "D": 0.9445187165775399
+        },
+        "changed_frames": 176
+      },
+      {
+        "group": "symmetric",
+        "C": 1.0,
+        "mode": "mix25",
+        "baseline": "macro_v6",
+        "macroF1": 0.9570882500517638,
+        "spellF1": 0.8749999999999998,
+        "possessions": 15,
+        "class_f1": {
+          "H": 0.9584552369806904,
+          "A": 0.9682907965970611,
+          "D": 0.9445187165775399
+        },
+        "changed_frames": 151
+      },
+      {
+        "group": "symmetric_rich",
+        "C": 0.3,
+        "mode": "replace",
+        "baseline": "macro_v6",
+        "macroF1": 0.9538877357484697,
+        "spellF1": 0.8235294117647058,
+        "possessions": 17,
+        "class_f1": {
+          "H": 0.953711790393013,
+          "A": 0.9633956386292836,
+          "D": 0.9445557782231129
+        },
+        "changed_frames": 186
+      },
+      {
+        "group": "symmetric_rich",
+        "C": 0.3,
+        "mode": "mix25",
+        "baseline": "macro_v6",
+        "macroF1": 0.9521568850115206,
+        "spellF1": 0.8235294117647058,
+        "possessions": 17,
+        "class_f1": {
+          "H": 0.9530181818181819,
+          "A": 0.9624732646315379,
+          "D": 0.9409792085848423
+        },
+        "changed_frames": 169
+      },
+      {
+        "group": "symmetric_rich",
+        "C": 1.0,
+        "mode": "replace",
+        "baseline": "macro_v6",
+        "macroF1": 0.95280656413389,
+        "spellF1": 0.8235294117647058,
+        "possessions": 17,
+        "class_f1": {
+          "H": 0.953711790393013,
+          "A": 0.9622714896927266,
+          "D": 0.9424364123159303
+        },
+        "changed_frames": 150
+      },
+      {
+        "group": "symmetric_rich",
+        "C": 1.0,
+        "mode": "mix25",
+        "baseline": "macro_v6",
+        "macroF1": 0.9536355000199124,
+        "spellF1": 0.8235294117647058,
+        "possessions": 17,
+        "class_f1": {
+          "H": 0.9542674046023886,
+          "A": 0.9624732646315379,
+          "D": 0.9441658308258107
+        },
+        "changed_frames": 182
+      },
+      {
+        "group": "video_rich",
+        "C": 0.3,
+        "mode": "replace",
+        "baseline": "macro_v6",
+        "macroF1": 0.9518464103942659,
+        "spellF1": 0.8235294117647058,
+        "possessions": 17,
+        "class_f1": {
+          "H": 0.9526446160571179,
+          "A": 0.9625460896565107,
+          "D": 0.9403485254691688
+        },
+        "changed_frames": 180
+      },
+      {
+        "group": "video_rich",
+        "C": 0.3,
+        "mode": "mix25",
+        "baseline": "macro_v6",
+        "macroF1": 0.9521568850115206,
+        "spellF1": 0.8235294117647058,
+        "possessions": 17,
+        "class_f1": {
+          "H": 0.9530181818181819,
+          "A": 0.9624732646315379,
+          "D": 0.9409792085848423
+        },
+        "changed_frames": 172
+      },
+      {
+        "group": "video_rich",
+        "C": 1.0,
+        "mode": "replace",
+        "baseline": "macro_v6",
+        "macroF1": 0.9518464103942659,
+        "spellF1": 0.8235294117647058,
+        "possessions": 17,
+        "class_f1": {
+          "H": 0.9526446160571179,
+          "A": 0.9625460896565107,
+          "D": 0.9403485254691688
+        },
+        "changed_frames": 185
+      },
+      {
+        "group": "video_rich",
+        "C": 1.0,
+        "mode": "mix25",
+        "baseline": "macro_v6",
+        "macroF1": 0.9523214382433647,
+        "spellF1": 0.8235294117647058,
+        "possessions": 17,
+        "class_f1": {
+          "H": 0.9531568228105907,
+          "A": 0.9624732646315379,
+          "D": 0.9413342272879652
+        },
+        "changed_frames": 172
+      }
+    ],
+    "boundary": [
+      {
+        "radius": 12,
+        "C": 0.1,
+        "weight": 2.0,
+        "OOF_sample_auc": 0.697092970521542,
+        "baseline": "macro_v6",
+        "macroF1": 0.9553919404899062,
+        "spellF1": 0.7600000000000001,
+        "possessions": 13,
+        "class_f1": {
+          "H": 0.9561133127843827,
+          "A": 0.9655437921077961,
+          "D": 0.9445187165775399
+        },
+        "changed_frames": 195
+      },
+      {
+        "radius": 12,
+        "C": 0.1,
+        "weight": 4.0,
+        "OOF_sample_auc": 0.697092970521542,
+        "baseline": "macro_v6",
+        "macroF1": 0.9439692299369541,
+        "spellF1": 0.6266666666666666,
+        "possessions": 13,
+        "class_f1": {
+          "H": 0.9412973290284707,
+          "A": 0.9460916442048517,
+          "D": 0.9445187165775399
+        },
+        "changed_frames": 322
+      },
+      {
+        "radius": 12,
+        "C": 0.1,
+        "weight": 8.0,
+        "OOF_sample_auc": 0.697092970521542,
+        "baseline": "macro_v6",
+        "macroF1": 0.9440817415499599,
+        "spellF1": 0.6399999999999999,
+        "possessions": 13,
+        "class_f1": {
+          "H": 0.9414526779163609,
+          "A": 0.9462738301559792,
+          "D": 0.9445187165775399
+        },
+        "changed_frames": 331
+      },
+      {
+        "radius": 12,
+        "C": 1.0,
+        "weight": 2.0,
+        "OOF_sample_auc": 0.6639814058956917,
+        "baseline": "macro_v6",
+        "macroF1": 0.9569750151069996,
+        "spellF1": 0.8749999999999998,
+        "possessions": 15,
+        "class_f1": {
+          "H": 0.9583150504607283,
+          "A": 0.9680912782827306,
+          "D": 0.9445187165775399
+        },
+        "changed_frames": 175
+      },
+      {
+        "radius": 12,
+        "C": 1.0,
+        "weight": 4.0,
+        "OOF_sample_auc": 0.6639814058956917,
+        "baseline": "macro_v6",
+        "macroF1": 0.9553919404899062,
+        "spellF1": 0.7600000000000001,
+        "possessions": 13,
+        "class_f1": {
+          "H": 0.9561133127843827,
+          "A": 0.9655437921077961,
+          "D": 0.9445187165775399
+        },
+        "changed_frames": 199
+      },
+      {
+        "radius": 12,
+        "C": 1.0,
+        "weight": 8.0,
+        "OOF_sample_auc": 0.6639814058956917,
+        "baseline": "macro_v6",
+        "macroF1": 0.944082907168802,
+        "spellF1": 0.6266666666666666,
+        "possessions": 13,
+        "class_f1": {
+          "H": 0.9414354909731395,
+          "A": 0.9462945139557267,
+          "D": 0.9445187165775399
+        },
+        "changed_frames": 330
+      },
+      {
+        "radius": 25,
+        "C": 0.1,
+        "weight": 2.0,
+        "OOF_sample_auc": 0.6562849215304694,
+        "baseline": "macro_v6",
+        "macroF1": 0.9439692299369541,
+        "spellF1": 0.6266666666666666,
+        "possessions": 13,
+        "class_f1": {
+          "H": 0.9412973290284707,
+          "A": 0.9460916442048517,
+          "D": 0.9445187165775399
+        },
+        "changed_frames": 298
+      },
+      {
+        "radius": 25,
+        "C": 0.1,
+        "weight": 4.0,
+        "OOF_sample_auc": 0.6562849215304694,
+        "baseline": "macro_v6",
+        "macroF1": 0.9440817415499599,
+        "spellF1": 0.6399999999999999,
+        "possessions": 13,
+        "class_f1": {
+          "H": 0.9414526779163609,
+          "A": 0.9462738301559792,
+          "D": 0.9445187165775399
+        },
+        "changed_frames": 308
+      },
+      {
+        "radius": 25,
+        "C": 0.1,
+        "weight": 8.0,
+        "OOF_sample_auc": 0.6562849215304694,
+        "baseline": "macro_v6",
+        "macroF1": 0.9552787805887659,
+        "spellF1": 0.7600000000000001,
+        "possessions": 13,
+        "class_f1": {
+          "H": 0.9559729967713531,
+          "A": 0.9653446284174046,
+          "D": 0.9445187165775399
+        },
+        "changed_frames": 229
+      },
+      {
+        "radius": 25,
+        "C": 1.0,
+        "weight": 2.0,
+        "OOF_sample_auc": 0.6475562424024378,
+        "baseline": "macro_v6",
+        "macroF1": 0.94565225565788,
+        "spellF1": 0.7625,
+        "possessions": 15,
+        "class_f1": {
+          "H": 0.9437052200614126,
+          "A": 0.9487328303346876,
+          "D": 0.9445187165775399
+        },
+        "changed_frames": 271
+      },
+      {
+        "radius": 25,
+        "C": 1.0,
+        "weight": 4.0,
+        "OOF_sample_auc": 0.6475562424024378,
+        "baseline": "macro_v6",
+        "macroF1": 0.9552787805887659,
+        "spellF1": 0.7600000000000001,
+        "possessions": 13,
+        "class_f1": {
+          "H": 0.9559729967713531,
+          "A": 0.9653446284174046,
+          "D": 0.9445187165775399
+        },
+        "changed_frames": 202
+      },
+      {
+        "radius": 25,
+        "C": 1.0,
+        "weight": 8.0,
+        "OOF_sample_auc": 0.6475562424024378,
+        "baseline": "macro_v6",
+        "macroF1": 0.9552787805887659,
+        "spellF1": 0.7600000000000001,
+        "possessions": 13,
+        "class_f1": {
+          "H": 0.9559729967713531,
+          "A": 0.9653446284174046,
+          "D": 0.9445187165775399
+        },
+        "changed_frames": 224
+      }
+    ],
+    "dead_logit": [
+      {
+        "mode": "logit",
+        "weight": 0.25,
+        "margin": 12,
+        "baseline": "macro_v6",
+        "macroF1": 0.955833180636648,
+        "spellF1": 0.8749999999999998,
+        "possessions": 15,
+        "class_f1": {
+          "H": 0.9572474377745241,
+          "A": 0.9682907965970611,
+          "D": 0.9419613075383588
+        },
+        "changed_frames": 69
+      },
+      {
+        "mode": "logit",
+        "weight": 0.25,
+        "margin": 50,
+        "baseline": "macro_v6",
+        "macroF1": 0.9517976496786984,
+        "spellF1": 0.8749999999999998,
+        "possessions": 15,
+        "class_f1": {
+          "H": 0.952801058667843,
+          "A": 0.9689488910318225,
+          "D": 0.9336429993364299
+        },
+        "changed_frames": 281
+      },
+      {
+        "mode": "logit",
+        "weight": 0.5,
+        "margin": 12,
+        "baseline": "macro_v6",
+        "macroF1": 0.9561788557741027,
+        "spellF1": 0.8749999999999998,
+        "possessions": 15,
+        "class_f1": {
+          "H": 0.9584673881251828,
+          "A": 0.9673556113579294,
+          "D": 0.942713567839196
+        },
+        "changed_frames": 141
+      },
+      {
+        "mode": "logit",
+        "weight": 0.5,
+        "margin": 50,
+        "baseline": "macro_v6",
+        "macroF1": 0.9557476890701521,
+        "spellF1": 0.8749999999999998,
+        "possessions": 15,
+        "class_f1": {
+          "H": 0.9584673881251828,
+          "A": 0.9670837343599614,
+          "D": 0.9416919447253117
+        },
+        "changed_frames": 425
+      },
+      {
+        "mode": "logit",
+        "weight": 0.75,
+        "margin": 12,
+        "baseline": "macro_v6",
+        "macroF1": 0.9564562563593979,
+        "spellF1": 0.8749999999999998,
+        "possessions": 15,
+        "class_f1": {
+          "H": 0.9588801399825022,
+          "A": 0.9671687910390112,
+          "D": 0.9433198380566801
+        },
+        "changed_frames": 258
+      },
+      {
+        "mode": "logit",
+        "weight": 0.75,
+        "margin": 50,
+        "baseline": "macro_v6",
+        "macroF1": 0.95161252771369,
+        "spellF1": 0.8749999999999998,
+        "possessions": 15,
+        "class_f1": {
+          "H": 0.9617169373549884,
+          "A": 0.959694364851958,
+          "D": 0.9334262809341234
+        },
+        "changed_frames": 656
+      },
+      {
+        "mode": "confident",
+        "weight": 1.0,
+        "margin": 12,
+        "baseline": "macro_v6",
+        "macroF1": 0.9563345544120535,
+        "spellF1": 0.8749999999999998,
+        "possessions": 15,
+        "class_f1": {
+          "H": 0.9595797460966001,
+          "A": 0.9664222307989193,
+          "D": 0.9430016863406407
+        },
+        "changed_frames": 282
+      },
+      {
+        "mode": "confident",
+        "weight": 1.0,
+        "margin": 50,
+        "baseline": "macro_v6",
+        "macroF1": 0.951307514583737,
+        "spellF1": 0.8749999999999998,
+        "possessions": 15,
+        "class_f1": {
+          "H": 0.9624147438688144,
+          "A": 0.9587786259541986,
+          "D": 0.9327291739281981
+        },
+        "changed_frames": 829
+      }
+    ],
+    "dino_class_embeddings": [
+      {
+        "folds": 5,
+        "crop": "128",
+        "pca_components": 16,
+        "C": 0.3,
+        "mode": "expert",
+        "macroF1": 0.9555050885698221,
+        "spellF1": 0.7600000000000001,
+        "possessions": 13,
+        "per_class": {
+          "H": {
+            "precision": 0.9699225729600953,
+            "recall": 0.9429646786334684,
+            "f1": 0.9562536699941281,
+            "support": 3454
+          },
+          "A": {
+            "precision": 0.9579992363497518,
+            "recall": 0.9736127279782693,
+            "f1": 0.9657428791377982,
+            "support": 2577
+          },
+          "D": {
+            "precision": 0.927774130006566,
+            "recall": 0.9618788291354663,
+            "f1": 0.9445187165775399,
+            "support": 1469
+          }
+        },
+        "changed_frames": 24
+      },
+      {
+        "folds": 5,
+        "crop": "128",
+        "pca_components": 16,
+        "C": 0.3,
+        "mode": "replace_dense",
+        "macroF1": 0.9423274796924805,
+        "spellF1": 0.6266666666666666,
+        "possessions": 13,
+        "per_class": {
+          "H": {
+            "precision": 0.9510966212211025,
+            "recall": 0.9290677475390852,
+            "f1": 0.9399531341534856,
+            "support": 3454
+          },
+          "A": {
+            "precision": 0.9395331037122082,
+            "recall": 0.9526581296080714,
+            "f1": 0.9460500963391137,
+            "support": 2577
+          },
+          "D": {
+            "precision": 0.9272967614011897,
+            "recall": 0.955071477195371,
+            "f1": 0.9409792085848423,
+            "support": 1469
+          }
+        },
+        "changed_frames": 301
+      },
+      {
+        "folds": 5,
+        "crop": "128",
+        "pca_components": 16,
+        "C": 0.3,
+        "mode": "auxiliary",
+        "macroF1": 0.9546496133343257,
+        "spellF1": 0.8375,
+        "possessions": 15,
+        "per_class": {
+          "H": {
+            "precision": 0.966006503103754,
+            "recall": 0.9461493920092646,
+            "f1": 0.9559748427672955,
+            "support": 3454
+          },
+          "A": {
+            "precision": 0.9619815668202765,
+            "recall": 0.9720605355064028,
+            "f1": 0.9669947886508395,
+            "support": 2577
+          },
+          "D": {
+            "precision": 0.9272967614011897,
+            "recall": 0.955071477195371,
+            "f1": 0.9409792085848423,
+            "support": 1469
+          }
+        },
+        "changed_frames": 39
+      },
+      {
+        "folds": 5,
+        "crop": "128",
+        "pca_components": 32,
+        "C": 0.3,
+        "mode": "expert",
+        "macroF1": 0.9555050885698221,
+        "spellF1": 0.7600000000000001,
+        "possessions": 13,
+        "per_class": {
+          "H": {
+            "precision": 0.9699225729600953,
+            "recall": 0.9429646786334684,
+            "f1": 0.9562536699941281,
+            "support": 3454
+          },
+          "A": {
+            "precision": 0.9579992363497518,
+            "recall": 0.9736127279782693,
+            "f1": 0.9657428791377982,
+            "support": 2577
+          },
+          "D": {
+            "precision": 0.927774130006566,
+            "recall": 0.9618788291354663,
+            "f1": 0.9445187165775399,
+            "support": 1469
+          }
+        },
+        "changed_frames": 24
+      },
+      {
+        "folds": 5,
+        "crop": "128",
+        "pca_components": 32,
+        "C": 0.3,
+        "mode": "replace_dense",
+        "macroF1": 0.9431794240590223,
+        "spellF1": 0.6266666666666666,
+        "possessions": 13,
+        "per_class": {
+          "H": {
+            "precision": 0.9538278224605302,
+            "recall": 0.9270411117544876,
+            "f1": 0.9402437233886359,
+            "support": 3454
+          },
+          "A": {
+            "precision": 0.9370229007633588,
+            "recall": 0.9526581296080714,
+            "f1": 0.9447758322108909,
+            "support": 2577
+          },
+          "D": {
+            "precision": 0.927774130006566,
+            "recall": 0.9618788291354663,
+            "f1": 0.9445187165775399,
+            "support": 1469
+          }
+        },
+        "changed_frames": 330
+      },
+      {
+        "folds": 5,
+        "crop": "128",
+        "pca_components": 32,
+        "C": 0.3,
+        "mode": "auxiliary",
+        "macroF1": 0.9561749008586234,
+        "spellF1": 0.8375,
+        "possessions": 15,
+        "per_class": {
+          "H": {
+            "precision": 0.968583283935981,
+            "recall": 0.9461493920092646,
+            "f1": 0.9572349150556532,
+            "support": 3454
+          },
+          "A": {
+            "precision": 0.9616122840690979,
+            "recall": 0.9720605355064028,
+            "f1": 0.9668081821690466,
+            "support": 2577
+          },
+          "D": {
+            "precision": 0.928336620644313,
+            "recall": 0.9611980939414567,
+            "f1": 0.9444816053511705,
+            "support": 1469
+          }
+        },
+        "changed_frames": 33
+      },
+      {
+        "folds": 5,
+        "crop": "320",
+        "pca_components": 16,
+        "C": 0.3,
+        "mode": "expert",
+        "macroF1": 0.9570882500517638,
+        "spellF1": 0.8749999999999998,
+        "possessions": 15,
+        "per_class": {
+          "H": {
+            "precision": 0.9686575990538143,
+            "recall": 0.9484655471916619,
+            "f1": 0.9584552369806904,
+            "support": 3454
+          },
+          "A": {
+            "precision": 0.9649325626204239,
+            "recall": 0.9716724873884361,
+            "f1": 0.9682907965970611,
+            "support": 2577
+          },
+          "D": {
+            "precision": 0.927774130006566,
+            "recall": 0.9618788291354663,
+            "f1": 0.9445187165775399,
+            "support": 1469
+          }
+        },
+        "changed_frames": 49
+      },
+      {
+        "folds": 5,
+        "crop": "320",
+        "pca_components": 16,
+        "C": 0.3,
+        "mode": "replace_dense",
+        "macroF1": 0.9431729009301005,
+        "spellF1": 0.6266666666666666,
+        "possessions": 13,
+        "per_class": {
+          "H": {
+            "precision": 0.9535576064304853,
+            "recall": 0.9273306311522872,
+            "f1": 0.94026126522824,
+            "support": 3454
+          },
+          "A": {
+            "precision": 0.9370229007633588,
+            "recall": 0.9526581296080714,
+            "f1": 0.9447758322108909,
+            "support": 2577
+          },
+          "D": {
+            "precision": 0.928336620644313,
+            "recall": 0.9611980939414567,
+            "f1": 0.9444816053511705,
+            "support": 1469
+          }
+        },
+        "changed_frames": 387
+      },
+      {
+        "folds": 5,
+        "crop": "320",
+        "pca_components": 16,
+        "C": 0.3,
+        "mode": "auxiliary",
+        "macroF1": 0.9546496133343257,
+        "spellF1": 0.8375,
+        "possessions": 15,
+        "per_class": {
+          "H": {
+            "precision": 0.966006503103754,
+            "recall": 0.9461493920092646,
+            "f1": 0.9559748427672955,
+            "support": 3454
+          },
+          "A": {
+            "precision": 0.9619815668202765,
+            "recall": 0.9720605355064028,
+            "f1": 0.9669947886508395,
+            "support": 2577
+          },
+          "D": {
+            "precision": 0.9272967614011897,
+            "recall": 0.955071477195371,
+            "f1": 0.9409792085848423,
+            "support": 1469
+          }
+        },
+        "changed_frames": 43
+      },
+      {
+        "folds": 5,
+        "crop": "320",
+        "pca_components": 32,
+        "C": 0.3,
+        "mode": "expert",
+        "macroF1": 0.9555050885698221,
+        "spellF1": 0.7600000000000001,
+        "possessions": 13,
+        "per_class": {
+          "H": {
+            "precision": 0.9699225729600953,
+            "recall": 0.9429646786334684,
+            "f1": 0.9562536699941281,
+            "support": 3454
+          },
+          "A": {
+            "precision": 0.9579992363497518,
+            "recall": 0.9736127279782693,
+            "f1": 0.9657428791377982,
+            "support": 2577
+          },
+          "D": {
+            "precision": 0.927774130006566,
+            "recall": 0.9618788291354663,
+            "f1": 0.9445187165775399,
+            "support": 1469
+          }
+        },
+        "changed_frames": 141
+      },
+      {
+        "folds": 5,
+        "crop": "320",
+        "pca_components": 32,
+        "C": 0.3,
+        "mode": "replace_dense",
+        "macroF1": 0.9419220649944916,
+        "spellF1": 0.6266666666666666,
+        "possessions": 13,
+        "per_class": {
+          "H": {
+            "precision": 0.9510385756676558,
+            "recall": 0.9279096699478865,
+            "f1": 0.9393317702227432,
+            "support": 3454
+          },
+          "A": {
+            "precision": 0.9377387318563789,
+            "recall": 0.9526581296080714,
+            "f1": 0.9451395572666024,
+            "support": 2577
+          },
+          "D": {
+            "precision": 0.9279100529100529,
+            "recall": 0.955071477195371,
+            "f1": 0.9412948674941294,
+            "support": 1469
+          }
+        },
+        "changed_frames": 335
+      },
+      {
+        "folds": 5,
+        "crop": "320",
+        "pca_components": 32,
+        "C": 0.3,
+        "mode": "auxiliary",
+        "macroF1": 0.9546926308101572,
+        "spellF1": 0.8375,
+        "possessions": 15,
+        "per_class": {
+          "H": {
+            "precision": 0.966006503103754,
+            "recall": 0.9461493920092646,
+            "f1": 0.9559748427672955,
+            "support": 3454
+          },
+          "A": {
+            "precision": 0.9616122840690979,
+            "recall": 0.9720605355064028,
+            "f1": 0.9668081821690466,
+            "support": 2577
+          },
+          "D": {
+            "precision": 0.9279100529100529,
+            "recall": 0.955071477195371,
+            "f1": 0.9412948674941294,
+            "support": 1469
+          }
+        },
+        "changed_frames": 55
+      },
+      {
+        "folds": 5,
+        "crop": "both",
+        "pca_components": 16,
+        "C": 0.3,
+        "mode": "expert",
+        "macroF1": 0.9570882500517638,
+        "spellF1": 0.8749999999999998,
+        "possessions": 15,
+        "per_class": {
+          "H": {
+            "precision": 0.9686575990538143,
+            "recall": 0.9484655471916619,
+            "f1": 0.9584552369806904,
+            "support": 3454
+          },
+          "A": {
+            "precision": 0.9649325626204239,
+            "recall": 0.9716724873884361,
+            "f1": 0.9682907965970611,
+            "support": 2577
+          },
+          "D": {
+            "precision": 0.927774130006566,
+            "recall": 0.9618788291354663,
+            "f1": 0.9445187165775399,
+            "support": 1469
+          }
+        },
+        "changed_frames": 0
+      },
+      {
+        "folds": 5,
+        "crop": "both",
+        "pca_components": 16,
+        "C": 0.3,
+        "mode": "replace_dense",
+        "macroF1": 0.9419220649944916,
+        "spellF1": 0.6266666666666666,
+        "possessions": 13,
+        "per_class": {
+          "H": {
+            "precision": 0.9510385756676558,
+            "recall": 0.9279096699478865,
+            "f1": 0.9393317702227432,
+            "support": 3454
+          },
+          "A": {
+            "precision": 0.9377387318563789,
+            "recall": 0.9526581296080714,
+            "f1": 0.9451395572666024,
+            "support": 2577
+          },
+          "D": {
+            "precision": 0.9279100529100529,
+            "recall": 0.955071477195371,
+            "f1": 0.9412948674941294,
+            "support": 1469
+          }
+        },
+        "changed_frames": 286
+      },
+      {
+        "folds": 5,
+        "crop": "both",
+        "pca_components": 16,
+        "C": 0.3,
+        "mode": "auxiliary",
+        "macroF1": 0.9546926308101572,
+        "spellF1": 0.8375,
+        "possessions": 15,
+        "per_class": {
+          "H": {
+            "precision": 0.966006503103754,
+            "recall": 0.9461493920092646,
+            "f1": 0.9559748427672955,
+            "support": 3454
+          },
+          "A": {
+            "precision": 0.9616122840690979,
+            "recall": 0.9720605355064028,
+            "f1": 0.9668081821690466,
+            "support": 2577
+          },
+          "D": {
+            "precision": 0.9279100529100529,
+            "recall": 0.955071477195371,
+            "f1": 0.9412948674941294,
+            "support": 1469
+          }
+        },
+        "changed_frames": 47
+      },
+      {
+        "folds": 5,
+        "crop": "both",
+        "pca_components": 32,
+        "C": 0.3,
+        "mode": "expert",
+        "macroF1": 0.9555050885698221,
+        "spellF1": 0.7600000000000001,
+        "possessions": 13,
+        "per_class": {
+          "H": {
+            "precision": 0.9699225729600953,
+            "recall": 0.9429646786334684,
+            "f1": 0.9562536699941281,
+            "support": 3454
+          },
+          "A": {
+            "precision": 0.9579992363497518,
+            "recall": 0.9736127279782693,
+            "f1": 0.9657428791377982,
+            "support": 2577
+          },
+          "D": {
+            "precision": 0.927774130006566,
+            "recall": 0.9618788291354663,
+            "f1": 0.9445187165775399,
+            "support": 1469
+          }
+        },
+        "changed_frames": 73
+      },
+      {
+        "folds": 5,
+        "crop": "both",
+        "pca_components": 32,
+        "C": 0.3,
+        "mode": "replace_dense",
+        "macroF1": 0.9435614543652965,
+        "spellF1": 0.6266666666666666,
+        "possessions": 13,
+        "per_class": {
+          "H": {
+            "precision": 0.9538690476190477,
+            "recall": 0.9279096699478865,
+            "f1": 0.9407103023187555,
+            "support": 3454
+          },
+          "A": {
+            "precision": 0.9377387318563789,
+            "recall": 0.9526581296080714,
+            "f1": 0.9451395572666024,
+            "support": 2577
+          },
+          "D": {
+            "precision": 0.9283837056504599,
+            "recall": 0.9618788291354663,
+            "f1": 0.9448345035105316,
+            "support": 1469
+          }
+        },
+        "changed_frames": 353
+      },
+      {
+        "folds": 5,
+        "crop": "both",
+        "pca_components": 32,
+        "C": 0.3,
+        "mode": "auxiliary",
+        "macroF1": 0.9561749008586234,
+        "spellF1": 0.8375,
+        "possessions": 15,
+        "per_class": {
+          "H": {
+            "precision": 0.968583283935981,
+            "recall": 0.9461493920092646,
+            "f1": 0.9572349150556532,
+            "support": 3454
+          },
+          "A": {
+            "precision": 0.9616122840690979,
+            "recall": 0.9720605355064028,
+            "f1": 0.9668081821690466,
+            "support": 2577
+          },
+          "D": {
+            "precision": 0.928336620644313,
+            "recall": 0.9611980939414567,
+            "f1": 0.9444816053511705,
+            "support": 1469
+          }
+        },
+        "changed_frames": 36
+      }
+    ],
+    "dead_regularization": [
+      {
+        "C": 3.0,
+        "weight": 0.5,
+        "baseline": "macro_v6",
+        "macroF1": 0.9570882500517638,
+        "spellF1": 0.8749999999999998,
+        "possessions": 15,
+        "class_f1": {
+          "H": 0.9584552369806904,
+          "A": 0.9682907965970611,
+          "D": 0.9445187165775399
+        },
+        "changed_frames": 142
+      },
+      {
+        "C": 3.0,
+        "weight": 1.0,
+        "baseline": "macro_v6",
+        "macroF1": 0.956378451647466,
+        "spellF1": 0.8749999999999998,
+        "possessions": 15,
+        "class_f1": {
+          "H": 0.9595797460966001,
+          "A": 0.9662357707891183,
+          "D": 0.9433198380566801
+        },
+        "changed_frames": 340
+      },
+      {
+        "C": 10.0,
+        "weight": 0.5,
+        "baseline": "macro_v6",
+        "macroF1": 0.9576036123814177,
+        "spellF1": 0.8749999999999998,
+        "possessions": 15,
+        "class_f1": {
+          "H": 0.9584552369806904,
+          "A": 0.9688888888888889,
+          "D": 0.9454667112746737
+        },
+        "changed_frames": 140
+      },
+      {
+        "C": 10.0,
+        "weight": 1.0,
+        "baseline": "macro_v6",
+        "macroF1": 0.9570105403261632,
+        "spellF1": 0.8749999999999998,
+        "possessions": 15,
+        "class_f1": {
+          "H": 0.9598598744708802,
+          "A": 0.9668209876543209,
+          "D": 0.9443507588532883
+        },
+        "changed_frames": 344
+      }
+    ],
+    "regularization_paired_folds": [
+      {
+        "folds": 3,
+        "mode": "C1_half",
+        "macroF1": 0.9410069395948382,
+        "spellF1": 0.7294117647058823,
+        "possessions": 17,
+        "class_f1": {
+          "H": 0.9367541766109786,
+          "A": 0.9413528199362937,
+          "D": 0.9449138222372423
+        },
+        "changed_frames": 327
+      },
+      {
+        "folds": 3,
+        "mode": "C10_half",
+        "macroF1": 0.9408170866044464,
+        "spellF1": 0.7294117647058823,
+        "possessions": 17,
+        "class_f1": {
+          "H": 0.9367541766109786,
+          "A": 0.9420588786799174,
+          "D": 0.9436382045224435
+        },
+        "changed_frames": 328
+      },
+      {
+        "folds": 4,
+        "mode": "C1_half",
+        "macroF1": 0.9420313702437685,
+        "spellF1": 0.7529411764705882,
+        "possessions": 17,
+        "class_f1": {
+          "H": 0.9405684754521964,
+          "A": 0.9417129262490088,
+          "D": 0.9438127090301003
+        },
+        "changed_frames": 267
+      },
+      {
+        "folds": 4,
+        "mode": "C10_half",
+        "macroF1": 0.9421511492888955,
+        "spellF1": 0.7529411764705882,
+        "possessions": 17,
+        "class_f1": {
+          "H": 0.9407035175879397,
+          "A": 0.9418996628990679,
+          "D": 0.943850267379679
+        },
+        "changed_frames": 272
+      },
+      {
+        "folds": 5,
+        "mode": "C1_half",
+        "macroF1": 0.9570882500517638,
+        "spellF1": 0.8749999999999998,
+        "possessions": 15,
+        "class_f1": {
+          "H": 0.9584552369806904,
+          "A": 0.9682907965970611,
+          "D": 0.9445187165775399
+        },
+        "changed_frames": 138
+      },
+      {
+        "folds": 5,
+        "mode": "C10_half",
+        "macroF1": 0.9576036123814177,
+        "spellF1": 0.8749999999999998,
+        "possessions": 15,
+        "class_f1": {
+          "H": 0.9584552369806904,
+          "A": 0.9688888888888889,
+          "D": 0.9454667112746737
+        },
+        "changed_frames": 140
+      },
+      {
+        "folds": 6,
+        "mode": "C1_half",
+        "macroF1": 0.9512505021080155,
+        "spellF1": 0.825,
+        "possessions": 15,
+        "class_f1": {
+          "H": 0.9518545454545454,
+          "A": 0.9609177522846588,
+          "D": 0.9409792085848423
+        },
+        "changed_frames": 165
+      },
+      {
+        "folds": 6,
+        "mode": "C10_half",
+        "macroF1": 0.9512505021080155,
+        "spellF1": 0.825,
+        "possessions": 15,
+        "class_f1": {
+          "H": 0.9518545454545454,
+          "A": 0.9609177522846588,
+          "D": 0.9409792085848423
+        },
+        "changed_frames": 170
+      }
+    ],
+    "dino_extraction": {
+      "version": 1,
+      "backbone": "dinov2_vits14",
+      "model_revision": "7764ea0f912e53c92e82eb78a2a1631e92725fc8",
+      "model_sha256": "b938bf1bc15cd2ec0feacfe3a1bb553fe8ea9ca46a7e1d8d00217f29aef60cd9",
+      "model_source": "https://github.com/facebookresearch/dinov2",
+      "raw_ball_sha256": "81040b87ba3b71bbc847396035b8b1b82b0d58ab59b301efc6af9d1da6bbd0e2",
+      "crop_ball_sha256": "fe31bca8048c63663c87ccd7b997ecfcb48fdbe916ddf9926a3fd6732afd841d",
+      "frame_plan_sha256": "32d5aea1683b351bebde5cd6719db2829134bb2a5c74bc42f8aeb2ae46f2dcb5",
+      "camera_params": {
+        "max_gap": 25,
+        "w_ball": 1.0,
+        "w_filled": 0.5,
+        "control_radius": 2.5,
+        "margin_scale": 2.0,
+        "w_tag": 0.0,
+        "w_sp_dead": 0.6,
+        "sp_dead_frames": 50,
+        "w_sp_team": 0.6,
+        "w_outside": 2.0,
+        "dead_gap": 75,
+        "w_missing": 0.3,
+        "slow_speed": 1.5,
+        "w_slow": 0.6,
+        "w_missing_slow": 0.8,
+        "alive_ball_speed": 4.0,
+        "w_alive": 0.5,
+        "d_bias": -0.1,
+        "switch_cost": 20.0,
+        "dead_cost": 20.0,
+        "err_scale": 1.0,
+        "pan_window": 25,
+        "z_slow": -0.3,
+        "z_temp": 0.3,
+        "w_slow_z": 0.4,
+        "team_gate": 0.5,
+        "w_cam_still": 0.2,
+        "cam_still_speed": 0.5,
+        "w_memory": 0.6,
+        "edge_margin": 2.0,
+        "restart_speed": 8.0,
+        "restart_min_delay": 50,
+        "memory_max": 1500,
+        "sp_pre_frames": 50
+      },
+      "ball_source": "fused_full",
+      "crops": [
+        128,
+        320
+      ],
+      "input_size": 224,
+      "embedding_size": 384,
+      "colour": "RGB",
+      "normalisation": "ImageNet mean/std",
+      "video_frames": 199319,
+      "video_size": [
+        1920,
+        1080
+      ],
+      "public_gt_used": false
+    }
+  },
+  "validation": {
+    "tests_passed": 51,
+    "tests_failed": 0,
+    "unit_test_implementation_revision": "8d92c6d",
+    "production_code_unchanged_since_macro_v6": true,
+    "official_validator_valid": true,
+    "official_scorer_confirmed": true,
+    "rows": 199319,
+    "prototype_builder_production_tuner_identical": true,
+    "macro_v6_reproduced_exactly": true,
+    "uncovered_video_preserved": true,
+    "dead_changes_within_flexibility": true,
+    "primary_video_frames": 21175,
+    "legacy_csv_sha256": "3d0706bb818ad9ff8ea152de75d57a954e1b0c52040e3b21b9fe764699215e21"
+  },
+  "sha256": {
+    "pretrain_data/macro_v7/ensemble.joblib": "c6f59332ab040defd9f5d106ecc2158fa242ac5a57f15774ba13ab755a89bd56",
+    "pretrain_data/macro_dead_video_c10/film_dead_motion_dead_logreg.joblib": "d022d059c33a09c791ff4bca76ed99950397c02fa083c75dd03116a969a80f77",
+    "evaluation/results/barca.csv": "e09c0524b08d88b8c198c00321bd63a90dd727331383350aec31d156dc86055c",
+    "evaluation/results/Borrow_Khan.csv": "e09c0524b08d88b8c198c00321bd63a90dd727331383350aec31d156dc86055c",
+    "evaluation/results/macro_v7.csv": "e09c0524b08d88b8c198c00321bd63a90dd727331383350aec31d156dc86055c",
+    "src/params.json": "272d0b0f0271def19ca65c8faa265b7180203807dbeaa19e69a241feda00e12d"
+  },
+  "feature_inputs": {
+    "baseline_sha256": "043fd4e2c071769c1793662d33f8c0a424f0e3a5b32cfdf092ad7d5bdc1f8b3c",
+    "raw_ball_sha256": "81040b87ba3b71bbc847396035b8b1b82b0d58ab59b301efc6af9d1da6bbd0e2",
+    "fused_ball_sha256": "fe31bca8048c63663c87ccd7b997ecfcb48fdbe916ddf9926a3fd6732afd841d",
+    "fused_columns": [
+      "v2_team",
+      "v2_dead",
+      "v2_is_H",
+      "v2_is_A",
+      "v2_is_D",
+      "v2_since_change",
+      "v2_until_change",
+      "dist_home",
+      "dist_away",
+      "ball_seen",
+      "ball_filled",
+      "since_seen",
+      "last_edge_m",
+      "z_player_speed",
+      "pan_speed",
+      "dead_memory",
+      "quality",
+      "players_in_view"
+    ],
+    "baseline_verified": true
+  },
+  "document_ablation": [
+    {
+      "configuration": "Primary before cleanup (v4)",
+      "macroF1": 0.9500025739152121,
+      "spellF1": 0.7529411764705882
+    },
+    {
+      "configuration": "v4 + oscillation removal",
+      "macroF1": 0.9556667008462338,
+      "spellF1": 0.8375
+    },
+    {
+      "configuration": "v4 + both temporal steps",
+      "macroF1": 0.9560077294091139,
+      "spellF1": 0.8749999999999998
+    },
+    {
+      "configuration": "v5: temporal + P(D) average",
+      "macroF1": 0.9561298353114885,
+      "spellF1": 0.8749999999999998
+    },
+    {
+      "configuration": "v6: binary dead-ball head C=1",
+      "macroF1": 0.9570882500517638,
+      "spellF1": 0.8749999999999998
+    },
+    {
+      "configuration": "v7: binary dead-ball head C=10",
+      "macroF1": 0.9576036123814177,
+      "spellF1": 0.8749999999999998
+    }
+  ],
+  "document_baseline": "Previous (v6)",
+  "limitations": [
+    "All feature and method selection reuses the same public 17 possessions.",
+    "This gain corrects only 3 public frames, with no new public errors.",
+    "Three-fold macro-F1 decreases by 0.000190; four/five increase and six are equal.",
+    "Spell-F1 stays equal in all paired partitions.",
+    "Repartitioning is sensitivity on the same slice, not independent validation.",
+    "No private, unseen-match or full-match accuracy is known.",
+    "Full-match statistics describe predictions.",
+    "DINO class embeddings did not improve macro v6; local patch-token experiments are ongoing and excluded from this frozen checkpoint.",
+    "Models, crops, features and output labels remain gitignored."
+  ]
+}
