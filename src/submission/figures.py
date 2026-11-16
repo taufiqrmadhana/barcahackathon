@@ -24,30 +24,20 @@ def finish(fig, axes, folder, name):
 
 
 def ablation(report, folder):
-    original = next(x for x in report['sensitivity']['results']
-                    if x['folds'] == 5 and x['objective'] == 'baseline')
-    motion = next(x for x in report['experiments']['motion_weight_trials']
-                  if x['motion_weight'] == .5 and x['prune_maximum'] == 100
-                  and x['prune_confidence'] == .5)
-    trial = {x['mode']: x for x in report['experiments']['temporal_without_dead_blend']}
-    final = report['checkpoint']['public']
-    rows = [
-        ('Previous primary (v4)', original['macroF1'], original['spellF1']),
-        ('Motion mixture alone', motion['macroF1'], motion['spellF1']),
-        ('v4 + oscillation removal', trial['oscillation']['macroF1'], trial['oscillation']['spellF1']),
-        ('v4 + short-spell agreement', trial['consensus']['macroF1'], trial['consensus']['spellF1']),
-        ('v4 + both temporal steps', trial['both']['macroF1'], trial['both']['spellF1']),
-        ('Final: both + P(D) average', final['macro_f1'], final['spell_f1_mean']),
-    ]
+    if 'document_ablation' in report:
+        rows = [(x['configuration'], x['macroF1'], x['spellF1'])
+                for x in report['document_ablation']]
+    else:
+        rows = legacy_ablation(report)
     fig, axes = plt.subplots(1, 2, figsize=(7.15, 2.45), sharey=True)
     y = np.arange(len(rows))
     for ax, index, title, color in [(axes[0], 1, 'Macro-F1', BLUE),
                                      (axes[1], 2, 'Spell-F1', ORANGE)]:
         values = [row[index] for row in rows]
-        ax.barh(y, values, height=.56, color=[GRAY] * 5 + [color], zorder=3)
+        ax.barh(y, values, height=.56, color=[GRAY] * (len(rows)-1) + [color], zorder=3)
         for i, value in enumerate(values):
             ax.text(value + .025, i, f'{value:.6f}', va='center', fontsize=8.2,
-                    color=INK, weight='bold' if i == 5 else 'normal')
+                    color=INK, weight='bold' if i == len(rows)-1 else 'normal')
         ax.set_xlim(0, 1.23)
         ax.set_xticks([0, .25, .5, .75, 1.])
         ax.set_title(title, fontsize=10, loc='left', color=color, weight='bold', pad=9)
@@ -60,6 +50,24 @@ def ablation(report, folder):
     return [dict(configuration=x[0], macroF1=x[1], spellF1=x[2]) for x in rows]
 
 
+def legacy_ablation(report):
+    original = next(x for x in report['sensitivity']['results']
+                    if x['folds'] == 5 and x['objective'] == 'baseline')
+    motion = next(x for x in report['experiments']['motion_weight_trials']
+                  if x['motion_weight'] == .5 and x['prune_maximum'] == 100
+                  and x['prune_confidence'] == .5)
+    trial = {x['mode']: x for x in report['experiments']['temporal_without_dead_blend']}
+    final = report['checkpoint']['public']
+    return [
+        ('Previous primary (v4)', original['macroF1'], original['spellF1']),
+        ('Motion mixture alone', motion['macroF1'], motion['spellF1']),
+        ('v4 + oscillation removal', trial['oscillation']['macroF1'], trial['oscillation']['spellF1']),
+        ('v4 + short-spell agreement', trial['consensus']['macroF1'], trial['consensus']['spellF1']),
+        ('v4 + both temporal steps', trial['both']['macroF1'], trial['both']['spellF1']),
+        ('Final: both + P(D) average', final['macro_f1'], final['spell_f1_mean']),
+    ]
+
+
 def sensitivity(report, folder):
     rows = report['sensitivity']['results']
     folds = sorted({x['folds'] for x in rows})
@@ -67,7 +75,7 @@ def sensitivity(report, folder):
     data = dict(folds=folds)
     for ax, metric, title, limits in [(axes[0], 'macroF1', 'Macro-F1', (.92, .97)),
                                       (axes[1], 'spellF1', 'Spell-F1', (.65, .90))]:
-        for key, name, color, marker in [('baseline', 'Previous (v4)', GRAY, 'o'),
+        for key, name, color, marker in [('baseline', report.get('document_baseline', 'Previous (v4)'), GRAY, 'o'),
                                           ('candidate', 'Final', BLUE, 's')]:
             scores = [next(x[metric] for x in rows if x['folds'] == f and x['objective'] == key)
                       for f in folds]

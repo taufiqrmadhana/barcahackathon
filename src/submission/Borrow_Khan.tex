@@ -73,8 +73,8 @@ We acknowledge Metrica Sports; FILM uses Apache-2.0 and YOLO11 follows upstream 
  Home/away control and loose states; duration-constrained D};
 \node[box,below=3mm of base] (heads) {\textbf{Primary and auxiliary video mixtures}\\
  Primary: 0.75 dense + 0.25 5\,Hz + ordered experts\\
- Auxiliary: 0.5 dense + 0.5 motion};
-\node[box,below=3mm of heads] (decode) {\textbf{Average P(D); independently decode both mixtures}\\
+ Auxiliary: 0.5 dense + 0.5 motion; binary dead-ball head};
+\node[box,below=3mm of heads] (decode) {\textbf{Fuse P(D); independently decode both mixtures}\\
  Preserve primary conditional H/A; use matching held-out heads};
 \node[box,below=3mm of decode,fill=Blue,text=white,draw=Blue] (out)
  {\textbf{Temporal agreement $\rightarrow$ public stitching $\rightarrow$ CSV}\\
@@ -91,7 +91,7 @@ full-data refits are used only outside the public window.}
 \centering\includegraphics[width=.98\textwidth]{figures/ablation.pdf}
 \caption{Public ablation under the same five-fold protocol. All bars start
 at zero and exact scores are annotated. Temporal cleanup drives the spell-F1 gain;
-separate P(D) averaging gives the final macro-F1 improvement.}
+separate P(D) estimation gives the final macro-F1 improvement.}
 \label{fig:ablation}
 \end{figure*}
 
@@ -117,11 +117,12 @@ Each head is an imputed, standardised logistic classifier trained on 301 native
 motion ($C=1$, six extra features), then fused-ball crops ($C=3$). An expert
 acts when primary confidence is below 0.8 and its own exceeds 0.9; earlier
 confident choices keep priority and P(D) is preserved. The auxiliary is
-0.5 dense/raw plus 0.5 motion.
+0.5 dense/raw plus 0.5 motion. A binary alive/dead head ($C=1$) uses 28
+video, flow, quality and motion features, excluding decoder dead-ball anchors.
 
-For primary $q$ after experts and auxiliary $r$, average only dead-ball probability:
+For primary $q$, auxiliary $r$ and binary head $d$, fuse only dead-ball probability:
 \begin{equation}
-\bar q_D=\tfrac12(q_D+r_D),\qquad
+\bar q_D=\tfrac14q_D+\tfrac14r_D+\tfrac12d_D,\quad
 \bar q_k=(1-\bar q_D)\frac{q_k}{q_H+q_A},
 \end{equation}
 for $k\in\{H,A\}$. Missing/undefined evidence abstains. Team and alive/dead
@@ -177,9 +178,9 @@ both models' support and primary H/A labels.}
 
 \begin{figure*}[!t]
 \centering\includegraphics[width=.98\textwidth]{figures/fold_sensitivity.pdf}
-\caption{Paired repartitions of the same public possessions. Both mixtures
-are refitted at each fold count. Final macro-F1 improves in all four checks;
-spell-F1 never decreases. These are sensitivity checks, not independent test sets.}
+\caption{Paired repartitions of the same public possessions, refitting all heads.
+Macro-F1 rises at 4/5/6 folds and falls 0.000297 at 3 folds; spell-F1 is unchanged.
+These are sensitivity checks, not independent test sets.}
 \label{fig:sensitivity}
 \end{figure*}
 
@@ -241,14 +242,15 @@ the matching held-out head before temporal corrections and public stitching.}
 Spell-F1 averages matching at IoU 0.3/0.4/0.5/0.6/0.7; macro-F1 averages H/A/D.
 The final output has 15 predicted spells: 14 matched, one spurious and three
 GT spells missed at every threshold, giving $2\times14/(15+17)=0.875$.
-H/A/D F1 is 0.955923/0.970389/0.942077; one-second transition F1 is 0.736842.
+H/A/D F1 is 0.958455/0.968291/0.944519; one-second transition F1 is 0.736842.
 
 Figure~\ref{fig:ablation} separates the contributions. Oscillation removal alone
 raises spell-F1 from 0.752941 to 0.837500; both temporal steps reach 0.875000.
-Figure~\ref{fig:sensitivity} shows robustness to 3/4/5/6 folds. Short-spell
-agreement alone regresses at four folds; its isolated gain is not uniformly reliable.
-Native 5\,Hz trees, denser raw video, gap-kick/contact variants and pose expert
-trials did not improve the retained checkpoint.
+The binary head raises macro-F1 from 0.956130 to \MacroScore{} while keeping
+spell-F1 unchanged. Figure~\ref{fig:sensitivity} shows the gain is not uniform
+across repartitions; away-class F1 also falls from 0.970389 to 0.968291.
+Denser video, alternate contact rules, pose and binary team heads did not beat
+the retained checkpoint.
 
 \textbf{Selection limit.} Features, weights and temporal rules were selected
 using the same 17 public possessions. OOF fitting does not remove this
@@ -257,10 +259,10 @@ method-selection bias. Private and unseen-match performance are unknown.
 
 
 \subsection{Predicted Match Statistics}
-Figure~\ref{fig:match} reports 402 possessions averaging 8.52\,s: 204 in the first
-half and 198 in the second. Home has 60.30\% of alive time (198 spells,
-10.43\,s mean); away has 39.70\% (204 spells, 6.67\,s mean). D occupies
-46.08\% of graded time in 130 intervals counted separately by half.
+Figure~\ref{fig:match} reports 401 possessions averaging 8.55\,s: 203 in the first
+half and 198 in the second. Home has 60.36\% of alive time (198 spells,
+10.45\,s mean); away has 39.64\% (203 spells, 6.69\,s mean). D occupies
+46.05\% of graded time in 130 intervals counted separately by half.
 
 \section{Limitations and Reproduction}
 \textbf{Limitations.} Occlusion, small players and crop alignment limit contact
@@ -271,28 +273,28 @@ better contact localisation and calibrated confidence.
 
 \balance
 \textbf{Reproduction.} The public \file{taufiq} branch at
-\texttt{\CodeRevision} uses \file{src/configs/macro_v5.json} and Python 3.11.
+\texttt{\CodeRevision} uses \file{src/configs/macro_v6.json} and Python 3.11.
 Dependencies are pinned in \file{requirements-src.txt}; CV/FILM use separate
 environments. Prepare the provided bundle and regenerate model/video caches
 first. Commands are in \file{src/README.md}, \file{src/bench/README.md} and
-\file{src/MACRO_V4.md}/\file{src/MACRO_V5.md}.
+\file{src/MACRO_V5.md}/\file{src/MACRO_V6.md}.
 \begin{lstlisting}
 OMP_NUM_THREADS=3 OPENBLAS_NUM_THREADS=3 \
   .venv/bin/python src/run.py \
-  --params src/configs/macro_v5.json --name Borrow_Khan
+  --params src/configs/macro_v6.json --name Borrow_Khan
 .venv/bin/python evaluation/validate_submission.py \
   evaluation/results/Borrow_Khan.csv
 .venv/bin/python evaluation/run_evaluation.py \
   --gt public --bootstrap 0 --no-detail
 \end{lstlisting}
 Expect 199,319 rows; the scorer reads every CSV in its results directory.
-All 48 contract tests passed at this checkpoint. Prototype, builder, production
+All 51 contract tests passed at this checkpoint. Prototype, builder, production
 and tuner agree on every frame. The full CSV checksum, metrics and asset hashes
-are in \file{src/bench/results/macro_v5_2026-11-16.json}.
+are in \file{src/bench/results/macro_v6_2026-11-17.json}.
 
 \begin{thebibliography}{4}
 \bibitem{challenge} More than a Hack 2027, ``Phase 1: Ball Possession,'' 2026.
-\url{https://github.com/taufiqrmadhana/barcahackathon/tree/b8e4ad0}.
+\url{https://github.com/taufiqrmadhana/barcahackathon/tree/8d92c6d}.
 \bibitem{yolo} Ultralytics, ``YOLO11.'' \url{https://docs.ultralytics.com/models/yolo11/}.
 \bibitem{film} F. Reda et al., ``FILM: Frame Interpolation for Large Motion,'' ECCV, 2022.
 \url{https://github.com/google-research/frame-interpolation}.

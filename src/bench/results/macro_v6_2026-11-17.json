@@ -3219,7 +3219,189 @@
       "kit_training_accuracy": 0.9882032667876588,
       "quality_frames": 1967,
       "quality_public_frames": 1309
-    }
+    },
+    "class_weight_trials": [
+      {
+        "group": "raw",
+        "power": 0.5,
+        "mode": "replace_dense",
+        "baseline": "macro_v6",
+        "macroF1": 0.9555050885698221,
+        "spellF1": 0.7600000000000001,
+        "possessions": 13,
+        "class_f1": {
+          "H": 0.9562536699941281,
+          "A": 0.9657428791377982,
+          "D": 0.9445187165775399
+        },
+        "changed_frames": 236
+      },
+      {
+        "group": "raw",
+        "power": 0.5,
+        "mode": "quarter",
+        "baseline": "macro_v6",
+        "macroF1": 0.9570882500517638,
+        "spellF1": 0.8749999999999998,
+        "possessions": 15,
+        "class_f1": {
+          "H": 0.9584552369806904,
+          "A": 0.9682907965970611,
+          "D": 0.9445187165775399
+        },
+        "changed_frames": 239
+      },
+      {
+        "group": "raw",
+        "power": 0.5,
+        "mode": "expert",
+        "baseline": "macro_v6",
+        "macroF1": 0.9570882500517638,
+        "spellF1": 0.8749999999999998,
+        "possessions": 15,
+        "class_f1": {
+          "H": 0.9584552369806904,
+          "A": 0.9682907965970611,
+          "D": 0.9445187165775399
+        },
+        "changed_frames": 138
+      },
+      {
+        "group": "raw",
+        "power": 1.0,
+        "mode": "replace_dense",
+        "baseline": "macro_v6",
+        "macroF1": 0.9566945086888472,
+        "spellF1": 0.7600000000000001,
+        "possessions": 13,
+        "class_f1": {
+          "H": 0.9563940684187345,
+          "A": 0.9670583702562127,
+          "D": 0.9466310873915944
+        },
+        "changed_frames": 230
+      },
+      {
+        "group": "raw",
+        "power": 1.0,
+        "mode": "quarter",
+        "baseline": "macro_v6",
+        "macroF1": 0.9570882500517638,
+        "spellF1": 0.8749999999999998,
+        "possessions": 15,
+        "class_f1": {
+          "H": 0.9584552369806904,
+          "A": 0.9682907965970611,
+          "D": 0.9445187165775399
+        },
+        "changed_frames": 239
+      },
+      {
+        "group": "raw",
+        "power": 1.0,
+        "mode": "expert",
+        "baseline": "macro_v6",
+        "macroF1": 0.9570882500517638,
+        "spellF1": 0.8749999999999998,
+        "possessions": 15,
+        "class_f1": {
+          "H": 0.9584552369806904,
+          "A": 0.9682907965970611,
+          "D": 0.9445187165775399
+        },
+        "changed_frames": 138
+      },
+      {
+        "group": "motion",
+        "power": 0.5,
+        "mode": "replace_dense",
+        "baseline": "macro_v6",
+        "macroF1": 0.9495175256457161,
+        "spellF1": 0.7529411764705883,
+        "possessions": 17,
+        "class_f1": {
+          "H": 0.9483291623730311,
+          "A": 0.9557046979865772,
+          "D": 0.9445187165775399
+        },
+        "changed_frames": 469
+      },
+      {
+        "group": "motion",
+        "power": 0.5,
+        "mode": "quarter",
+        "baseline": "macro_v6",
+        "macroF1": 0.9544880087823234,
+        "spellF1": 0.7600000000000001,
+        "possessions": 13,
+        "class_f1": {
+          "H": 0.954886113152094,
+          "A": 0.9640591966173362,
+          "D": 0.9445187165775399
+        },
+        "changed_frames": 322
+      },
+      {
+        "group": "motion",
+        "power": 0.5,
+        "mode": "expert",
+        "baseline": "macro_v6",
+        "macroF1": 0.9570882500517638,
+        "spellF1": 0.8749999999999998,
+        "possessions": 15,
+        "class_f1": {
+          "H": 0.9584552369806904,
+          "A": 0.9682907965970611,
+          "D": 0.9445187165775399
+        },
+        "changed_frames": 141
+      },
+      {
+        "group": "motion",
+        "power": 1.0,
+        "mode": "replace_dense",
+        "baseline": "macro_v6",
+        "macroF1": 0.9495175256457161,
+        "spellF1": 0.7529411764705883,
+        "possessions": 17,
+        "class_f1": {
+          "H": 0.9483291623730311,
+          "A": 0.9557046979865772,
+          "D": 0.9445187165775399
+        },
+        "changed_frames": 465
+      },
+      {
+        "group": "motion",
+        "power": 1.0,
+        "mode": "quarter",
+        "baseline": "macro_v6",
+        "macroF1": 0.9544880087823234,
+        "spellF1": 0.7600000000000001,
+        "possessions": 13,
+        "class_f1": {
+          "H": 0.954886113152094,
+          "A": 0.9640591966173362,
+          "D": 0.9445187165775399
+        },
+        "changed_frames": 329
+      },
+      {
+        "group": "motion",
+        "power": 1.0,
+        "mode": "expert",
+        "baseline": "macro_v6",
+        "macroF1": 0.9570882500517638,
+        "spellF1": 0.8749999999999998,
+        "possessions": 15,
+        "class_f1": {
+          "H": 0.9584552369806904,
+          "A": 0.9682907965970611,
+          "D": 0.9445187165775399
+        },
+        "changed_frames": 142
+      }
+    ]
   },
   "validation": {
     "tests_passed": 51,
@@ -3278,5 +3460,38 @@
     "Full-match statistics describe predictions, not evaluated full-match performance.",
     "Rejected pose trials use the corrected held-out stitching protocol. A discarded scratch run had its fold-index variable overwritten; its refit scores are excluded.",
     "Models, crops, features and output labels remain gitignored."
+  ],
+  "document_baseline": "Previous (v5)",
+  "document_ablation": [
+    {
+      "configuration": "Primary before cleanup (v4)",
+      "macroF1": 0.9500025739152121,
+      "spellF1": 0.7529411764705882
+    },
+    {
+      "configuration": "v4 + oscillation removal",
+      "macroF1": 0.9556667008462338,
+      "spellF1": 0.8375
+    },
+    {
+      "configuration": "v4 + short-spell agreement",
+      "macroF1": 0.9503419326369346,
+      "spellF1": 0.788235294117647
+    },
+    {
+      "configuration": "v4 + both temporal steps",
+      "macroF1": 0.9560077294091139,
+      "spellF1": 0.8749999999999998
+    },
+    {
+      "configuration": "v5: temporal + P(D) average",
+      "macroF1": 0.9561298353114885,
+      "spellF1": 0.8749999999999998
+    },
+    {
+      "configuration": "v6: add binary dead-ball head",
+      "macroF1": 0.9570882500517638,
+      "spellF1": 0.8749999999999998
+    }
   ]
 }
