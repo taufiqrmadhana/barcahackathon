@@ -117,7 +117,7 @@ Each head is an imputed, standardised logistic classifier trained on 301 native
 motion ($C=1$, six extra features), then fused-ball crops ($C=3$). An expert
 acts when primary confidence is below 0.8 and its own exceeds 0.9; earlier
 confident choices keep priority and P(D) is preserved. The auxiliary is
-0.5 dense/raw plus 0.5 motion. A binary alive/dead head ($C=1$) uses 28
+0.5 dense/raw plus 0.5 motion. A binary alive/dead head ($C=10$) uses 28
 video, flow, quality and motion features, excluding decoder dead-ball anchors.
 
 For primary $q$, auxiliary $r$ and binary head $d$, fuse only dead-ball probability:
@@ -179,7 +179,7 @@ both models' support and primary H/A labels.}
 \begin{figure*}[!t]
 \centering\includegraphics[width=.98\textwidth]{figures/fold_sensitivity.pdf}
 \caption{Paired repartitions of the same public possessions, refitting all heads.
-Macro-F1 rises at 4/5/6 folds and falls 0.000297 at 3 folds; spell-F1 is unchanged.
+Macro-F1 rises at 4/5 folds, is equal at 6 and falls 0.000190 at 3; spell-F1 is unchanged.
 These are sensitivity checks, not independent test sets.}
 \label{fig:sensitivity}
 \end{figure*}
@@ -242,13 +242,14 @@ the matching held-out head before temporal corrections and public stitching.}
 Spell-F1 averages matching at IoU 0.3/0.4/0.5/0.6/0.7; macro-F1 averages H/A/D.
 The final output has 15 predicted spells: 14 matched, one spurious and three
 GT spells missed at every threshold, giving $2\times14/(15+17)=0.875$.
-H/A/D F1 is 0.958455/0.968291/0.944519; one-second transition F1 is 0.736842.
+H/A/D F1 is 0.958455/0.968889/0.945467; one-second transition F1 is 0.736842.
 
 Figure~\ref{fig:ablation} separates the contributions. Oscillation removal alone
 raises spell-F1 from 0.752941 to 0.837500; both temporal steps reach 0.875000.
-The binary head raises macro-F1 from 0.956130 to \MacroScore{} while keeping
-spell-F1 unchanged. Figure~\ref{fig:sensitivity} shows the gain is not uniform
-across repartitions; away-class F1 also falls from 0.970389 to 0.968291.
+The binary head with $C=1$ reaches 0.957088; $C=10$ corrects three more public
+frames, reaching \MacroScore{} with spell-F1 unchanged. Figure~\ref{fig:sensitivity}
+shows the gain is not uniform
+across repartitions; away-class F1 rises from v6's 0.968291 to 0.968889.
 Denser video, alternate contact rules, pose and binary team heads did not beat
 the retained checkpoint.
 
@@ -273,15 +274,15 @@ better contact localisation and calibrated confidence.
 
 \balance
 \textbf{Reproduction.} The public \file{taufiq} branch at
-\texttt{\CodeRevision} uses \file{src/configs/macro_v6.json} and Python 3.11.
+\texttt{\CodeRevision} uses \file{src/configs/macro_v7.json} and Python 3.11.
 Dependencies are pinned in \file{requirements-src.txt}; CV/FILM use separate
 environments. Prepare the provided bundle and regenerate model/video caches
 first. Commands are in \file{src/README.md}, \file{src/bench/README.md} and
-\file{src/MACRO_V5.md}/\file{src/MACRO_V6.md}.
+\file{src/MACRO_V6.md}/\file{src/MACRO_V7.md}.
 \begin{lstlisting}
 OMP_NUM_THREADS=3 OPENBLAS_NUM_THREADS=3 \
   .venv/bin/python src/run.py \
-  --params src/configs/macro_v6.json --name Borrow_Khan
+  --params src/configs/macro_v7.json --name Borrow_Khan
 .venv/bin/python evaluation/validate_submission.py \
   evaluation/results/Borrow_Khan.csv
 .venv/bin/python evaluation/run_evaluation.py \
@@ -290,11 +291,11 @@ OMP_NUM_THREADS=3 OPENBLAS_NUM_THREADS=3 \
 Expect 199,319 rows; the scorer reads every CSV in its results directory.
 All 51 contract tests passed at this checkpoint. Prototype, builder, production
 and tuner agree on every frame. The full CSV checksum, metrics and asset hashes
-are in \file{src/bench/results/macro_v6_2026-11-17.json}.
+are in \file{src/bench/results/macro_v7_2026-11-17.json}.
 
 \begin{thebibliography}{4}
 \bibitem{challenge} More than a Hack 2027, ``Phase 1: Ball Possession,'' 2026.
-\url{https://github.com/taufiqrmadhana/barcahackathon/tree/8d92c6d}.
+\url{https://github.com/taufiqrmadhana/barcahackathon/tree/0fa7ac2}.
 \bibitem{yolo} Ultralytics, ``YOLO11.'' \url{https://docs.ultralytics.com/models/yolo11/}.
 \bibitem{film} F. Reda et al., ``FILM: Frame Interpolation for Large Motion,'' ECCV, 2022.
 \url{https://github.com/google-research/frame-interpolation}.
