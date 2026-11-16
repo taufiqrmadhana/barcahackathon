@@ -5,10 +5,12 @@ not needed to typeset the document and are never copied into the output archive.
 """
 import argparse
 import hashlib
+import importlib.util
 import json
 from pathlib import Path
 import shutil
 import subprocess
+import sys
 import zipfile
 
 HERE = Path(__file__).resolve().parent
@@ -20,6 +22,7 @@ def main():
     ap = argparse.ArgumentParser(description=__doc__)
     ap.add_argument('--engine', help='path to tectonic or pdflatex')
     ap.add_argument('--out', type=Path, default=HERE / 'build')
+    ap.add_argument('--plot-python', help='Python interpreter with matplotlib installed')
     args = ap.parse_args()
     report = json.loads(REPORT.read_text())
     public = report['checkpoint']['public']
@@ -37,6 +40,18 @@ def main():
     output.mkdir(parents=True, exist_ok=True)
     for name in ('Borrow_Khan.tex', 'team.tex', 'metrics.tex'):
         shutil.copyfile(HERE / name, output / name)
+    plot_python = args.plot_python
+    if not plot_python:
+        if importlib.util.find_spec('matplotlib'):
+            plot_python = sys.executable
+        elif (ROOT / '.venv-cv/bin/python').exists():
+            plot_python = str(ROOT / '.venv-cv/bin/python')
+        else:
+            raise SystemExit('Install src/submission/requirements.txt, or provide --plot-python.')
+    plots = subprocess.run([plot_python, str(HERE / 'figures.py'), '--report', str(REPORT),
+                            '--out', str(output / 'figures')], text=True, capture_output=True)
+    if plots.returncode:
+        raise SystemExit(plots.stdout + plots.stderr)
     local_engine = ROOT / 'cache/document_tools/tectonic'
     engine = (args.engine or shutil.which('tectonic')
               or (str(local_engine) if local_engine.exists() else None)
@@ -61,11 +76,14 @@ def main():
     if not pdf.exists():
         raise SystemExit('Compiler did not produce Borrow_Khan.pdf.')
     with zipfile.ZipFile(output / 'Borrow_Khan_Overleaf.zip', 'w', zipfile.ZIP_DEFLATED) as archive:
-        for name in ('Borrow_Khan.tex', 'team.tex', 'metrics.tex'):
+        for name in ('Borrow_Khan.tex', 'team.tex', 'metrics.tex',
+                     'figures/ablation.pdf', 'figures/fold_sensitivity.pdf',
+                     'figures/match_statistics.pdf', 'figures/data.json'):
             archive.write(output / name, name)
         archive.writestr('README.txt',
             'Main document: Borrow_Khan.tex. Compile with pdfLaTeX.\n'
-            'IEEEtran is included with standard TeX Live/Overleaf.\n'
+            'Four-page visual technical report. Standard TeX Live/Overleaf packages.\n'
+            'Figures are vector PDFs generated from aggregate checkpoint metrics.\n'
             'Edit team.tex for author information. Metrics refer to code b8e4ad0.\n')
     print(f'PDF: {pdf}')
     print(f'Editable source: {output / "Borrow_Khan_Overleaf.zip"}')
