@@ -16,6 +16,10 @@ Macro v2 (**0.9491** / **0.7529**) remains in `configs/macro_v2.json`.
 The previous macro checkpoint (**0.9473** / **0.7647**) is in `configs/macro_v1.json`;
 the retained spell-focused alternative (**0.9355** / **0.7882**) is in `configs/spell_best.json`.
 
+Borrow Khan's three-page submission document and editable IEEE LaTeX source are
+in [submission/](submission/README.md). Its results describe the frozen `b8e4ad0`
+algorithm checkpoint.
+
 The earlier video-gated decoder and bounded dead-ball edges are documented in
 [DECODER_EXPERIMENTS.md](DECODER_EXPERIMENTS.md). Its predecessor is in
 `configs/pre_loose.json`.
