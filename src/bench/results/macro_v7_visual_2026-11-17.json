@@ -1,0 +1,2503 @@
+{
+  "date": "2026-11-17",
+  "baseline_commit": "0fa7ac2",
+  "objective": "macroF1",
+  "selected_on_public": true,
+  "same_public_possessions": true,
+  "private_score_known": false,
+  "default_changed": false,
+  "decision": "Retain macro v7; no DINO candidate beats its corresponding frozen baseline.",
+  "dino_groups": {
+    "dino_bench": {
+      "baseline": {
+        "macro_f1": 0.9570882500517638,
+        "spell_f1_mean": 0.8749999999999998,
+        "n_pred_spells": 15,
+        "n_gt_spells": 17
+      },
+      "results": [
+        {
+          "folds": 5,
+          "crop": "128",
+          "pca_components": 16,
+          "C": 0.3,
+          "mode": "expert",
+          "macroF1": 0.9555050885698221,
+          "spellF1": 0.7600000000000001,
+          "possessions": 13,
+          "per_class": {
+            "H": {
+              "precision": 0.9699225729600953,
+              "recall": 0.9429646786334684,
+              "f1": 0.9562536699941281,
+              "support": 3454
+            },
+            "A": {
+              "precision": 0.9579992363497518,
+              "recall": 0.9736127279782693,
+              "f1": 0.9657428791377982,
+              "support": 2577
+            },
+            "D": {
+              "precision": 0.927774130006566,
+              "recall": 0.9618788291354663,
+              "f1": 0.9445187165775399,
+              "support": 1469
+            }
+          },
+          "changed_frames": 24
+        },
+        {
+          "folds": 5,
+          "crop": "128",
+          "pca_components": 16,
+          "C": 0.3,
+          "mode": "replace_dense",
+          "macroF1": 0.9423274796924805,
+          "spellF1": 0.6266666666666666,
+          "possessions": 13,
+          "per_class": {
+            "H": {
+              "precision": 0.9510966212211025,
+              "recall": 0.9290677475390852,
+              "f1": 0.9399531341534856,
+              "support": 3454
+            },
+            "A": {
+              "precision": 0.9395331037122082,
+              "recall": 0.9526581296080714,
+              "f1": 0.9460500963391137,
+              "support": 2577
+            },
+            "D": {
+              "precision": 0.9272967614011897,
+              "recall": 0.955071477195371,
+              "f1": 0.9409792085848423,
+              "support": 1469
+            }
+          },
+          "changed_frames": 301
+        },
+        {
+          "folds": 5,
+          "crop": "128",
+          "pca_components": 16,
+          "C": 0.3,
+          "mode": "auxiliary",
+          "macroF1": 0.9546496133343257,
+          "spellF1": 0.8375,
+          "possessions": 15,
+          "per_class": {
+            "H": {
+              "precision": 0.966006503103754,
+              "recall": 0.9461493920092646,
+              "f1": 0.9559748427672955,
+              "support": 3454
+            },
+            "A": {
+              "precision": 0.9619815668202765,
+              "recall": 0.9720605355064028,
+              "f1": 0.9669947886508395,
+              "support": 2577
+            },
+            "D": {
+              "precision": 0.9272967614011897,
+              "recall": 0.955071477195371,
+              "f1": 0.9409792085848423,
+              "support": 1469
+            }
+          },
+          "changed_frames": 39
+        },
+        {
+          "folds": 5,
+          "crop": "128",
+          "pca_components": 32,
+          "C": 0.3,
+          "mode": "expert",
+          "macroF1": 0.9555050885698221,
+          "spellF1": 0.7600000000000001,
+          "possessions": 13,
+          "per_class": {
+            "H": {
+              "precision": 0.9699225729600953,
+              "recall": 0.9429646786334684,
+              "f1": 0.9562536699941281,
+              "support": 3454
+            },
+            "A": {
+              "precision": 0.9579992363497518,
+              "recall": 0.9736127279782693,
+              "f1": 0.9657428791377982,
+              "support": 2577
+            },
+            "D": {
+              "precision": 0.927774130006566,
+              "recall": 0.9618788291354663,
+              "f1": 0.9445187165775399,
+              "support": 1469
+            }
+          },
+          "changed_frames": 24
+        },
+        {
+          "folds": 5,
+          "crop": "128",
+          "pca_components": 32,
+          "C": 0.3,
+          "mode": "replace_dense",
+          "macroF1": 0.9431794240590223,
+          "spellF1": 0.6266666666666666,
+          "possessions": 13,
+          "per_class": {
+            "H": {
+              "precision": 0.9538278224605302,
+              "recall": 0.9270411117544876,
+              "f1": 0.9402437233886359,
+              "support": 3454
+            },
+            "A": {
+              "precision": 0.9370229007633588,
+              "recall": 0.9526581296080714,
+              "f1": 0.9447758322108909,
+              "support": 2577
+            },
+            "D": {
+              "precision": 0.927774130006566,
+              "recall": 0.9618788291354663,
+              "f1": 0.9445187165775399,
+              "support": 1469
+            }
+          },
+          "changed_frames": 330
+        },
+        {
+          "folds": 5,
+          "crop": "128",
+          "pca_components": 32,
+          "C": 0.3,
+          "mode": "auxiliary",
+          "macroF1": 0.9561749008586234,
+          "spellF1": 0.8375,
+          "possessions": 15,
+          "per_class": {
+            "H": {
+              "precision": 0.968583283935981,
+              "recall": 0.9461493920092646,
+              "f1": 0.9572349150556532,
+              "support": 3454
+            },
+            "A": {
+              "precision": 0.9616122840690979,
+              "recall": 0.9720605355064028,
+              "f1": 0.9668081821690466,
+              "support": 2577
+            },
+            "D": {
+              "precision": 0.928336620644313,
+              "recall": 0.9611980939414567,
+              "f1": 0.9444816053511705,
+              "support": 1469
+            }
+          },
+          "changed_frames": 33
+        },
+        {
+          "folds": 5,
+          "crop": "320",
+          "pca_components": 16,
+          "C": 0.3,
+          "mode": "expert",
+          "macroF1": 0.9570882500517638,
+          "spellF1": 0.8749999999999998,
+          "possessions": 15,
+          "per_class": {
+            "H": {
+              "precision": 0.9686575990538143,
+              "recall": 0.9484655471916619,
+              "f1": 0.9584552369806904,
+              "support": 3454
+            },
+            "A": {
+              "precision": 0.9649325626204239,
+              "recall": 0.9716724873884361,
+              "f1": 0.9682907965970611,
+              "support": 2577
+            },
+            "D": {
+              "precision": 0.927774130006566,
+              "recall": 0.9618788291354663,
+              "f1": 0.9445187165775399,
+              "support": 1469
+            }
+          },
+          "changed_frames": 49
+        },
+        {
+          "folds": 5,
+          "crop": "320",
+          "pca_components": 16,
+          "C": 0.3,
+          "mode": "replace_dense",
+          "macroF1": 0.9431729009301005,
+          "spellF1": 0.6266666666666666,
+          "possessions": 13,
+          "per_class": {
+            "H": {
+              "precision": 0.9535576064304853,
+              "recall": 0.9273306311522872,
+              "f1": 0.94026126522824,
+              "support": 3454
+            },
+            "A": {
+              "precision": 0.9370229007633588,
+              "recall": 0.9526581296080714,
+              "f1": 0.9447758322108909,
+              "support": 2577
+            },
+            "D": {
+              "precision": 0.928336620644313,
+              "recall": 0.9611980939414567,
+              "f1": 0.9444816053511705,
+              "support": 1469
+            }
+          },
+          "changed_frames": 387
+        },
+        {
+          "folds": 5,
+          "crop": "320",
+          "pca_components": 16,
+          "C": 0.3,
+          "mode": "auxiliary",
+          "macroF1": 0.9546496133343257,
+          "spellF1": 0.8375,
+          "possessions": 15,
+          "per_class": {
+            "H": {
+              "precision": 0.966006503103754,
+              "recall": 0.9461493920092646,
+              "f1": 0.9559748427672955,
+              "support": 3454
+            },
+            "A": {
+              "precision": 0.9619815668202765,
+              "recall": 0.9720605355064028,
+              "f1": 0.9669947886508395,
+              "support": 2577
+            },
+            "D": {
+              "precision": 0.9272967614011897,
+              "recall": 0.955071477195371,
+              "f1": 0.9409792085848423,
+              "support": 1469
+            }
+          },
+          "changed_frames": 43
+        },
+        {
+          "folds": 5,
+          "crop": "320",
+          "pca_components": 32,
+          "C": 0.3,
+          "mode": "expert",
+          "macroF1": 0.9555050885698221,
+          "spellF1": 0.7600000000000001,
+          "possessions": 13,
+          "per_class": {
+            "H": {
+              "precision": 0.9699225729600953,
+              "recall": 0.9429646786334684,
+              "f1": 0.9562536699941281,
+              "support": 3454
+            },
+            "A": {
+              "precision": 0.9579992363497518,
+              "recall": 0.9736127279782693,
+              "f1": 0.9657428791377982,
+              "support": 2577
+            },
+            "D": {
+              "precision": 0.927774130006566,
+              "recall": 0.9618788291354663,
+              "f1": 0.9445187165775399,
+              "support": 1469
+            }
+          },
+          "changed_frames": 141
+        },
+        {
+          "folds": 5,
+          "crop": "320",
+          "pca_components": 32,
+          "C": 0.3,
+          "mode": "replace_dense",
+          "macroF1": 0.9419220649944916,
+          "spellF1": 0.6266666666666666,
+          "possessions": 13,
+          "per_class": {
+            "H": {
+              "precision": 0.9510385756676558,
+              "recall": 0.9279096699478865,
+              "f1": 0.9393317702227432,
+              "support": 3454
+            },
+            "A": {
+              "precision": 0.9377387318563789,
+              "recall": 0.9526581296080714,
+              "f1": 0.9451395572666024,
+              "support": 2577
+            },
+            "D": {
+              "precision": 0.9279100529100529,
+              "recall": 0.955071477195371,
+              "f1": 0.9412948674941294,
+              "support": 1469
+            }
+          },
+          "changed_frames": 335
+        },
+        {
+          "folds": 5,
+          "crop": "320",
+          "pca_components": 32,
+          "C": 0.3,
+          "mode": "auxiliary",
+          "macroF1": 0.9546926308101572,
+          "spellF1": 0.8375,
+          "possessions": 15,
+          "per_class": {
+            "H": {
+              "precision": 0.966006503103754,
+              "recall": 0.9461493920092646,
+              "f1": 0.9559748427672955,
+              "support": 3454
+            },
+            "A": {
+              "precision": 0.9616122840690979,
+              "recall": 0.9720605355064028,
+              "f1": 0.9668081821690466,
+              "support": 2577
+            },
+            "D": {
+              "precision": 0.9279100529100529,
+              "recall": 0.955071477195371,
+              "f1": 0.9412948674941294,
+              "support": 1469
+            }
+          },
+          "changed_frames": 55
+        },
+        {
+          "folds": 5,
+          "crop": "both",
+          "pca_components": 16,
+          "C": 0.3,
+          "mode": "expert",
+          "macroF1": 0.9570882500517638,
+          "spellF1": 0.8749999999999998,
+          "possessions": 15,
+          "per_class": {
+            "H": {
+              "precision": 0.9686575990538143,
+              "recall": 0.9484655471916619,
+              "f1": 0.9584552369806904,
+              "support": 3454
+            },
+            "A": {
+              "precision": 0.9649325626204239,
+              "recall": 0.9716724873884361,
+              "f1": 0.9682907965970611,
+              "support": 2577
+            },
+            "D": {
+              "precision": 0.927774130006566,
+              "recall": 0.9618788291354663,
+              "f1": 0.9445187165775399,
+              "support": 1469
+            }
+          },
+          "changed_frames": 0
+        },
+        {
+          "folds": 5,
+          "crop": "both",
+          "pca_components": 16,
+          "C": 0.3,
+          "mode": "replace_dense",
+          "macroF1": 0.9419220649944916,
+          "spellF1": 0.6266666666666666,
+          "possessions": 13,
+          "per_class": {
+            "H": {
+              "precision": 0.9510385756676558,
+              "recall": 0.9279096699478865,
+              "f1": 0.9393317702227432,
+              "support": 3454
+            },
+            "A": {
+              "precision": 0.9377387318563789,
+              "recall": 0.9526581296080714,
+              "f1": 0.9451395572666024,
+              "support": 2577
+            },
+            "D": {
+              "precision": 0.9279100529100529,
+              "recall": 0.955071477195371,
+              "f1": 0.9412948674941294,
+              "support": 1469
+            }
+          },
+          "changed_frames": 286
+        },
+        {
+          "folds": 5,
+          "crop": "both",
+          "pca_components": 16,
+          "C": 0.3,
+          "mode": "auxiliary",
+          "macroF1": 0.9546926308101572,
+          "spellF1": 0.8375,
+          "possessions": 15,
+          "per_class": {
+            "H": {
+              "precision": 0.966006503103754,
+              "recall": 0.9461493920092646,
+              "f1": 0.9559748427672955,
+              "support": 3454
+            },
+            "A": {
+              "precision": 0.9616122840690979,
+              "recall": 0.9720605355064028,
+              "f1": 0.9668081821690466,
+              "support": 2577
+            },
+            "D": {
+              "precision": 0.9279100529100529,
+              "recall": 0.955071477195371,
+              "f1": 0.9412948674941294,
+              "support": 1469
+            }
+          },
+          "changed_frames": 47
+        },
+        {
+          "folds": 5,
+          "crop": "both",
+          "pca_components": 32,
+          "C": 0.3,
+          "mode": "expert",
+          "macroF1": 0.9555050885698221,
+          "spellF1": 0.7600000000000001,
+          "possessions": 13,
+          "per_class": {
+            "H": {
+              "precision": 0.9699225729600953,
+              "recall": 0.9429646786334684,
+              "f1": 0.9562536699941281,
+              "support": 3454
+            },
+            "A": {
+              "precision": 0.9579992363497518,
+              "recall": 0.9736127279782693,
+              "f1": 0.9657428791377982,
+              "support": 2577
+            },
+            "D": {
+              "precision": 0.927774130006566,
+              "recall": 0.9618788291354663,
+              "f1": 0.9445187165775399,
+              "support": 1469
+            }
+          },
+          "changed_frames": 73
+        },
+        {
+          "folds": 5,
+          "crop": "both",
+          "pca_components": 32,
+          "C": 0.3,
+          "mode": "replace_dense",
+          "macroF1": 0.9435614543652965,
+          "spellF1": 0.6266666666666666,
+          "possessions": 13,
+          "per_class": {
+            "H": {
+              "precision": 0.9538690476190477,
+              "recall": 0.9279096699478865,
+              "f1": 0.9407103023187555,
+              "support": 3454
+            },
+            "A": {
+              "precision": 0.9377387318563789,
+              "recall": 0.9526581296080714,
+              "f1": 0.9451395572666024,
+              "support": 2577
+            },
+            "D": {
+              "precision": 0.9283837056504599,
+              "recall": 0.9618788291354663,
+              "f1": 0.9448345035105316,
+              "support": 1469
+            }
+          },
+          "changed_frames": 353
+        },
+        {
+          "folds": 5,
+          "crop": "both",
+          "pca_components": 32,
+          "C": 0.3,
+          "mode": "auxiliary",
+          "macroF1": 0.9561749008586234,
+          "spellF1": 0.8375,
+          "possessions": 15,
+          "per_class": {
+            "H": {
+              "precision": 0.968583283935981,
+              "recall": 0.9461493920092646,
+              "f1": 0.9572349150556532,
+              "support": 3454
+            },
+            "A": {
+              "precision": 0.9616122840690979,
+              "recall": 0.9720605355064028,
+              "f1": 0.9668081821690466,
+              "support": 2577
+            },
+            "D": {
+              "precision": 0.928336620644313,
+              "recall": 0.9611980939414567,
+              "f1": 0.9444816053511705,
+              "support": 1469
+            }
+          },
+          "changed_frames": 36
+        }
+      ]
+    },
+    "dino_above_v7": {
+      "baseline": {
+        "macro_f1": 0.9576036123814177,
+        "spell_f1_mean": 0.8749999999999998,
+        "n_pred_spells": 15,
+        "n_gt_spells": 17
+      },
+      "results": [
+        {
+          "folds": 5,
+          "pool": "above",
+          "crop": "128",
+          "pca_components": 16,
+          "C": 0.3,
+          "mode": "expert",
+          "macroF1": 0.9576036123814177,
+          "spellF1": 0.8749999999999998,
+          "possessions": 15,
+          "per_class": {
+            "H": {
+              "precision": 0.9686575990538143,
+              "recall": 0.9484655471916619,
+              "f1": 0.9584552369806904,
+              "support": 3454
+            },
+            "A": {
+              "precision": 0.9649730561970746,
+              "recall": 0.972836631742336,
+              "f1": 0.9688888888888889,
+              "support": 2577
+            },
+            "D": {
+              "precision": 0.9296052631578947,
+              "recall": 0.9618788291354663,
+              "f1": 0.9454667112746737,
+              "support": 1469
+            }
+          },
+          "changed_frames": 0
+        },
+        {
+          "folds": 5,
+          "pool": "above",
+          "crop": "128",
+          "pca_components": 16,
+          "C": 0.3,
+          "mode": "replace_dense",
+          "macroF1": 0.9436983500159751,
+          "spellF1": 0.6266666666666666,
+          "possessions": 13,
+          "per_class": {
+            "H": {
+              "precision": 0.9538278224605302,
+              "recall": 0.9270411117544876,
+              "f1": 0.9402437233886359,
+              "support": 3454
+            },
+            "A": {
+              "precision": 0.9370949294700724,
+              "recall": 0.9538222739619713,
+              "f1": 0.9453846153846155,
+              "support": 2577
+            },
+            "D": {
+              "precision": 0.9296052631578947,
+              "recall": 0.9618788291354663,
+              "f1": 0.9454667112746737,
+              "support": 1469
+            }
+          },
+          "changed_frames": 323
+        },
+        {
+          "folds": 5,
+          "pool": "above",
+          "crop": "128",
+          "pca_components": 16,
+          "C": 0.3,
+          "mode": "auxiliary",
+          "macroF1": 0.9551647521469292,
+          "spellF1": 0.8375,
+          "possessions": 15,
+          "per_class": {
+            "H": {
+              "precision": 0.966006503103754,
+              "recall": 0.9461493920092646,
+              "f1": 0.9559748427672955,
+              "support": 3454
+            },
+            "A": {
+              "precision": 0.9620253164556962,
+              "recall": 0.9732246798603027,
+              "f1": 0.9675925925925927,
+              "support": 2577
+            },
+            "D": {
+              "precision": 0.9291390728476822,
+              "recall": 0.955071477195371,
+              "f1": 0.9419268210808996,
+              "support": 1469
+            }
+          },
+          "changed_frames": 63
+        },
+        {
+          "folds": 5,
+          "pool": "above",
+          "crop": "128",
+          "pca_components": 32,
+          "C": 0.3,
+          "mode": "expert",
+          "macroF1": 0.9576036123814177,
+          "spellF1": 0.8749999999999998,
+          "possessions": 15,
+          "per_class": {
+            "H": {
+              "precision": 0.9686575990538143,
+              "recall": 0.9484655471916619,
+              "f1": 0.9584552369806904,
+              "support": 3454
+            },
+            "A": {
+              "precision": 0.9649730561970746,
+              "recall": 0.972836631742336,
+              "f1": 0.9688888888888889,
+              "support": 2577
+            },
+            "D": {
+              "precision": 0.9296052631578947,
+              "recall": 0.9618788291354663,
+              "f1": 0.9454667112746737,
+              "support": 1469
+            }
+          },
+          "changed_frames": 0
+        },
+        {
+          "folds": 5,
+          "pool": "above",
+          "crop": "128",
+          "pca_components": 32,
+          "C": 0.3,
+          "mode": "replace_dense",
+          "macroF1": 0.9558525300396035,
+          "spellF1": 0.7600000000000001,
+          "possessions": 13,
+          "per_class": {
+            "H": {
+              "precision": 0.9687778768956289,
+              "recall": 0.9432541980312681,
+              "f1": 0.9558456799178524,
+              "support": 3454
+            },
+            "A": {
+              "precision": 0.9583651642475172,
+              "recall": 0.9736127279782693,
+              "f1": 0.9659287776708373,
+              "support": 2577
+            },
+            "D": {
+              "precision": 0.9302172481895984,
+              "recall": 0.9618788291354663,
+              "f1": 0.9457831325301205,
+              "support": 1469
+            }
+          },
+          "changed_frames": 202
+        },
+        {
+          "folds": 5,
+          "pool": "above",
+          "crop": "128",
+          "pca_components": 32,
+          "C": 0.3,
+          "mode": "auxiliary",
+          "macroF1": 0.9551647521469292,
+          "spellF1": 0.8375,
+          "possessions": 15,
+          "per_class": {
+            "H": {
+              "precision": 0.966006503103754,
+              "recall": 0.9461493920092646,
+              "f1": 0.9559748427672955,
+              "support": 3454
+            },
+            "A": {
+              "precision": 0.9620253164556962,
+              "recall": 0.9732246798603027,
+              "f1": 0.9675925925925927,
+              "support": 2577
+            },
+            "D": {
+              "precision": 0.9291390728476822,
+              "recall": 0.955071477195371,
+              "f1": 0.9419268210808996,
+              "support": 1469
+            }
+          },
+          "changed_frames": 67
+        },
+        {
+          "folds": 5,
+          "pool": "above",
+          "crop": "320",
+          "pca_components": 16,
+          "C": 0.3,
+          "mode": "expert",
+          "macroF1": 0.9560200206588768,
+          "spellF1": 0.7600000000000001,
+          "possessions": 13,
+          "per_class": {
+            "H": {
+              "precision": 0.9699225729600953,
+              "recall": 0.9429646786334684,
+              "f1": 0.9562536699941281,
+              "support": 3454
+            },
+            "A": {
+              "precision": 0.958047292143402,
+              "recall": 0.9747768723321691,
+              "f1": 0.9663396807078285,
+              "support": 2577
+            },
+            "D": {
+              "precision": 0.9296052631578947,
+              "recall": 0.9618788291354663,
+              "f1": 0.9454667112746737,
+              "support": 1469
+            }
+          },
+          "changed_frames": 25
+        },
+        {
+          "folds": 5,
+          "pool": "above",
+          "crop": "320",
+          "pca_components": 16,
+          "C": 0.3,
+          "mode": "replace_dense",
+          "macroF1": 0.9538665922890684,
+          "spellF1": 0.7600000000000001,
+          "possessions": 13,
+          "per_class": {
+            "H": {
+              "precision": 0.9667063020214031,
+              "recall": 0.9415170816444702,
+              "f1": 0.9539454385450279,
+              "support": 3454
+            },
+            "A": {
+              "precision": 0.9562238294632661,
+              "recall": 0.9747768723321691,
+              "f1": 0.9654112221368178,
+              "support": 2577
+            },
+            "D": {
+              "precision": 0.9297548045062956,
+              "recall": 0.955071477195371,
+              "f1": 0.9422431161853593,
+              "support": 1469
+            }
+          },
+          "changed_frames": 207
+        },
+        {
+          "folds": 5,
+          "pool": "above",
+          "crop": "320",
+          "pca_components": 16,
+          "C": 0.3,
+          "mode": "auxiliary",
+          "macroF1": 0.9555033328211034,
+          "spellF1": 0.85,
+          "possessions": 15,
+          "per_class": {
+            "H": {
+              "precision": 0.9674170616113744,
+              "recall": 0.9455703532136653,
+              "f1": 0.9563689604685213,
+              "support": 3454
+            },
+            "A": {
+              "precision": 0.9613618974751339,
+              "recall": 0.9751649204501358,
+              "f1": 0.9682142169138894,
+              "support": 2577
+            },
+            "D": {
+              "precision": 0.9291390728476822,
+              "recall": 0.955071477195371,
+              "f1": 0.9419268210808996,
+              "support": 1469
+            }
+          },
+          "changed_frames": 48
+        },
+        {
+          "folds": 5,
+          "pool": "above",
+          "crop": "320",
+          "pca_components": 32,
+          "C": 0.3,
+          "mode": "expert",
+          "macroF1": 0.9560200206588768,
+          "spellF1": 0.7600000000000001,
+          "possessions": 13,
+          "per_class": {
+            "H": {
+              "precision": 0.9699225729600953,
+              "recall": 0.9429646786334684,
+              "f1": 0.9562536699941281,
+              "support": 3454
+            },
+            "A": {
+              "precision": 0.958047292143402,
+              "recall": 0.9747768723321691,
+              "f1": 0.9663396807078285,
+              "support": 2577
+            },
+            "D": {
+              "precision": 0.9296052631578947,
+              "recall": 0.9618788291354663,
+              "f1": 0.9454667112746737,
+              "support": 1469
+            }
+          },
+          "changed_frames": 111
+        },
+        {
+          "folds": 5,
+          "pool": "above",
+          "crop": "320",
+          "pca_components": 32,
+          "C": 0.3,
+          "mode": "replace_dense",
+          "macroF1": 0.9402175665946233,
+          "spellF1": 0.6266666666666666,
+          "possessions": 13,
+          "per_class": {
+            "H": {
+              "precision": 0.9453793917921465,
+              "recall": 0.9270411117544876,
+              "f1": 0.936120450226575,
+              "support": 3454
+            },
+            "A": {
+              "precision": 0.9374039938556068,
+              "recall": 0.9472254559565386,
+              "f1": 0.942289133371936,
+              "support": 2577
+            },
+            "D": {
+              "precision": 0.9297548045062956,
+              "recall": 0.955071477195371,
+              "f1": 0.9422431161853593,
+              "support": 1469
+            }
+          },
+          "changed_frames": 415
+        },
+        {
+          "folds": 5,
+          "pool": "above",
+          "crop": "320",
+          "pca_components": 32,
+          "C": 0.3,
+          "mode": "auxiliary",
+          "macroF1": 0.9556009481294331,
+          "spellF1": 0.8375,
+          "possessions": 15,
+          "per_class": {
+            "H": {
+              "precision": 0.9637275140076673,
+              "recall": 0.9461493920092646,
+              "f1": 0.9548575602629658,
+              "support": 3454
+            },
+            "A": {
+              "precision": 0.9649055148476668,
+              "recall": 0.9708963911525029,
+              "f1": 0.9678916827852999,
+              "support": 2577
+            },
+            "D": {
+              "precision": 0.929419525065963,
+              "recall": 0.9591558883594282,
+              "f1": 0.9440536013400336,
+              "support": 1469
+            }
+          },
+          "changed_frames": 54
+        },
+        {
+          "folds": 5,
+          "pool": "above",
+          "crop": "both",
+          "pca_components": 16,
+          "C": 0.3,
+          "mode": "expert",
+          "macroF1": 0.9576036123814177,
+          "spellF1": 0.8749999999999998,
+          "possessions": 15,
+          "per_class": {
+            "H": {
+              "precision": 0.9686575990538143,
+              "recall": 0.9484655471916619,
+              "f1": 0.9584552369806904,
+              "support": 3454
+            },
+            "A": {
+              "precision": 0.9649730561970746,
+              "recall": 0.972836631742336,
+              "f1": 0.9688888888888889,
+              "support": 2577
+            },
+            "D": {
+              "precision": 0.9296052631578947,
+              "recall": 0.9618788291354663,
+              "f1": 0.9454667112746737,
+              "support": 1469
+            }
+          },
+          "changed_frames": 1
+        },
+        {
+          "folds": 5,
+          "pool": "above",
+          "crop": "both",
+          "pca_components": 16,
+          "C": 0.3,
+          "mode": "replace_dense",
+          "macroF1": 0.9542055705448407,
+          "spellF1": 0.7600000000000001,
+          "possessions": 13,
+          "per_class": {
+            "H": {
+              "precision": 0.9667359667359667,
+              "recall": 0.9423856398378692,
+              "f1": 0.9544055123882129,
+              "support": 3454
+            },
+            "A": {
+              "precision": 0.9573170731707317,
+              "recall": 0.9747768723321691,
+              "f1": 0.9659680830609497,
+              "support": 2577
+            },
+            "D": {
+              "precision": 0.9297548045062956,
+              "recall": 0.955071477195371,
+              "f1": 0.9422431161853593,
+              "support": 1469
+            }
+          },
+          "changed_frames": 211
+        },
+        {
+          "folds": 5,
+          "pool": "above",
+          "crop": "both",
+          "pca_components": 16,
+          "C": 0.3,
+          "mode": "auxiliary",
+          "macroF1": 0.9555033328211034,
+          "spellF1": 0.85,
+          "possessions": 15,
+          "per_class": {
+            "H": {
+              "precision": 0.9674170616113744,
+              "recall": 0.9455703532136653,
+              "f1": 0.9563689604685213,
+              "support": 3454
+            },
+            "A": {
+              "precision": 0.9613618974751339,
+              "recall": 0.9751649204501358,
+              "f1": 0.9682142169138894,
+              "support": 2577
+            },
+            "D": {
+              "precision": 0.9291390728476822,
+              "recall": 0.955071477195371,
+              "f1": 0.9419268210808996,
+              "support": 1469
+            }
+          },
+          "changed_frames": 55
+        },
+        {
+          "folds": 5,
+          "pool": "above",
+          "crop": "both",
+          "pca_components": 32,
+          "C": 0.3,
+          "mode": "expert",
+          "macroF1": 0.9576036123814177,
+          "spellF1": 0.8749999999999998,
+          "possessions": 15,
+          "per_class": {
+            "H": {
+              "precision": 0.9686575990538143,
+              "recall": 0.9484655471916619,
+              "f1": 0.9584552369806904,
+              "support": 3454
+            },
+            "A": {
+              "precision": 0.9649730561970746,
+              "recall": 0.972836631742336,
+              "f1": 0.9688888888888889,
+              "support": 2577
+            },
+            "D": {
+              "precision": 0.9296052631578947,
+              "recall": 0.9618788291354663,
+              "f1": 0.9454667112746737,
+              "support": 1469
+            }
+          },
+          "changed_frames": 1
+        },
+        {
+          "folds": 5,
+          "pool": "above",
+          "crop": "both",
+          "pca_components": 32,
+          "C": 0.3,
+          "mode": "replace_dense",
+          "macroF1": 0.948234906104282,
+          "spellF1": 0.7625,
+          "possessions": 15,
+          "per_class": {
+            "H": {
+              "precision": 0.9506713368359603,
+              "recall": 0.9429646786334684,
+              "f1": 0.9468023255813953,
+              "support": 3454
+            },
+            "A": {
+              "precision": 0.9578947368421052,
+              "recall": 0.9534342258440046,
+              "f1": 0.955659276546091,
+              "support": 2577
+            },
+            "D": {
+              "precision": 0.9297548045062956,
+              "recall": 0.955071477195371,
+              "f1": 0.9422431161853593,
+              "support": 1469
+            }
+          },
+          "changed_frames": 321
+        },
+        {
+          "folds": 5,
+          "pool": "above",
+          "crop": "both",
+          "pca_components": 32,
+          "C": 0.3,
+          "mode": "auxiliary",
+          "macroF1": 0.9545180292269352,
+          "spellF1": 0.8375,
+          "possessions": 15,
+          "per_class": {
+            "H": {
+              "precision": 0.9637275140076673,
+              "recall": 0.9461493920092646,
+              "f1": 0.9548575602629658,
+              "support": 3454
+            },
+            "A": {
+              "precision": 0.9626779530588688,
+              "recall": 0.9708963911525029,
+              "f1": 0.9667697063369398,
+              "support": 2577
+            },
+            "D": {
+              "precision": 0.9291390728476822,
+              "recall": 0.955071477195371,
+              "f1": 0.9419268210808996,
+              "support": 1469
+            }
+          },
+          "changed_frames": 74
+        }
+      ]
+    },
+    "dino_pools_v7": {
+      "baseline": {
+        "macro_f1": 0.9576036123814177,
+        "spell_f1_mean": 0.8749999999999998,
+        "n_pred_spells": 15,
+        "n_gt_spells": 17
+      },
+      "results": [
+        {
+          "folds": 5,
+          "pool": "pools",
+          "crop": "128",
+          "pca_components": 16,
+          "C": 0.3,
+          "mode": "expert",
+          "macroF1": 0.9576036123814177,
+          "spellF1": 0.8749999999999998,
+          "possessions": 15,
+          "per_class": {
+            "H": {
+              "precision": 0.9686575990538143,
+              "recall": 0.9484655471916619,
+              "f1": 0.9584552369806904,
+              "support": 3454
+            },
+            "A": {
+              "precision": 0.9649730561970746,
+              "recall": 0.972836631742336,
+              "f1": 0.9688888888888889,
+              "support": 2577
+            },
+            "D": {
+              "precision": 0.9296052631578947,
+              "recall": 0.9618788291354663,
+              "f1": 0.9454667112746737,
+              "support": 1469
+            }
+          },
+          "changed_frames": 0
+        },
+        {
+          "folds": 5,
+          "pool": "pools",
+          "crop": "128",
+          "pca_components": 16,
+          "C": 0.3,
+          "mode": "replace_dense",
+          "macroF1": 0.9425860123480868,
+          "spellF1": 0.6266666666666666,
+          "possessions": 13,
+          "per_class": {
+            "H": {
+              "precision": 0.9493633402428191,
+              "recall": 0.9281991893456861,
+              "f1": 0.938661982140243,
+              "support": 3454
+            },
+            "A": {
+              "precision": 0.9389166346523242,
+              "recall": 0.9483896003104385,
+              "f1": 0.9436293436293437,
+              "support": 2577
+            },
+            "D": {
+              "precision": 0.9296052631578947,
+              "recall": 0.9618788291354663,
+              "f1": 0.9454667112746737,
+              "support": 1469
+            }
+          },
+          "changed_frames": 260
+        },
+        {
+          "folds": 5,
+          "pool": "pools",
+          "crop": "128",
+          "pca_components": 16,
+          "C": 0.3,
+          "mode": "auxiliary",
+          "macroF1": 0.9555036747368187,
+          "spellF1": 0.85,
+          "possessions": 15,
+          "per_class": {
+            "H": {
+              "precision": 0.9668639053254438,
+              "recall": 0.9461493920092646,
+              "f1": 0.9563944980977466,
+              "support": 3454
+            },
+            "A": {
+              "precision": 0.9620689655172414,
+              "recall": 0.9743888242142026,
+              "f1": 0.9681897050318102,
+              "support": 2577
+            },
+            "D": {
+              "precision": 0.9291390728476822,
+              "recall": 0.955071477195371,
+              "f1": 0.9419268210808996,
+              "support": 1469
+            }
+          },
+          "changed_frames": 51
+        },
+        {
+          "folds": 5,
+          "pool": "pools",
+          "crop": "128",
+          "pca_components": 32,
+          "C": 0.3,
+          "mode": "expert",
+          "macroF1": 0.9576036123814177,
+          "spellF1": 0.8749999999999998,
+          "possessions": 15,
+          "per_class": {
+            "H": {
+              "precision": 0.9686575990538143,
+              "recall": 0.9484655471916619,
+              "f1": 0.9584552369806904,
+              "support": 3454
+            },
+            "A": {
+              "precision": 0.9649730561970746,
+              "recall": 0.972836631742336,
+              "f1": 0.9688888888888889,
+              "support": 2577
+            },
+            "D": {
+              "precision": 0.9296052631578947,
+              "recall": 0.9618788291354663,
+              "f1": 0.9454667112746737,
+              "support": 1469
+            }
+          },
+          "changed_frames": 0
+        },
+        {
+          "folds": 5,
+          "pool": "pools",
+          "crop": "128",
+          "pca_components": 32,
+          "C": 0.3,
+          "mode": "replace_dense",
+          "macroF1": 0.9422838337467855,
+          "spellF1": 0.6266666666666666,
+          "possessions": 13,
+          "per_class": {
+            "H": {
+              "precision": 0.9510240427426536,
+              "recall": 0.9276201505500868,
+              "f1": 0.9391763154037813,
+              "support": 3454
+            },
+            "A": {
+              "precision": 0.9378099961846623,
+              "recall": 0.9538222739619713,
+              "f1": 0.9457483647556753,
+              "support": 2577
+            },
+            "D": {
+              "precision": 0.9291390728476822,
+              "recall": 0.955071477195371,
+              "f1": 0.9419268210808996,
+              "support": 1469
+            }
+          },
+          "changed_frames": 224
+        },
+        {
+          "folds": 5,
+          "pool": "pools",
+          "crop": "128",
+          "pca_components": 32,
+          "C": 0.3,
+          "mode": "auxiliary",
+          "macroF1": 0.9551647521469292,
+          "spellF1": 0.8375,
+          "possessions": 15,
+          "per_class": {
+            "H": {
+              "precision": 0.966006503103754,
+              "recall": 0.9461493920092646,
+              "f1": 0.9559748427672955,
+              "support": 3454
+            },
+            "A": {
+              "precision": 0.9620253164556962,
+              "recall": 0.9732246798603027,
+              "f1": 0.9675925925925927,
+              "support": 2577
+            },
+            "D": {
+              "precision": 0.9291390728476822,
+              "recall": 0.955071477195371,
+              "f1": 0.9419268210808996,
+              "support": 1469
+            }
+          },
+          "changed_frames": 55
+        },
+        {
+          "folds": 5,
+          "pool": "pools",
+          "crop": "320",
+          "pca_components": 16,
+          "C": 0.3,
+          "mode": "expert",
+          "macroF1": 0.9576036123814177,
+          "spellF1": 0.8749999999999998,
+          "possessions": 15,
+          "per_class": {
+            "H": {
+              "precision": 0.9686575990538143,
+              "recall": 0.9484655471916619,
+              "f1": 0.9584552369806904,
+              "support": 3454
+            },
+            "A": {
+              "precision": 0.9649730561970746,
+              "recall": 0.972836631742336,
+              "f1": 0.9688888888888889,
+              "support": 2577
+            },
+            "D": {
+              "precision": 0.9296052631578947,
+              "recall": 0.9618788291354663,
+              "f1": 0.9454667112746737,
+              "support": 1469
+            }
+          },
+          "changed_frames": 1
+        },
+        {
+          "folds": 5,
+          "pool": "pools",
+          "crop": "320",
+          "pca_components": 16,
+          "C": 0.3,
+          "mode": "replace_dense",
+          "macroF1": 0.9541467862291014,
+          "spellF1": 0.7600000000000001,
+          "possessions": 13,
+          "per_class": {
+            "H": {
+              "precision": 0.9670231729055259,
+              "recall": 0.9423856398378692,
+              "f1": 0.9545454545454546,
+              "support": 3454
+            },
+            "A": {
+              "precision": 0.9573170731707317,
+              "recall": 0.9747768723321691,
+              "f1": 0.9659680830609497,
+              "support": 2577
+            },
+            "D": {
+              "precision": 0.9291390728476822,
+              "recall": 0.955071477195371,
+              "f1": 0.9419268210808996,
+              "support": 1469
+            }
+          },
+          "changed_frames": 254
+        },
+        {
+          "folds": 5,
+          "pool": "pools",
+          "crop": "320",
+          "pca_components": 16,
+          "C": 0.3,
+          "mode": "auxiliary",
+          "macroF1": 0.9555033328211034,
+          "spellF1": 0.85,
+          "possessions": 15,
+          "per_class": {
+            "H": {
+              "precision": 0.9674170616113744,
+              "recall": 0.9455703532136653,
+              "f1": 0.9563689604685213,
+              "support": 3454
+            },
+            "A": {
+              "precision": 0.9613618974751339,
+              "recall": 0.9751649204501358,
+              "f1": 0.9682142169138894,
+              "support": 2577
+            },
+            "D": {
+              "precision": 0.9291390728476822,
+              "recall": 0.955071477195371,
+              "f1": 0.9419268210808996,
+              "support": 1469
+            }
+          },
+          "changed_frames": 55
+        },
+        {
+          "folds": 5,
+          "pool": "pools",
+          "crop": "320",
+          "pca_components": 32,
+          "C": 0.3,
+          "mode": "expert",
+          "macroF1": 0.9503791132368655,
+          "spellF1": 0.675,
+          "possessions": 15,
+          "per_class": {
+            "H": {
+              "precision": 0.9694679564691656,
+              "recall": 0.9284887087434858,
+              "f1": 0.9485359361135758,
+              "support": 3454
+            },
+            "A": {
+              "precision": 0.9401197604790419,
+              "recall": 0.9747768723321691,
+              "f1": 0.957134692322347,
+              "support": 2577
+            },
+            "D": {
+              "precision": 0.9296052631578947,
+              "recall": 0.9618788291354663,
+              "f1": 0.9454667112746737,
+              "support": 1469
+            }
+          },
+          "changed_frames": 75
+        },
+        {
+          "folds": 5,
+          "pool": "pools",
+          "crop": "320",
+          "pca_components": 32,
+          "C": 0.3,
+          "mode": "replace_dense",
+          "macroF1": 0.948348471848823,
+          "spellF1": 0.7625,
+          "possessions": 15,
+          "per_class": {
+            "H": {
+              "precision": 0.950948905109489,
+              "recall": 0.9429646786334684,
+              "f1": 0.9469399622038087,
+              "support": 3454
+            },
+            "A": {
+              "precision": 0.9579111457521434,
+              "recall": 0.9538222739619713,
+              "f1": 0.9558623371573012,
+              "support": 2577
+            },
+            "D": {
+              "precision": 0.9297548045062956,
+              "recall": 0.955071477195371,
+              "f1": 0.9422431161853593,
+              "support": 1469
+            }
+          },
+          "changed_frames": 267
+        },
+        {
+          "folds": 5,
+          "pool": "pools",
+          "crop": "320",
+          "pca_components": 32,
+          "C": 0.3,
+          "mode": "auxiliary",
+          "macroF1": 0.9551647521469292,
+          "spellF1": 0.8375,
+          "possessions": 15,
+          "per_class": {
+            "H": {
+              "precision": 0.966006503103754,
+              "recall": 0.9461493920092646,
+              "f1": 0.9559748427672955,
+              "support": 3454
+            },
+            "A": {
+              "precision": 0.9620253164556962,
+              "recall": 0.9732246798603027,
+              "f1": 0.9675925925925927,
+              "support": 2577
+            },
+            "D": {
+              "precision": 0.9291390728476822,
+              "recall": 0.955071477195371,
+              "f1": 0.9419268210808996,
+              "support": 1469
+            }
+          },
+          "changed_frames": 50
+        },
+        {
+          "folds": 5,
+          "pool": "pools",
+          "crop": "both",
+          "pca_components": 16,
+          "C": 0.3,
+          "mode": "expert",
+          "macroF1": 0.9576036123814177,
+          "spellF1": 0.8749999999999998,
+          "possessions": 15,
+          "per_class": {
+            "H": {
+              "precision": 0.9686575990538143,
+              "recall": 0.9484655471916619,
+              "f1": 0.9584552369806904,
+              "support": 3454
+            },
+            "A": {
+              "precision": 0.9649730561970746,
+              "recall": 0.972836631742336,
+              "f1": 0.9688888888888889,
+              "support": 2577
+            },
+            "D": {
+              "precision": 0.9296052631578947,
+              "recall": 0.9618788291354663,
+              "f1": 0.9454667112746737,
+              "support": 1469
+            }
+          },
+          "changed_frames": 1
+        },
+        {
+          "folds": 5,
+          "pool": "pools",
+          "crop": "both",
+          "pca_components": 16,
+          "C": 0.3,
+          "mode": "replace_dense",
+          "macroF1": 0.9540338547461146,
+          "spellF1": 0.7600000000000001,
+          "possessions": 13,
+          "per_class": {
+            "H": {
+              "precision": 0.9667359667359667,
+              "recall": 0.9423856398378692,
+              "f1": 0.9544055123882129,
+              "support": 3454
+            },
+            "A": {
+              "precision": 0.9573008006099886,
+              "recall": 0.9743888242142026,
+              "f1": 0.9657692307692308,
+              "support": 2577
+            },
+            "D": {
+              "precision": 0.9291390728476822,
+              "recall": 0.955071477195371,
+              "f1": 0.9419268210808996,
+              "support": 1469
+            }
+          },
+          "changed_frames": 232
+        },
+        {
+          "folds": 5,
+          "pool": "pools",
+          "crop": "both",
+          "pca_components": 16,
+          "C": 0.3,
+          "mode": "auxiliary",
+          "macroF1": 0.9555033328211034,
+          "spellF1": 0.85,
+          "possessions": 15,
+          "per_class": {
+            "H": {
+              "precision": 0.9674170616113744,
+              "recall": 0.9455703532136653,
+              "f1": 0.9563689604685213,
+              "support": 3454
+            },
+            "A": {
+              "precision": 0.9613618974751339,
+              "recall": 0.9751649204501358,
+              "f1": 0.9682142169138894,
+              "support": 2577
+            },
+            "D": {
+              "precision": 0.9291390728476822,
+              "recall": 0.955071477195371,
+              "f1": 0.9419268210808996,
+              "support": 1469
+            }
+          },
+          "changed_frames": 55
+        },
+        {
+          "folds": 5,
+          "pool": "pools",
+          "crop": "both",
+          "pca_components": 32,
+          "C": 0.3,
+          "mode": "expert",
+          "macroF1": 0.9560200206588768,
+          "spellF1": 0.7600000000000001,
+          "possessions": 13,
+          "per_class": {
+            "H": {
+              "precision": 0.9699225729600953,
+              "recall": 0.9429646786334684,
+              "f1": 0.9562536699941281,
+              "support": 3454
+            },
+            "A": {
+              "precision": 0.958047292143402,
+              "recall": 0.9747768723321691,
+              "f1": 0.9663396807078285,
+              "support": 2577
+            },
+            "D": {
+              "precision": 0.9296052631578947,
+              "recall": 0.9618788291354663,
+              "f1": 0.9454667112746737,
+              "support": 1469
+            }
+          },
+          "changed_frames": 25
+        },
+        {
+          "folds": 5,
+          "pool": "pools",
+          "crop": "both",
+          "pca_components": 32,
+          "C": 0.3,
+          "mode": "replace_dense",
+          "macroF1": 0.9365701562447688,
+          "spellF1": 0.6375,
+          "possessions": 15,
+          "per_class": {
+            "H": {
+              "precision": 0.9360210341805434,
+              "recall": 0.9276201505500868,
+              "f1": 0.9318016576995783,
+              "support": 3454
+            },
+            "A": {
+              "precision": 0.9373052959501558,
+              "recall": 0.9340318199456733,
+              "f1": 0.9356656948493685,
+              "support": 2577
+            },
+            "D": {
+              "precision": 0.9297548045062956,
+              "recall": 0.955071477195371,
+              "f1": 0.9422431161853593,
+              "support": 1469
+            }
+          },
+          "changed_frames": 397
+        },
+        {
+          "folds": 5,
+          "pool": "pools",
+          "crop": "both",
+          "pca_components": 32,
+          "C": 0.3,
+          "mode": "auxiliary",
+          "macroF1": 0.9545180292269352,
+          "spellF1": 0.8375,
+          "possessions": 15,
+          "per_class": {
+            "H": {
+              "precision": 0.9637275140076673,
+              "recall": 0.9461493920092646,
+              "f1": 0.9548575602629658,
+              "support": 3454
+            },
+            "A": {
+              "precision": 0.9626779530588688,
+              "recall": 0.9708963911525029,
+              "f1": 0.9667697063369398,
+              "support": 2577
+            },
+            "D": {
+              "precision": 0.9291390728476822,
+              "recall": 0.955071477195371,
+              "f1": 0.9419268210808996,
+              "support": 1469
+            }
+          },
+          "changed_frames": 62
+        }
+      ]
+    },
+    "dino_full_cls_v7": {
+      "baseline": {
+        "macro_f1": 0.9576036123814177,
+        "spell_f1_mean": 0.8749999999999998,
+        "n_pred_spells": 15,
+        "n_gt_spells": 17
+      },
+      "results": [
+        {
+          "folds": 5,
+          "pool": "cls",
+          "crop": "128",
+          "pca_components": 0,
+          "C": 0.03,
+          "mode": "expert",
+          "macroF1": 0.9450527899313649,
+          "spellF1": 0.6266666666666666,
+          "possessions": 13,
+          "per_class": {
+            "H": {
+              "precision": 0.9550728949717346,
+              "recall": 0.9293572669368848,
+              "f1": 0.9420396184886282,
+              "support": 3454
+            },
+            "A": {
+              "precision": 0.9400534555173731,
+              "recall": 0.9553744664338378,
+              "f1": 0.947652040030793,
+              "support": 2577
+            },
+            "D": {
+              "precision": 0.9296052631578947,
+              "recall": 0.9618788291354663,
+              "f1": 0.9454667112746737,
+              "support": 1469
+            }
+          },
+          "changed_frames": 190
+        },
+        {
+          "folds": 5,
+          "pool": "cls",
+          "crop": "128",
+          "pca_components": 0,
+          "C": 0.03,
+          "mode": "replace_dense",
+          "macroF1": 0.9363947148088014,
+          "spellF1": 0.6,
+          "possessions": 15,
+          "per_class": {
+            "H": {
+              "precision": 0.9345359324992726,
+              "recall": 0.9299363057324841,
+              "f1": 0.9322304455086344,
+              "support": 3454
+            },
+            "A": {
+              "precision": 0.9389193422083008,
+              "recall": 0.9305393868839736,
+              "f1": 0.9347105827324108,
+              "support": 2577
+            },
+            "D": {
+              "precision": 0.9297548045062956,
+              "recall": 0.955071477195371,
+              "f1": 0.9422431161853593,
+              "support": 1469
+            }
+          },
+          "changed_frames": 495
+        },
+        {
+          "folds": 5,
+          "pool": "cls",
+          "crop": "128",
+          "pca_components": 0,
+          "C": 0.03,
+          "mode": "auxiliary",
+          "macroF1": 0.9518828591412235,
+          "spellF1": 0.7882352941176471,
+          "possessions": 17,
+          "per_class": {
+            "H": {
+              "precision": 0.9577960140679953,
+              "recall": 0.9461493920092646,
+              "f1": 0.9519370812700262,
+              "support": 3454
+            },
+            "A": {
+              "precision": 0.9615981380915438,
+              "recall": 0.9619712844392705,
+              "f1": 0.9617846750727449,
+              "support": 2577
+            },
+            "D": {
+              "precision": 0.9291390728476822,
+              "recall": 0.955071477195371,
+              "f1": 0.9419268210808996,
+              "support": 1469
+            }
+          },
+          "changed_frames": 76
+        },
+        {
+          "folds": 5,
+          "pool": "cls",
+          "crop": "320",
+          "pca_components": 0,
+          "C": 0.03,
+          "mode": "expert",
+          "macroF1": 0.9507169906770864,
+          "spellF1": 0.675,
+          "possessions": 15,
+          "per_class": {
+            "H": {
+              "precision": 0.9694956206584113,
+              "recall": 0.9293572669368848,
+              "f1": 0.9490022172949003,
+              "support": 3454
+            },
+            "A": {
+              "precision": 0.9411764705882353,
+              "recall": 0.9747768723321691,
+              "f1": 0.957682043461685,
+              "support": 2577
+            },
+            "D": {
+              "precision": 0.9296052631578947,
+              "recall": 0.9618788291354663,
+              "f1": 0.9454667112746737,
+              "support": 1469
+            }
+          },
+          "changed_frames": 121
+        },
+        {
+          "folds": 5,
+          "pool": "cls",
+          "crop": "320",
+          "pca_components": 0,
+          "C": 0.03,
+          "mode": "replace_dense",
+          "macroF1": 0.9424156978463324,
+          "spellF1": 0.6266666666666666,
+          "possessions": 13,
+          "per_class": {
+            "H": {
+              "precision": 0.9513785947227987,
+              "recall": 0.9290677475390852,
+              "f1": 0.940090815878131,
+              "support": 3454
+            },
+            "A": {
+              "precision": 0.9382151029748284,
+              "recall": 0.9545983701979045,
+              "f1": 0.9463358338141951,
+              "support": 2577
+            },
+            "D": {
+              "precision": 0.9295681063122924,
+              "recall": 0.9523485364193329,
+              "f1": 0.9408204438466713,
+              "support": 1469
+            }
+          },
+          "changed_frames": 397
+        },
+        {
+          "folds": 5,
+          "pool": "cls",
+          "crop": "320",
+          "pca_components": 0,
+          "C": 0.03,
+          "mode": "auxiliary",
+          "macroF1": 0.9551647521469292,
+          "spellF1": 0.8375,
+          "possessions": 15,
+          "per_class": {
+            "H": {
+              "precision": 0.966006503103754,
+              "recall": 0.9461493920092646,
+              "f1": 0.9559748427672955,
+              "support": 3454
+            },
+            "A": {
+              "precision": 0.9620253164556962,
+              "recall": 0.9732246798603027,
+              "f1": 0.9675925925925927,
+              "support": 2577
+            },
+            "D": {
+              "precision": 0.9291390728476822,
+              "recall": 0.955071477195371,
+              "f1": 0.9419268210808996,
+              "support": 1469
+            }
+          },
+          "changed_frames": 73
+        }
+      ]
+    },
+    "dino_full_above_v7": {
+      "baseline": {
+        "macro_f1": 0.9576036123814177,
+        "spell_f1_mean": 0.8749999999999998,
+        "n_pred_spells": 15,
+        "n_gt_spells": 17
+      },
+      "results": [
+        {
+          "folds": 5,
+          "pool": "above",
+          "crop": "128",
+          "pca_components": 0,
+          "C": 0.03,
+          "mode": "expert",
+          "macroF1": 0.9462862426546043,
+          "spellF1": 0.7500000000000001,
+          "possessions": 15,
+          "per_class": {
+            "H": {
+              "precision": 0.9538734476641041,
+              "recall": 0.9339895773016792,
+              "f1": 0.9438267992978351,
+              "support": 3454
+            },
+            "A": {
+              "precision": 0.9457274826789839,
+              "recall": 0.9534342258440046,
+              "f1": 0.9495652173913043,
+              "support": 2577
+            },
+            "D": {
+              "precision": 0.9296052631578947,
+              "recall": 0.9618788291354663,
+              "f1": 0.9454667112746737,
+              "support": 1469
+            }
+          },
+          "changed_frames": 100
+        },
+        {
+          "folds": 5,
+          "pool": "above",
+          "crop": "128",
+          "pca_components": 0,
+          "C": 0.03,
+          "mode": "replace_dense",
+          "macroF1": 0.9400202464072707,
+          "spellF1": 0.5875,
+          "possessions": 15,
+          "per_class": {
+            "H": {
+              "precision": 0.9454438218814509,
+              "recall": 0.9281991893456861,
+              "f1": 0.9367421475529584,
+              "support": 3454
+            },
+            "A": {
+              "precision": 0.936367142306209,
+              "recall": 0.9421808304229724,
+              "f1": 0.93926499032882,
+              "support": 2577
+            },
+            "D": {
+              "precision": 0.929419525065963,
+              "recall": 0.9591558883594282,
+              "f1": 0.9440536013400336,
+              "support": 1469
+            }
+          },
+          "changed_frames": 341
+        },
+        {
+          "folds": 5,
+          "pool": "above",
+          "crop": "128",
+          "pca_components": 0,
+          "C": 0.03,
+          "mode": "auxiliary",
+          "macroF1": 0.9508894322342933,
+          "spellF1": 0.7882352941176471,
+          "possessions": 17,
+          "per_class": {
+            "H": {
+              "precision": 0.9555555555555556,
+              "recall": 0.9461493920092646,
+              "f1": 0.9508292115216759,
+              "support": 3454
+            },
+            "A": {
+              "precision": 0.9622274143302181,
+              "recall": 0.9588668994955375,
+              "f1": 0.9605442176870749,
+              "support": 2577
+            },
+            "D": {
+              "precision": 0.9279100529100529,
+              "recall": 0.955071477195371,
+              "f1": 0.9412948674941294,
+              "support": 1469
+            }
+          },
+          "changed_frames": 99
+        },
+        {
+          "folds": 5,
+          "pool": "above",
+          "crop": "320",
+          "pca_components": 0,
+          "C": 0.03,
+          "mode": "expert",
+          "macroF1": 0.9560200206588768,
+          "spellF1": 0.7600000000000001,
+          "possessions": 13,
+          "per_class": {
+            "H": {
+              "precision": 0.9699225729600953,
+              "recall": 0.9429646786334684,
+              "f1": 0.9562536699941281,
+              "support": 3454
+            },
+            "A": {
+              "precision": 0.958047292143402,
+              "recall": 0.9747768723321691,
+              "f1": 0.9663396807078285,
+              "support": 2577
+            },
+            "D": {
+              "precision": 0.9296052631578947,
+              "recall": 0.9618788291354663,
+              "f1": 0.9454667112746737,
+              "support": 1469
+            }
+          },
+          "changed_frames": 111
+        },
+        {
+          "folds": 5,
+          "pool": "above",
+          "crop": "320",
+          "pca_components": 0,
+          "C": 0.03,
+          "mode": "replace_dense",
+          "macroF1": 0.93929943019186,
+          "spellF1": 0.5875,
+          "possessions": 15,
+          "per_class": {
+            "H": {
+              "precision": 0.9432686654908877,
+              "recall": 0.9290677475390852,
+              "f1": 0.9361143523920654,
+              "support": 3454
+            },
+            "A": {
+              "precision": 0.9378858024691358,
+              "recall": 0.9433449747768723,
+              "f1": 0.9406074675952796,
+              "support": 2577
+            },
+            "D": {
+              "precision": 0.9296148738379814,
+              "recall": 0.9530292716133424,
+              "f1": 0.9411764705882352,
+              "support": 1469
+            }
+          },
+          "changed_frames": 403
+        },
+        {
+          "folds": 5,
+          "pool": "above",
+          "crop": "320",
+          "pca_components": 0,
+          "C": 0.03,
+          "mode": "auxiliary",
+          "macroF1": 0.9551647521469292,
+          "spellF1": 0.8375,
+          "possessions": 15,
+          "per_class": {
+            "H": {
+              "precision": 0.966006503103754,
+              "recall": 0.9461493920092646,
+              "f1": 0.9559748427672955,
+              "support": 3454
+            },
+            "A": {
+              "precision": 0.9620253164556962,
+              "recall": 0.9732246798603027,
+              "f1": 0.9675925925925927,
+              "support": 2577
+            },
+            "D": {
+              "precision": 0.9291390728476822,
+              "recall": 0.955071477195371,
+              "f1": 0.9419268210808996,
+              "support": 1469
+            }
+          },
+          "changed_frames": 74
+        }
+      ]
+    }
+  },
+  "dead_calibration": {
+    "results": [
+      {
+        "family": "sigmoid1",
+        "calibration_fraction": 0.5,
+        "baseline": "macro_v7",
+        "macroF1": 0.9521568850115206,
+        "spellF1": 0.8235294117647058,
+        "possessions": 17,
+        "class_f1": {
+          "H": 0.9530181818181819,
+          "A": 0.9624732646315379,
+          "D": 0.9409792085848423
+        },
+        "changed_frames": 145
+      },
+      {
+        "family": "sigmoid1",
+        "calibration_fraction": 1.0,
+        "baseline": "macro_v7",
+        "macroF1": 0.9523214382433647,
+        "spellF1": 0.8235294117647058,
+        "possessions": 17,
+        "class_f1": {
+          "H": 0.9531568228105907,
+          "A": 0.9624732646315379,
+          "D": 0.9413342272879652
+        },
+        "changed_frames": 92
+      },
+      {
+        "family": "sigmoid1000",
+        "calibration_fraction": 0.5,
+        "baseline": "macro_v7",
+        "macroF1": 0.9521568850115206,
+        "spellF1": 0.8235294117647058,
+        "possessions": 17,
+        "class_f1": {
+          "H": 0.9530181818181819,
+          "A": 0.9624732646315379,
+          "D": 0.9409792085848423
+        },
+        "changed_frames": 145
+      },
+      {
+        "family": "sigmoid1000",
+        "calibration_fraction": 1.0,
+        "baseline": "macro_v7",
+        "macroF1": 0.9523214382433647,
+        "spellF1": 0.8235294117647058,
+        "possessions": 17,
+        "class_f1": {
+          "H": 0.9531568228105907,
+          "A": 0.9624732646315379,
+          "D": 0.9413342272879652
+        },
+        "changed_frames": 92
+      },
+      {
+        "family": "isotonic",
+        "calibration_fraction": 0.5,
+        "baseline": "macro_v7",
+        "macroF1": 0.9537994635105763,
+        "spellF1": 0.8235294117647058,
+        "possessions": 17,
+        "class_f1": {
+          "H": 0.9544064093226511,
+          "A": 0.9624732646315379,
+          "D": 0.9445187165775399
+        },
+        "changed_frames": 158
+      },
+      {
+        "family": "isotonic",
+        "calibration_fraction": 1.0,
+        "baseline": "macro_v7",
+        "macroF1": 0.954006259650757,
+        "spellF1": 0.8235294117647058,
+        "possessions": 17,
+        "class_f1": {
+          "H": 0.9545454545454546,
+          "A": 0.9622861586314152,
+          "D": 0.9451871657754011
+        },
+        "changed_frames": 105
+      }
+    ],
+    "diagnostics": [
+      {
+        "head": -1,
+        "family": "sigmoid1",
+        "slope": 0.23034152405666744,
+        "inner_rows": 301
+      },
+      {
+        "head": -1,
+        "family": "sigmoid1000",
+        "slope": 0.23062737187322085,
+        "inner_rows": 301
+      },
+      {
+        "head": -1,
+        "family": "isotonic",
+        "slope": null,
+        "inner_rows": 301
+      },
+      {
+        "head": 0,
+        "family": "sigmoid1",
+        "slope": 0.21213006764072978,
+        "inner_rows": 236
+      },
+      {
+        "head": 0,
+        "family": "sigmoid1000",
+        "slope": 0.21239748037323303,
+        "inner_rows": 236
+      },
+      {
+        "head": 0,
+        "family": "isotonic",
+        "slope": null,
+        "inner_rows": 236
+      },
+      {
+        "head": 1,
+        "family": "sigmoid1",
+        "slope": 0.07500064955910983,
+        "inner_rows": 231
+      },
+      {
+        "head": 1,
+        "family": "sigmoid1000",
+        "slope": 0.07513661853848196,
+        "inner_rows": 231
+      },
+      {
+        "head": 1,
+        "family": "isotonic",
+        "slope": null,
+        "inner_rows": 231
+      },
+      {
+        "head": 2,
+        "family": "sigmoid1",
+        "slope": 0.2062152666136631,
+        "inner_rows": 231
+      },
+      {
+        "head": 2,
+        "family": "sigmoid1000",
+        "slope": 0.20650120739480257,
+        "inner_rows": 231
+      },
+      {
+        "head": 2,
+        "family": "isotonic",
+        "slope": null,
+        "inner_rows": 231
+      },
+      {
+        "head": 3,
+        "family": "sigmoid1",
+        "slope": 0.25131639079369655,
+        "inner_rows": 231
+      },
+      {
+        "head": 3,
+        "family": "sigmoid1000",
+        "slope": 0.25178003576654906,
+        "inner_rows": 231
+      },
+      {
+        "head": 3,
+        "family": "isotonic",
+        "slope": null,
+        "inner_rows": 231
+      },
+      {
+        "head": 4,
+        "family": "sigmoid1",
+        "slope": 0.2861100561856475,
+        "inner_rows": 235
+      },
+      {
+        "head": 4,
+        "family": "sigmoid1000",
+        "slope": 0.2868886200384984,
+        "inner_rows": 235
+      },
+      {
+        "head": 4,
+        "family": "isotonic",
+        "slope": null,
+        "inner_rows": 235
+      }
+    ]
+  },
+  "extraction": {
+    "dino_5hz": {
+      "version": 1,
+      "backbone": "dinov2_vits14",
+      "model_revision": "7764ea0f912e53c92e82eb78a2a1631e92725fc8",
+      "model_sha256": "b938bf1bc15cd2ec0feacfe3a1bb553fe8ea9ca46a7e1d8d00217f29aef60cd9",
+      "model_source": "https://github.com/facebookresearch/dinov2",
+      "raw_ball_sha256": "81040b87ba3b71bbc847396035b8b1b82b0d58ab59b301efc6af9d1da6bbd0e2",
+      "crop_ball_sha256": "fe31bca8048c63663c87ccd7b997ecfcb48fdbe916ddf9926a3fd6732afd841d",
+      "frame_plan_sha256": "32d5aea1683b351bebde5cd6719db2829134bb2a5c74bc42f8aeb2ae46f2dcb5",
+      "camera_params": {
+        "max_gap": 25,
+        "w_ball": 1.0,
+        "w_filled": 0.5,
+        "control_radius": 2.5,
+        "margin_scale": 2.0,
+        "w_tag": 0.0,
+        "w_sp_dead": 0.6,
+        "sp_dead_frames": 50,
+        "w_sp_team": 0.6,
+        "w_outside": 2.0,
+        "dead_gap": 75,
+        "w_missing": 0.3,
+        "slow_speed": 1.5,
+        "w_slow": 0.6,
+        "w_missing_slow": 0.8,
+        "alive_ball_speed": 4.0,
+        "w_alive": 0.5,
+        "d_bias": -0.1,
+        "switch_cost": 20.0,
+        "dead_cost": 20.0,
+        "err_scale": 1.0,
+        "pan_window": 25,
+        "z_slow": -0.3,
+        "z_temp": 0.3,
+        "w_slow_z": 0.4,
+        "team_gate": 0.5,
+        "w_cam_still": 0.2,
+        "cam_still_speed": 0.5,
+        "w_memory": 0.6,
+        "edge_margin": 2.0,
+        "restart_speed": 8.0,
+        "restart_min_delay": 50,
+        "memory_max": 1500,
+        "sp_pre_frames": 50
+      },
+      "ball_source": "fused_full",
+      "crops": [
+        128,
+        320
+      ],
+      "input_size": 224,
+      "embedding_size": 384,
+      "colour": "RGB",
+      "normalisation": "ImageNet mean/std",
+      "video_frames": 199319,
+      "video_size": [
+        1920,
+        1080
+      ],
+      "public_gt_used": false
+    },
+    "dino_tokens_5hz": {
+      "version": 2,
+      "backbone": "dinov2_vits14",
+      "model_revision": "7764ea0f912e53c92e82eb78a2a1631e92725fc8",
+      "model_sha256": "b938bf1bc15cd2ec0feacfe3a1bb553fe8ea9ca46a7e1d8d00217f29aef60cd9",
+      "model_source": "https://github.com/facebookresearch/dinov2",
+      "raw_ball_sha256": "81040b87ba3b71bbc847396035b8b1b82b0d58ab59b301efc6af9d1da6bbd0e2",
+      "crop_ball_sha256": "fe31bca8048c63663c87ccd7b997ecfcb48fdbe916ddf9926a3fd6732afd841d",
+      "frame_plan_sha256": "32d5aea1683b351bebde5cd6719db2829134bb2a5c74bc42f8aeb2ae46f2dcb5",
+      "camera_params": {
+        "max_gap": 25,
+        "w_ball": 1.0,
+        "w_filled": 0.5,
+        "control_radius": 2.5,
+        "margin_scale": 2.0,
+        "w_tag": 0.0,
+        "w_sp_dead": 0.6,
+        "sp_dead_frames": 50,
+        "w_sp_team": 0.6,
+        "w_outside": 2.0,
+        "dead_gap": 75,
+        "w_missing": 0.3,
+        "slow_speed": 1.5,
+        "w_slow": 0.6,
+        "w_missing_slow": 0.8,
+        "alive_ball_speed": 4.0,
+        "w_alive": 0.5,
+        "d_bias": -0.1,
+        "switch_cost": 20.0,
+        "dead_cost": 20.0,
+        "err_scale": 1.0,
+        "pan_window": 25,
+        "z_slow": -0.3,
+        "z_temp": 0.3,
+        "w_slow_z": 0.4,
+        "team_gate": 0.5,
+        "w_cam_still": 0.2,
+        "cam_still_speed": 0.5,
+        "w_memory": 0.6,
+        "edge_margin": 2.0,
+        "restart_speed": 8.0,
+        "restart_min_delay": 50,
+        "memory_max": 1500,
+        "sp_pre_frames": 50
+      },
+      "ball_source": "fused_full",
+      "crops": [
+        128,
+        320
+      ],
+      "input_size": 224,
+      "embedding_size": 384,
+      "colour": "RGB",
+      "normalisation": "ImageNet mean/std",
+      "video_frames": 199319,
+      "video_size": [
+        1920,
+        1080
+      ],
+      "public_gt_used": false,
+      "patch_pools": [
+        "ball_neighbourhood",
+        "above_ball"
+      ],
+      "patch_pool_size": 4,
+      "patch_grid": 16
+    }
+  },
+  "validation": {
+    "complete_frame_plan": 2221,
+    "cls_embeddings_reproduced_exactly": true,
+    "patch_pools_all_finite": true,
+    "prototype_matches_production_before_every_screen": true,
+    "default_csv_sha256": "e09c0524b08d88b8c198c00321bd63a90dd727331383350aec31d156dc86055c"
+  },
+  "sha256": {
+    "cache/improve_nov17/dino_5hz.npz": "4cc0118b641490ac0a59cbc6e91cf56dad95fca946523b6f805fa67610700ccb",
+    "cache/improve_nov17/dino_tokens_5hz.npz": "eb534a6fa8f39b27cd7bc2f4d958f0681b92cd6636c5da5ea9d3177e83ac78c9",
+    "src/bench/dino_extract.py": "19cc2f1ebb1d4071557ad2efc53d1ffb9aed03ba2c652d89a3a86120303f1cf6",
+    "src/bench/dino_bench.py": "8ff9fd16bf334bfc9beb7fa09fe8a0388786f135387fc37b5b781e9527b97cf3"
+  },
+  "limitations": [
+    "All screens reuse the same 17 public possessions.",
+    "DINO class-token trials use v6; patch-token and full-feature trials use v7.",
+    "Extra visual features can change unscored match frames without improving public metrics.",
+    "No independent private or unseen-match validation."
+  ]
+}

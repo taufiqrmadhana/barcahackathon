@@ -1,5 +1,10 @@
 # External possession benchmark and supervised ownership prototype
 
+The later [frozen DINOv2 experiments](DINO_EXPERIMENTS.md) test class/patch
+features with the macro-v7 ensemble. All 66 visual variants fail to improve
+their corresponding retained checkpoint; the local extraction and screening
+commands are documented there.
+
 Metrica Sports sample games 1 and 2 are used with acknowledgement to
 <https://github.com/metrica-sports/sample-data>. Their event-derived possession labels
 are **weak supervision**, not corrected tracking ownership. The labelling convention
