@@ -115,7 +115,7 @@
   "contact_min_frames": 12,
   "contact_switch_cost": 4.0,
   "contact_local_switch": 0,
-  "hybrid_model": "pretrain_data/macro_v10/ensemble.joblib",
+  "hybrid_model": "pretrain_data/macro_v11/ensemble.joblib",
   "hybrid_weight": 0.5,
   "hybrid_lock_dead": 1,
   "hybrid_prune_max_frames": 100,

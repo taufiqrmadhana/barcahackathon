@@ -6,6 +6,7 @@ from pathlib import Path
 import warnings
 
 import numpy as np
+from scipy.ndimage import uniform_filter1d
 from scipy.signal import correlate
 
 from games import asset_paths, source_frames
@@ -18,6 +19,24 @@ FEATURES = ('broadcast_quality', 'broadcast_player_match', 'broadcast_players',
     'broadcast_player_speed_home', 'broadcast_count_home', 'broadcast_dist_away',
     'broadcast_relative_away', 'broadcast_player_speed_away', 'broadcast_count_away',
     'broadcast_team_distance', 'broadcast_ball_disagreement')
+CONTEXT_FEATURES = ('broadcast_available_since', 'broadcast_available_until',
+                    'broadcast_available_fraction25', 'broadcast_available_fraction125')
+
+
+def availability_context(available, blocks):
+    """GT-free, per-half context of short versus sustained tracking failures."""
+    result = {}
+    for key, function in [('since', clean.since_last), ('until', clean.until_next)]:
+        value = np.full(len(available), np.nan)
+        for _, first, last in blocks:
+            value[first:last+1] = np.minimum(function(available[first:last+1]), 125.)/25
+        result['broadcast_available_'+key] = value
+    for width in (25, 125):
+        value = np.full(len(available), np.nan)
+        for _, first, last in blocks:
+            value[first:last+1] = uniform_filter1d(available[first:last+1].astype(float), width, mode='nearest')
+        result[f'broadcast_available_fraction{width}'] = value
+    return result
 
 
 def digest(path):
@@ -221,6 +240,17 @@ def features(inputs, p):
     return inputs._get('broadcast_features', (key,), build)
 
 
+def provenance(inputs, p, names=()):
+    _, available, metadata = features(inputs, p)
+    if not any(name in CONTEXT_FEATURES for name in names):
+        return metadata
+    columns = availability_context(available, inputs.blocks)
+    values = np.column_stack([columns[name] for name in CONTEXT_FEATURES])
+    return dict(version=2, geometry=metadata, availability_context=dict(version=1,
+        names=list(CONTEXT_FEATURES), cap_frames=125, windows_frames=[25,125],
+        per_half=True, values_sha256=hashlib.sha256(values.tobytes()).hexdigest()))
+
+
 def check(inputs, p, artifact):
-    if features(inputs, p)[2] != artifact.get('broadcast_provenance'):
+    if provenance(inputs, p, artifact['names']) != artifact.get('broadcast_provenance'):
         raise ValueError('broadcast evidence differs from the fitted checkpoint; refit')

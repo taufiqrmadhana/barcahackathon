@@ -33,7 +33,7 @@ def main():
     probe = Probe(args.params, 5)
     phase_index = probe.a['phase_router']['expert']
     original = joblib.load(probe.p.hybrid_model)['members'][phase_index]
-    if (original['model_name'] != 'dead_logreg' or not original.get('strict_fold_edges')
+    if (original['model_name'] not in ('dead_logreg','dead_context_blend') or not original.get('strict_fold_edges')
             or 'broadcast_available' not in original['names']):
         raise ValueError('expected the availability-aware binary phase classifier')
     columns, coverage, frames, _ = probe.views[phase_index]
@@ -58,7 +58,9 @@ def main():
             class_f1=f1_score(truth, predicted, labels=[0, 1, 2], average=None, zero_division=0).tolist(),
             gt_class_counts=np.bincount(truth, minlength=3)[:3].tolist()))
     seed, fractions = 20261117, (.25, .5, .75, 1.)
-    report = dict(date='2026-11-17', model='broadcast phase logistic regression',
+    report = dict(date='2026-11-17', model=('broadcast phase logistic blend'
+        if original['model_name']=='dead_context_blend' else 'broadcast phase logistic regression'),
+        model_name=original['model_name'], base_classifier_count=2 if original['model_name']=='dead_context_blend' else 1,
         feature_count=len(original['names']), C=original['logreg_c'],
         target='binary alive versus dead; D is the positive class',
         x_axis='fraction of each fold\'s eligible training rows, not epochs',
@@ -95,7 +97,7 @@ def main():
                 np.testing.assert_array_equal(selected, np.flatnonzero(train))
                 model = original['heads'][fold]
             else:
-                model = hybrid.factory('dead_logreg', names=original['names'],
+                model = hybrid.factory(original['model_name'], names=original['names'],
                                         logreg_c=original['logreg_c']).fit(matrix[selected], target[selected])
             models.append(model)
             train_pd = validator._proba3(model, matrix[selected])[:, 2]

@@ -37,3 +37,30 @@ class DeadBallClassifier(ClassifierMixin, BaseEstimator):
 
     def predict(self, x):
         return self.classes_[self.predict_proba(x).argmax(axis=1)]
+
+
+class ContextDeadBallClassifier(DeadBallClassifier):
+    """Average the original phase head and a head with availability history.
+
+    Both preprocessors and classifiers are fitted on the same training rows.
+    The original columns come first; history columns follow them. H/A remains
+    neutral, so this model supplies only dead-ball evidence.
+    """
+    def __init__(self, C=.3, base_features=18):
+        self.C = C
+        self.base_features = base_features
+
+    def fit(self, x, y):
+        x = np.asarray(x)
+        if (x.ndim != 2 or not isinstance(self.base_features, (int, np.integer))
+                or isinstance(self.base_features, bool) or not 0 < self.base_features < x.shape[1]):
+            raise ValueError('context head needs original columns followed by extra features')
+        self.base_ = DeadBallClassifier(self.C).fit(x[:, :self.base_features], y)
+        self.context_ = DeadBallClassifier(self.C).fit(x, y)
+        self.classes_ = np.arange(3)
+        self.n_features_in_ = x.shape[1]
+        return self
+
+    def predict_proba(self, x):
+        x = np.asarray(x)
+        return .5*self.base_.predict_proba(x[:, :self.base_features])+.5*self.context_.predict_proba(x)

@@ -26,7 +26,7 @@ def main():
     ap.add_argument('--set', nargs='+')
     ap.add_argument('--interp', default='film')
     ap.add_argument('--sets', nargs='+', choices=list(hybrid.FEATURE_SETS), default=['context','flow','film'])
-    ap.add_argument('--models', nargs='+', choices=['logreg','hist_gbm','logreg_blend','dead_logreg'], default=['logreg','hist_gbm'])
+    ap.add_argument('--models', nargs='+', choices=list(hybrid.LOGISTIC_MODELS)+['hist_gbm'], default=['logreg','hist_gbm'])
     ap.add_argument('--weights', nargs='+', type=float, default=[.25,.5,1.])
     ap.add_argument('--lock-dead', nargs='+', type=int, default=[1,0])
     ap.add_argument('--out', default=str(Path(ROOT,'cache/valdi_hybrid')))
@@ -61,7 +61,7 @@ def main():
             artifact['tracking_ball_sha256'] = hashlib.sha256(inputs.atd['ball'].tobytes()).hexdigest()
             if any(name.startswith('broadcast_') for name in artifact['names']):
                 from possession import broadcast
-                artifact['broadcast_provenance'] = broadcast.features(inputs, p)[2]
+                artifact['broadcast_provenance'] = broadcast.provenance(inputs, p, artifact['names'])
             if video_provenance.describe(inputs, p, args.interp, legacy_params) != provenance:
                 raise ValueError('video cache changed during fitting; wait for extraction to finish and refit')
             if provenance is not None:

@@ -46,12 +46,14 @@ FEATURE_SETS['film_motion'] = FEATURE_SETS['film_soft'] + tuple('spatial_' + k f
 FEATURE_SETS['film_dead_motion'] = tuple(k for k in FEATURE_SETS['film_motion']
     if k.startswith(('film_', 'flow_', 'spatial_')) or k in
     ('ball_seen', 'ball_filled', 'since_seen', 'quality', 'players_in_view', 'pan_speed'))
-from .broadcast import FEATURES as BROADCAST_FEATURES
+from .broadcast import FEATURES as BROADCAST_FEATURES, CONTEXT_FEATURES as BROADCAST_CONTEXT
 FEATURE_SETS['broadcast_dead'] = BROADCAST_FEATURES
 # Missing second-camera geometry is itself observable. This explicit feature
 # opts into training/inference on primary-video frames without valid broadcast
 # tracking; ordinary broadcast heads retain their quality-only coverage.
 FEATURE_SETS['broadcast_dead_available'] = BROADCAST_FEATURES + ('broadcast_available',)
+FEATURE_SETS['broadcast_dead_context'] = FEATURE_SETS['broadcast_dead_available'] + BROADCAST_CONTEXT
+LOGISTIC_MODELS = ('logreg', 'logreg_blend', 'dead_logreg', 'dead_context_blend')
 
 
 def covered_intervals(frames, mask, max_gap=25):
@@ -110,6 +112,8 @@ def features(inputs, p, labels, emit, shape, kind='film', legacy_params=None, fe
         else:
             mask &= coverage
             frames = frames[coverage[frames]]
+        if any(name in BROADCAST_CONTEXT for name in feature_names):
+            columns.update(broadcast.availability_context(coverage, inputs.blocks))
     if any(name.startswith('spatial_') for name in feature_names):
         raw, names = inputs.shape_features(p)
         for name in MOTION:
@@ -120,13 +124,18 @@ def features(inputs, p, labels, emit, shape, kind='film', legacy_params=None, fe
 def factory(name, seed=0, names=None, logreg_c=.3):
     def build_logreg():
         return validator.model_zoo(seed)['logreg']().set_params(logisticregression__C=logreg_c)
-    if name in ('logreg', 'logreg_blend', 'dead_logreg') and (not np.isfinite(logreg_c) or logreg_c <= 0):
+    if name in LOGISTIC_MODELS and (not np.isfinite(logreg_c) or logreg_c <= 0):
         raise ValueError('logistic C must be finite and positive')
     if name == 'logreg':
         return build_logreg()
     if name == 'dead_logreg':
         from .dead_head import DeadBallClassifier
         return DeadBallClassifier(C=logreg_c)
+    if name == 'dead_context_blend':
+        if tuple(names or ()) != FEATURE_SETS['broadcast_dead_context']:
+            raise ValueError('context blend requires the ordered broadcast context feature set')
+        from .dead_head import ContextDeadBallClassifier
+        return ContextDeadBallClassifier(C=logreg_c, base_features=len(FEATURE_SETS['broadcast_dead_available']))
     if name == 'logreg_blend':
         if names is None:
             raise ValueError('feature names are required for the blended classifier')
@@ -177,7 +186,7 @@ def fit(columns, sample_frames, gt_codes, names, model_name, kind, legacy_params
         legacy_params=legacy_params, full=full, heads=heads, edges=edges,
         public_start=int(public.min()), public_stop=int(public.max()) + 1,
         purge_frames=gap, training_rows=len(rows), folds=n_folds, train_stride=train_stride,
-        logreg_c=logreg_c if model_name in ('logreg', 'logreg_blend', 'dead_logreg') else None)
+        logreg_c=logreg_c if model_name in LOGISTIC_MODELS else None)
     if strict_fold_edges:
         artifact['strict_fold_edges'] = True
     return artifact

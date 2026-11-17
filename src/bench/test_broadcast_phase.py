@@ -14,6 +14,60 @@ from possession.config import Params
 
 
 class BroadcastPhaseContracts(unittest.TestCase):
+    def test_availability_history_resets_at_halves_and_ignores_gaps(self):
+        available=np.zeros(400,bool);available[140:150]=True;available[300:]=True
+        blocks=[(1,0,149),(2,200,399)]
+        columns=broadcast.availability_context(available,blocks)
+        self.assertEqual(tuple(columns),broadcast.CONTEXT_FEATURES)
+        self.assertEqual(columns['broadcast_available_since'][200],5.)
+        self.assertEqual(columns['broadcast_available_until'][200],4.)
+        changed=available.copy();changed[150:200]=True;changed[200:]=~changed[200:]
+        other=broadcast.availability_context(changed,blocks)
+        for key,value in columns.items():
+            np.testing.assert_array_equal(value[:150],other[key][:150])
+            self.assertTrue(np.isnan(value[150:200]).all())
+            if 'fraction' in key:
+                self.assertGreaterEqual(np.nanmin(value),0.)
+                self.assertLessEqual(np.nanmax(value),1.)
+
+    def test_context_provenance_detects_changed_history_and_preserves_old_metadata(self):
+        available=np.zeros(400,bool);available[50:100]=True
+        inputs=SimpleNamespace(blocks=[(1,0,199),(2,200,399)])
+        metadata={'geometry':'frozen'}
+        with patch.object(broadcast,'features',return_value=({},available,metadata)):
+            self.assertEqual(broadcast.provenance(inputs,None,('broadcast_available',)),metadata)
+            names=hybrid.FEATURE_SETS['broadcast_dead_context']
+            first=broadcast.provenance(inputs,None,names)
+            broadcast.check(inputs,None,dict(names=names,broadcast_provenance=first))
+            available[75]=False
+            self.assertNotEqual(first,broadcast.provenance(inputs,None,names))
+            with self.assertRaises(ValueError):
+                broadcast.check(inputs,None,dict(names=names,broadcast_provenance=first))
+
+    def test_context_blend_preserves_binary_semantics_and_matching_fold_isolation(self):
+        from possession.dead_head import ContextDeadBallClassifier
+        rng=np.random.default_rng(45);n=500;frames=np.arange(n)
+        names=hybrid.FEATURE_SETS['broadcast_dead_context'];x=rng.normal(size=(n,len(names)))
+        x[::13,2]=np.nan
+        gt=np.where(x[:,0]+x[:,-1]>.7,2,np.where(x[:,1]>0,0,1)).astype(np.int8)
+        changed=gt.copy();changed[:100]=(changed[:100]+1)%3
+        columns=dict(zip(names,x.T))
+        def fit(target):
+            return hybrid.fit(columns,frames,target,names,'dead_context_blend','film',{},
+                              gap=5,train_stride=1,strict_fold_edges=True)
+        first,second=fit(gt),fit(changed)
+        np.testing.assert_array_equal(first['heads'][0].predict_proba(x),second['heads'][0].predict_proba(x))
+        self.assertFalse(np.array_equal(first['full'].predict_proba(x),second['full'].predict_proba(x)))
+        model=first['full'];q=model.predict_proba(x)
+        np.testing.assert_array_equal(q[:,0],q[:,1]);np.testing.assert_allclose(q.sum(1),1.)
+        np.testing.assert_array_equal(q,.5*model.base_.predict_proba(x[:,:18])+.5*model.context_.predict_proba(x))
+        swapped=np.where(gt<2,1-gt,gt)
+        np.testing.assert_array_equal(ContextDeadBallClassifier().fit(x,swapped).predict_proba(x),q)
+        for target,dead in [(np.ones(n),0.),(np.full(n,2),1.)]:
+            np.testing.assert_array_equal(ContextDeadBallClassifier().fit(x,target).predict_proba(x)[:,2],dead)
+        self.assertEqual(first['logreg_c'],.3)
+        with self.assertRaises(ValueError):hybrid.factory('dead_context_blend',names=names[::-1])
+
     def test_missing_broadcast_is_explicit_and_never_expands_primary_video(self):
         n = 80
         frames = np.array([10,15,20,50,55,60])
