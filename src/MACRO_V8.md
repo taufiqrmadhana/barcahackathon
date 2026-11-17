@@ -17,6 +17,9 @@ All selection reuses the same 7,500 public frames and 17 GT possessions.
 Held-out fitting does not remove this method-selection bias. Private and
 unseen-match performance are unknown. V7 remains in `configs/macro_v7.json`.
 
+[Macro v9](MACRO_V9.md) subsequently changes only the phase probability weight;
+this 50% profile remains in `configs/macro_v8.json`.
+
 ## Synchronise the second recording without possession labels
 
 Broadcast ATD and homography use a different clock from the tactical reference.

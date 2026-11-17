@@ -6,9 +6,12 @@ the possession rules and what was tried and dropped are in [TECHNICAL.md](TECHNI
 
 Latest (November 17): the default prioritises **macroF1**, as requested. Two video-cadence
 heads, ordered motion/aligned-crop experts, temporal agreement and aligned broadcast phase
-evidence reach public macroF1 **0.96215**, spellF1 **0.9032**. Approach, statistics and validation:
-[MACRO_V8.md](MACRO_V8.md), `configs/macro_v8.json`. Paired macroF1 rises at 3/4/5 folds
-and falls at 6; all partitions reuse the same public possessions. The previous
+evidence reach public macroF1 **0.96232**, spellF1 **0.9032**. Approach, statistics and validation:
+[MACRO_V9.md](MACRO_V9.md), `configs/macro_v9.json`. Paired macroF1 rises at all tested
+fold counts versus v8, while three-fold spellF1 falls. The five-fold gain changes
+four wrong D labels to wrong A labels, leaving exact accuracy unchanged. All
+partitions reuse the same public possessions. The **0.96215 / 0.9032** model remains
+in `configs/macro_v8.json`, described in [MACRO_V8.md](MACRO_V8.md). The previous
 **0.95760 / 0.8750** model remains in `configs/macro_v7.json`, described in [MACRO_V7.md](MACRO_V7.md).
 The **0.95709 / 0.8750** checkpoint is
 retained in `configs/macro_v6.json`, described in [MACRO_V6.md](MACRO_V6.md).
