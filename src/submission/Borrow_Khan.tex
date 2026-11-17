@@ -1,0 +1,426 @@
+\RequirePackage[T1]{fontenc}
+\documentclass[conference,a4paper,10pt]{IEEEtran}
+\usepackage{amsmath,amssymb,booktabs,array,graphicx,tikz,xurl,balance}
+\usetikzlibrary{arrows.meta,positioning,calc}
+\usepackage[hidelinks]{hyperref}
+\definecolor{Blue}{HTML}{185B80}
+\definecolor{Orange}{HTML}{B45E22}
+\definecolor{Muted}{HTML}{536573}
+\definecolor{Pale}{HTML}{EDF3F6}
+\definecolor{Line}{HTML}{DCE4E9}
+\input{team.tex}
+\input{metrics.tex}
+\hypersetup{pdftitle={Recovering Football Possession Spells with Tracking, Video and Temporal Consensus},
+ pdfauthor={\PDFAuthors},pdfsubject={Borrow Khan -- IEEE two-column technical document, Phase 1}}
+\title{Recovering Football Possession Spells\\with Tracking, Video and Temporal Consensus}
+\author{\IEEEauthorblockN{\TeamAuthors}
+ \IEEEauthorblockA{Team \TeamName\\More than a Hack 2027 --- Phase 1 Technical Document}}
+\begin{document}
+\maketitle
+
+\begin{abstract}
+We recover home, away and dead-ball labels from football tracking and video.
+A first stream estimates ownership while keeping possession continuous through
+passes. A second refines when play stops or resumes using aligned broadcast
+geometry and its availability. Short-spell corrections precede the merge.
+Public predictions use classifiers trained without that interval's labels.
+On 7,500 public frames, macro-F1 is \MacroScore{} and spell-F1 is \SpellScore{}:
+14 of 17 ground-truth possessions are matched, with no spurious predictions.
+All method selection reuses this slice; private and unseen-match performance
+remain unknown.
+\end{abstract}
+
+\section{Task and System Overview}
+The challenge requires H (home), A (away), D (dead ball), or X outside the graded
+half windows for 199,319 tactical frames at 25\,Hz~\cite{challenge}. A possession
+\emph{spell} is an uninterrupted H or A interval. Correct frame labels and
+correct spell boundaries are both needed: a brief wrong-team island can split
+one real possession into three predictions. The scorer averages H/A/D F1;
+GT X is ungraded, while predicted X on a graded frame counts as a miss.
+
+Our design separates two questions: \emph{who owns the ball?} and \emph{is play
+alive?} The primary stream answers both using tracking and tactical video.
+A separate phase stream revisits only alive/dead timing with evidence from the
+second recording. Where both streams predict alive play, the primary team's
+label is retained. This prevents a useful stoppage correction from replacing
+an already stable team estimate (Fig.~\ref{fig:pipeline}).
+
+\section{Inputs and Representations}
+\textbf{Provided observations.} Automatic Tracking Data (ATD) gives ball/player
+positions. Homography matrices map pitch coordinates to image pixels, locating
+video crops and comparing the recordings. Tactical video/audio supplies motion,
+a 3.8\,kHz whistle score and scoreboard changes. Smart Tagging and official
+kick-off timing provide restart cues. Broadcast tracking contributes geometric
+phase evidence after clock alignment; the final model uses no broadcast RGB.
+
+\textbf{Frozen vision models.} YOLO11s~\cite{yolo}, pretrained on COCO, detects
+ball candidates in tracked crops and grid searches; a tracker combines them
+with ATD. FILM~\cite{film} predicts the middle image from $t\pm2$. Differences
+from the actual $256\times192$ ball/player crop describe abrupt local motion.
+Optical flow/crossfade add comparison features. Possession classifiers learn
+their relation to H/A/D; the vision backbones remain frozen.
+
+\textbf{External supervision.} Metrica games 1--3~\cite{metrica} provide
+approximate event-derived labels for ownership, team changes and \emph{shape}:
+player arrangement/motion supporting estimates when the ball is missing.
+Base shape uses physical pseudo-labels; the external model replaces its H/A
+ratio. Metrica Sports is acknowledged as the source of these external
+tracking and event annotations.
+
+\begin{figure}[!t]
+\centering
+\begin{tikzpicture}[font=\footnotesize,
+ box/.style={draw=Line,rounded corners=1pt,align=center,inner sep=4pt,
+ text width=71mm,minimum height=9mm,fill=Pale},
+ arrow/.style={-{Latex[length=1.7mm]},Blue,thick}]
+\node[box] (input) {\textbf{1. Prepare observations}\\
+ Clean/fuse tracking; align cameras; extract motion and audio};
+\node[box,below=3mm of input] (base) {\textbf{2. Build a continuous possession baseline}\\
+ Keep ownership through passes; identify stoppages};
+\node[box,below=3mm of base] (heads) {\textbf{3. Estimate frame probabilities}\\
+ Primary team estimate + selective specialists\\
+ Separate video and broadcast dead-ball estimates};
+\node[box,below=3mm of heads] (decode) {\textbf{4. Decode and check short spells}\\
+ Primary / phase edges: 12 / 50 frames; held-out models};
+\node[box,below=3mm of decode,fill=Blue,text=white,draw=Blue] (out)
+ {\textbf{5. Merge phase and team labels $\rightarrow$ CSV}\\
+ Phase sets D; retain primary team when both predict alive};
+
+\draw[arrow] (input)--(base);\draw[arrow] (base)--(heads);
+\draw[arrow] (heads)--(decode);\draw[arrow] (decode)--(out);
+\end{tikzpicture}
+\caption{Final system: observation fusion, possession modelling, ML probability
+estimation, constrained sequence decoding and team/phase fusion.}
+\label{fig:pipeline}
+\end{figure}
+
+\begin{figure*}[!t]
+\centering\includegraphics[width=.98\textwidth]{figures/ablation.pdf}
+\caption{Approach comparison under the same five-fold protocol. Configurations
+differ in team/phase fusion and the treatment of broadcast availability.
+The proposed system averages availability-only and contextual phase models.
+All bars start at zero; exact scores are annotated.}
+\label{fig:ablation}
+\end{figure*}
+
+\section{Method and Possession Rules}
+\subsection{Physical Continuity and Contact Evidence}
+The baseline is a hidden semi-Markov model (HSMM): it scores state sequences
+with transition/duration constraints. Viterbi decoding selects the highest score.
+Home and away each have control and loose-ball states, alongside D. Loose states
+keep ownership through a pass until opponent control. Distances, motion and
+contacts support control; whistles and restart cues support D. The contact vote
+switches midway between opposing contacts and abstains beyond 5\,s from a ball
+observation.
+
+ML probabilities supplement tracking evidence before a second Viterbi decode.
+Conditional H/A probabilities express ownership; P(D) expresses phase. Shared
+transition and duration constraints retain ownership through loose-ball states
+instead of independently labelling each frame.
+
+D lasts at least 100 frames and exits into control. Later corrections move
+primary D edges by at most 12 frames and phase edges by 50, preserving fixed
+phase centres. Kick-off timing and confirmed scoreboard-to-restart intervals
+provide structural D. Halves are independent; initial cleanup preserves D and
+merges surrounded team islands shorter than 12 frames.
+
+\subsection{Video Mixtures and Separate Dead-Ball Evidence}
+The primary combines two logistic classifiers with 34 tracking/context/video
+features (Table~\ref{tab:roles}). The training pool has 301 native 1\,Hz public
+rows; denser image sampling does not change this grid. Missing values use the
+training fold's medians; scaling also uses that fold's statistics.
+
+Ordered team specialists use motion (six extra features), then fused-ball crops.
+A specialist acts only when conditional team confidence is below 0.8 and its
+own exceeds 0.9, preserving P(D) and earlier confident choices. A supporting
+\emph{auxiliary} estimate averages dense/raw and motion probabilities equally.
+The binary dead-ball model uses 28 video/flow/quality/motion features,
+excluding decoder dead-ball anchors.
+
+\begin{table}[!t]
+\centering
+\caption{Classifiers fitted to public labels; $C$ controls regularisation.}
+\label{tab:roles}
+\footnotesize
+\begin{tabular}{@{}p{29mm}p{37mm}r@{}}
+\toprule
+Evidence & Role in the final model & $C$\\
+\midrule
+Raw video (dense) & Primary team mixture (75\%) & 1\\
+Raw video (5\,Hz) & Primary team mixture (25\%) & 3\\
+Video + motion & Team specialist; auxiliary & 1\\
+Fused-ball crops & Second team specialist & 3\\
+Video dead-ball & Binary P(D), 28 features & 10\\
+Broadcast phase & Average 18/22-feature P(D) & 0.3\\
+\bottomrule
+\end{tabular}
+\end{table}
+
+The auxiliary checks short-spell boundaries. The binary classifier estimates
+alive/dead independently of team identity. For primary $q$, auxiliary $r$ and
+binary model $d$, fuse dead-ball probability:
+\begin{equation}
+\bar q_D=\tfrac14q_D+\tfrac14r_D+\tfrac12d_D,\quad
+\bar q_k=(1-\bar q_D)\frac{q_k}{q_H+q_A},
+\end{equation}
+for $k\in\{H,A\}$. Remaining alive probability keeps the primary H:A ratio,
+allowing phase calibration without changing team preference. Missing experts
+abstain. Team and alive/dead evidence weights in the decoder are 0.5 and 2.0.
+Pruning removes surrounded islands up to 100 frames when mean conditional
+own-team confidence is below 0.5. Video gaps over 1\,s are not interpolated;
+uncovered frames retain the baseline.
+
+\begin{figure}[!t]
+\centering
+\begin{tikzpicture}[font=\footnotesize,x=1.1cm,y=1cm]
+\node[anchor=west,font=\scriptsize\color{Muted}] at (0,1.15) {BEFORE};
+\fill[Blue] (0,.45) rectangle (2,.9);
+\fill[Orange] (2,.45) rectangle (3,.9);
+\fill[Blue] (3,.45) rectangle (6,.9);
+\node[text=white] at (1,.675) {H: 2\,s};
+\node[text=white] at (2.5,.675) {A: 1\,s};
+\node[text=white] at (4.5,.675) {H: 3\,s};
+\node[font=\scriptsize] at (1,.18) {$c_L=.88$};
+\node[font=\scriptsize] at (2.5,.18) {$c_M=.72$};
+\node[font=\scriptsize] at (4.5,.18) {$c_R=.94$};
+\node[anchor=west,font=\scriptsize\color{Muted}] at (0,-.25) {AFTER};
+\fill[Blue] (0,-.95) rectangle (6,-.5);
+\node[text=white] at (3,-.725) {Home: one continuous 6-second spell};
+\draw[-{Latex[length=1.7mm]},Blue,thick] (6.3,.68)--(6.3,-.72);
+\end{tikzpicture}
+\caption{Illustrative oscillation removal, not measured match data. Pooled
+neighbour confidence is $(2(.88)+3(.94))/5=.916>.72$; all three input spells
+are at most 4\,s. The rule is symmetric for H/A/H and A/H/A.}
+\label{fig:oscillation}
+\end{figure}
+
+\begin{figure}[!t]
+\centering
+\begin{tikzpicture}[font=\footnotesize,x=.82cm,y=1cm]
+\node[anchor=east] at (1.5,1.0) {Primary};
+\node[anchor=east] at (1.5,.3) {Auxiliary};
+\node[anchor=east,font=\bfseries] at (1.5,-.4) {Union};
+\fill[Blue!72] (3.4,.8) rectangle (7,1.2);
+\fill[Blue!48] (2.5,.1) rectangle (7.9,.5);
+\fill[Blue] (2.5,-.6) rectangle (7.9,-.2);
+\node[text=white] at (5.2,1) {H};\node at (5.2,.3) {H};
+\node[text=white] at (5.2,-.4) {H: 3 seconds};
+\draw[Muted] (1.6,-1)--(8.8,-1);
+\foreach \i in {0,1,2,3,4}{\draw[Muted] ({1.6+1.8*\i},-1)--++(0,-.08);
+ \node[font=\scriptsize,below] at ({1.6+1.8*\i},-1.08) {\i\,s};}
+\end{tikzpicture}
+\caption{Illustrative short-spell agreement. Primary [1,3] s and auxiliary
+[0.5,3.5] s have IoU $2/3$; their union is 3\,s. The entire union must have
+both models' support and primary H/A labels.}
+\label{fig:union}
+\end{figure}
+
+\begin{figure*}[!t]
+\centering\includegraphics[width=.98\textwidth]{figures/fold_sensitivity.pdf}
+\caption{Paired repartitions of the same public possessions, refitting all classifiers.
+Macro-F1 rises at all four fold counts; spell-F1 is unchanged at every partition.
+These are sensitivity checks, not independent test sets.}
+\label{fig:sensitivity}
+\end{figure*}
+
+\begin{figure*}[!t]
+\centering\includegraphics[width=.98\textwidth]{figures/match_statistics.pdf}
+\caption{Predicted full-match statistics over 158,857 graded frames.
+Alive-time percentages exclude D; possession counts include only H/A.
+These are model summaries, with no full-match GT comparison.}
+\label{fig:match}
+\end{figure*}
+
+\subsection{Temporal Agreement}
+Both streams receive two checks before their final merge: remove unsupported
+short switches, then adjust short spells already agreed by both estimates.
+
+\textbf{Oscillations (Fig.~\ref{fig:oscillation}).} Consider H/A/H or A/H/A
+triplets with each spell at most 100 frames and complete video support.
+Neighbour own-team confidence must exceed 0.5, and their duration-weighted mean
+must exceed the middle's own confidence. Apply non-overlapping proposals once,
+in confidence-gain order. Merges cannot cascade.
+
+\textbf{Agreed boundaries (Fig.~\ref{fig:union}).} Independently decode the
+auxiliary; pair same-team spells at IoU $\geq0.5$. Use their union only if
+it is at most 100 frames, fully covered by both models, and contains only
+primary H/A labels. Higher-IoU proposals win overlap conflicts. Temporal edits
+preserve D/X, missing-video and half boundaries and use no frame-specific
+manual corrections. Earlier probability fusion can move D through the bounded decoder.
+
+\subsection{Broadcast Alignment and Phase Refinement}
+\textbf{Clock and quality.} Ball-trajectory cross-correlation and geometric
+search align the recordings independently per half. Consistent low-error
+anchors determine each clock offset, without possession labels. Ten anchors
+are accepted per half, with offset spreads of 3/2 frames.
+
+Reject invalid/poor homography and inconsistent views. Require at least 5 broadcast
+and 8 tactical players with median same-team discrepancy $<1.5$\,m. The gate
+supports 5,590 public frames (74.53\%); supported player discrepancy has median
+0.288\,m. This is agreement between recordings, not independent location accuracy.
+
+\textbf{Phase classifiers.} Two binary logistic heads ($C=0.3$) estimate
+alive/dead, leaving team identity to the primary stream. One uses 17 geometry
+features plus availability; the other adds four context features: time since/until
+valid tracking (capped at 5\,s) and availability fractions in centred 1/5\,s
+windows. Context is computed independently per half, using no possession labels.
+Missing tracking does not imply D: both heads retain rejected-geometry rows.
+Average their P(D) equally, then combine
+75\% of that result with 25\% primary P(D), preserving conditional H/A. Decode
+this phase stream with 50-frame edges and the same temporal operations.
+
+Take the phase D mask and retain primary H/A where both streams predict alive.
+Where primary D becomes alive, use the phase team (Fig.~\ref{fig:phase}). Merge
+frame by frame before assembling public folds, with no later cleanup to undo these
+D decisions. Fixed D cores and primary-video coverage remain protected.
+
+\begin{figure}[!t]
+\centering
+\begin{tikzpicture}[font=\footnotesize,x=.83cm,y=1cm]
+\node[anchor=east] at (1.45,1.1) {Primary};
+\node[anchor=east] at (1.45,.4) {Phase};
+\node[anchor=east,font=\bfseries] at (1.45,-.3) {Output};
+\foreach \label/\col/\i in {H/Blue/0,H/Blue/1,D/Muted/2,D/Muted/3,A/Orange/4,A/Orange/5}{
+ \fill[\col] ({1.6+\i},.9) rectangle ({2.55+\i},1.3);
+ \node[text=white] at ({2.07+\i},1.1) {\label};}
+\foreach \label/\col/\i in {A/Orange/0,D/Muted/1,H/Blue/2,D/Muted/3,H/Blue/4,A/Orange/5}{
+ \fill[\col] ({1.6+\i},.2) rectangle ({2.55+\i},.6);
+ \node[text=white] at ({2.07+\i},.4) {\label};}
+\foreach \label/\col/\i in {H/Blue/0,D/Muted/1,H/Blue/2,D/Muted/3,A/Orange/4,A/Orange/5}{
+ \fill[\col] ({1.6+\i},-.5) rectangle ({2.55+\i},-.1);
+ \node[text=white] at ({2.07+\i},-.3) {\label};}
+\end{tikzpicture}
+\caption{Illustrative pointwise phase fusion, not measured match data. D follows
+the phase stream; disagreements between alive teams retain the primary label.
+Newly exposed alive frames use the phase team.}
+\label{fig:phase}
+\end{figure}
+
+\section{Validation and Results}
+\subsection{Public Validation Protocol}
+The public slice has 7,500 frames (300\,s) and 17 ground-truth (GT) possessions. Five contiguous
+60-second folds use a 125-frame (5\,s) purge. Every stream excludes the same target labels. Each fold's complete halves are
+decoded and corrected before copying its held-out slice (Fig.~\ref{fig:validation}).
+Refits on all public labels apply only outside this window.
+
+Whole-half correction uses the same excluded training interval for every
+neighbour. Otherwise, smoothing could import predictions from a model fitted
+to the held-out labels. This protects fitting-time isolation. Method selection
+still reuses the same 17 spells; repartitions measure sensitivity, not
+independent match generalisation. Private and unseen-match scores are unknown.
+
+\begin{figure}[!t]
+\centering
+\begin{tikzpicture}[x=.024cm,y=1cm,font=\footnotesize]
+\foreach \f in {1,2,3,4,5}{\node[font=\scriptsize\color{Muted}] at ({60*\f-30},.75) {Fold \f};}
+\fill[Line] (0,0) rectangle (115,.45);
+\fill[Orange] (115,0) rectangle (120,.45);
+\fill[Blue] (120,0) rectangle (180,.45);
+\fill[Orange] (180,0) rectangle (185,.45);
+\fill[Line] (185,0) rectangle (300,.45);
+\node at (55,.225) {Training};\node[text=white] at (150,.225) {Held out};
+\node at (240,.225) {Training};
+\foreach \t in {0,60,120,180,240,300}{\draw[Muted] (\t,-.04)--(\t,-.1);
+ \node[font=\scriptsize,below] at (\t,-.13) {\t\,s};}
+\node[font=\scriptsize\color{Orange}] at (150,-.8) {Orange: 5-second purge on each side};
+\end{tikzpicture}
+\caption{Example held-out fold. Both video mixtures and every expert use
+matching held-out classifiers before corrections and assembly of public folds.}
+\label{fig:validation}
+\end{figure}
+
+
+
+
+
+\balance
+\subsection{Public Metrics and Approach Comparison}
+Macro-F1 averages the three H/A/D class F1 scores, giving each class equal
+weight. Spell-F1 measures matched possessions, averaging IoU thresholds
+0.3/0.4/0.5/0.6/0.7. Here IoU is the shared duration divided by the combined
+duration of a same-team predicted/GT pair. A correct team at most frames can
+still score poorly if one possession is split into several intervals.
+\textbf{Public scope:} 17 GT spells and 14 predictions in the five-minute window.
+All 14 match at every threshold, with three missed GT spells and zero spurious
+predictions: $2\times14/(14+17)=0.903226$. The 400 spells in Fig.~\ref{fig:match}
+are full-match predictions and do not enter this public score.
+H/A/D F1 is 0.963257/0.967318/0.961322; one-second transition F1 is 0.810811.
+
+Figure~\ref{fig:ablation} shows why broadcast phase and team ownership are
+separate. The final availability/context average improves macro-F1 over the
+18-feature head in all four partitions: mean 0.955030 to 0.955782, with spell-F1
+unchanged (Fig.~\ref{fig:sensitivity}). Context-only and bagged phase models
+improve the five-fold score over availability alone but have lower mean
+macro-F1 across repartitions.
+
+\subsection{Error Analysis}
+Table~\ref{tab:errors} compares the proposed model with availability-only phase
+evidence. False D labels fall from 104 to 102 and missed D labels from 18 to 15.
+The unchanged H/A confusions locate the improvement in phase timing.
+
+The proposed system makes 268 errors (3.57\% of public frames): 151 wrong-team
+labels, 102 alive frames labelled D, and 15 dead frames labelled alive. Thus
+team identity accounts for 56.34\% of remaining errors. D recall (98.98\%)
+exceeds precision (93.44\%): residual phase errors more often mark live play
+as dead than miss dead frames.
+
+\begin{table}[!t]
+\centering
+\caption{Public frame errors. ``Alive as D'' means GT H/A predicted as dead.}
+\label{tab:errors}
+\footnotesize
+\begin{tabular}{@{}lrr@{}}
+\toprule
+Error type & Availability & Proposed\\
+\midrule
+Wrong team while alive (H $\leftrightarrow$ A) & 151 & 151\\
+Alive as D & 104 & 102\\
+D as alive & 18 & 15\\
+\midrule
+Total incorrect frames & 273 & 268\\
+\bottomrule
+\end{tabular}
+\end{table}
+
+Both outputs have 14 predicted spells, all matched at every threshold; the
+three missed GT possessions remain unresolved.
+
+\subsection{Predicted Match Statistics}
+Figure~\ref{fig:match} reports 400 possessions averaging 8.59\,s: 202 in the first
+half and 198 in the second. Home has 60.28\% of alive time (197 spells,
+10.51\,s mean); away has 39.72\% (203 spells, 6.72\,s mean). D occupies
+45.93\% of graded time in 130 intervals counted separately by half.
+
+Home share divides H frames by H+A; dead share divides D by all 158,857 graded
+frames. Mean duration divides H+A time by 400 spells. The 40,462 X frames
+outside the halves enter neither denominator. These summaries describe
+predictions over the match; measured accuracy is limited to the public slice.
+
+\section{Discussion and Conclusion}
+\textbf{Interpreting possession.} Fewer spells can reflect either less
+fragmentation or missed turnovers. Public matching supports recovered
+possessions; the full-match count alone cannot establish accuracy. The three
+unmatched GT spells remain a limitation despite the high frame score.
+
+\textbf{Limitations.} Occlusion and crop alignment affect contacts; replay timing
+and camera coverage affect broadcast features. External event labels and audio
+cues may not transfer. The system uses future observations and is evaluated
+offline. Short-spell corrections can erase genuine turnovers; additional
+labelled matches are needed to measure this tradeoff and performance under
+different camera coverage.
+
+\textbf{Conclusion.} Tracking continuity, video specialists and broadcast phase
+evidence feed constrained Viterbi decoding. Separating team identity from phase
+retains stable ownership while refining stoppages. The final system achieves
+macro-F1 \MacroScore{} and spell-F1 \SpellScore{}, matching 14 of 17 public GT
+possessions without spurious predictions.
+
+\begin{thebibliography}{4}
+\bibitem{challenge} More than a Hack 2027, ``Phase 1: Ball Possession,'' 2026.
+\bibitem{yolo} Ultralytics, ``YOLO11.'' \url{https://docs.ultralytics.com/models/yolo11/}.
+\bibitem{film} F. Reda et al., ``FILM: Frame Interpolation for Large Motion,'' ECCV, 2022.
+\url{https://github.com/google-research/frame-interpolation}.
+\bibitem{metrica} Metrica Sports, ``Sample tracking and event data,'' games 1--3.
+\url{https://github.com/metrica-sports/sample-data}.
+\end{thebibliography}
+\end{document}

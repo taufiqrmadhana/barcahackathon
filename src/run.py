@@ -22,7 +22,10 @@ def parse_overrides(pairs):
     out = {}
     for pair in pairs or []:
         key, _, value = pair.partition("=")
-        out[key] = int(value) if value.lstrip("-").isdigit() else float(value)
+        try:
+            out[key] = int(value) if value.lstrip("-").isdigit() else float(value)
+        except ValueError:
+            out[key] = value
     return out
 
 

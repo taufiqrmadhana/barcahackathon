@@ -8,6 +8,8 @@ for -- without any special case.
 
 import numpy as np
 
+from .hsmm import njit
+
 H, A, D = 0, 1, 2
 LABELS = np.array(["H", "A", "D"])
 
@@ -50,7 +52,7 @@ def evidence(feat, tags, p):
     return score
 
 
-def viterbi(score, switch_cost, dead_cost):
+def viterbi_reference(score, switch_cost, dead_cost):
     """Most likely state path for one contiguous block of frames."""
     cost = np.array([[0.0, switch_cost, dead_cost],
                      [switch_cost, 0.0, dead_cost],
@@ -68,6 +70,33 @@ def viterbi(score, switch_cost, dead_cost):
     for t in range(n - 1, 0, -1):
         path[t - 1] = back[t, path[t]]
     return path
+
+
+def _viterbi_fast(score, switch_cost, dead_cost):
+    cost = np.array([[0.,switch_cost,dead_cost],[switch_cost,0.,dead_cost],
+                     [dead_cost,dead_cost,0.]])
+    n = len(score)
+    back = np.zeros((n,3),dtype=np.int8)
+    total = score[0] + np.array([-dead_cost,-dead_cost,0.])
+    for t in range(1,n):
+        new = np.empty(3)
+        for j in range(3):
+            best, previous = -np.inf, 0
+            for i in range(3):
+                value = total[i] - cost[i,j]
+                if value > best:
+                    best, previous = value, i
+            back[t,j] = previous
+            new[j] = best + score[t,j]
+        total = new
+    path = np.empty(n,dtype=np.int8)
+    path[-1] = int(total.argmax())
+    for t in range(n-1,0,-1):
+        path[t-1] = back[t,path[t]]
+    return path
+
+
+viterbi = njit(cache=True)(_viterbi_fast) if njit is not None else viterbi_reference
 
 
 def decode(score, blocks, p):
