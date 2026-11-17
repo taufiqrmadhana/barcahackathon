@@ -1,5 +1,9 @@
 # External possession benchmark and supervised ownership prototype
 
+The later [broadcast follow-ups](BROADCAST_FOLLOWUPS.md) test temporal geometry,
+second-camera motion/FILM, audio and explicit missingness. The availability-aware
+phase head becomes [macro v10](../MACRO_V10.md); all per-frame outputs remain ignored.
+
 The later [frozen DINOv2 experiments](DINO_EXPERIMENTS.md) test class/patch
 features with the macro-v7 ensemble. All 66 visual variants fail to improve
 their corresponding retained checkpoint; the local extraction and screening

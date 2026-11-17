@@ -1,6 +1,8 @@
 """Clock recovery and independent phase routing must not borrow held-out labels."""
 from pathlib import Path
+from contextlib import ExitStack
 import sys
+from types import SimpleNamespace
 import unittest
 from unittest.mock import patch
 
@@ -12,6 +14,40 @@ from possession.config import Params
 
 
 class BroadcastPhaseContracts(unittest.TestCase):
+    def test_missing_broadcast_is_explicit_and_never_expands_primary_video(self):
+        n = 80
+        frames = np.array([10,15,20,50,55,60])
+        graded = np.ones(n,bool)
+        quality = np.zeros(n,bool); quality[15:56] = True
+        raw = {'broadcast_quality':np.where(quality,1.,np.nan)}
+        inputs = SimpleNamespace(game='synthetic',atd={},n=n,graded=graded)
+        video = {key:np.zeros(n) for key in hybrid.validator.FILM_COLS+hybrid.validator.NAIVE_COLS}
+        mocks = [(hybrid.video_provenance,'describe',None),
+                 (hybrid.model_v2,'evidence',np.zeros((n,3))),
+                 (hybrid.model_v2,'decode',np.full(n,'H')),
+                 (hybrid.model_v2,'dead_memory',np.zeros(n)),
+                 (hybrid.validator,'sample_table',{}),
+                 (hybrid.validator,'frame_video_features',video),
+                 (broadcast,'features',(raw,quality,{}))]
+        with ExitStack() as stack:
+            for module,name,result in mocks:
+                stack.enter_context(patch.object(module,name,return_value=result))
+            stack.enter_context(patch.object(hybrid.validator,'v2_context',side_effect=lambda *a,**kw:{}))
+            stack.enter_context(patch.object(hybrid.pipeline_v2,'Inputs'))
+            store=stack.enter_context(patch.object(hybrid,'Store'))
+            store.return_value.table.return_value=(frames,{})
+            args=(inputs,Params(),np.full(n,'H'),np.zeros((n,5)),np.ones((n,3)))
+            old=hybrid.features(*args,feature_names=('broadcast_quality',))
+            new=hybrid.features(*args,feature_names=('broadcast_quality','broadcast_available'))
+        primary=np.zeros(n,bool);primary[10:21]=True;primary[50:61]=True
+        np.testing.assert_array_equal(old[1],primary&quality)
+        np.testing.assert_array_equal(new[1],primary)
+        np.testing.assert_array_equal(new[2],frames)
+        np.testing.assert_array_equal(old[2],frames[quality[frames]])
+        np.testing.assert_array_equal(new[0]['broadcast_available'],quality.astype(float))
+        self.assertTrue(np.isnan(new[0]['broadcast_quality'][~quality]).all())
+        self.assertNotIn('broadcast_available',old[0])
+
     def test_clock_alignment_recovers_offsets_without_possession_labels(self):
         rng = np.random.default_rng(12)
         n = 48500

@@ -1,0 +1,4520 @@
+{
+  "date": "2026-11-17",
+  "objective": "macroF1",
+  "baseline_commit": "dcb3af6",
+  "previous_method_report": "src/bench/results/macro_v9_2026-11-17.json",
+  "selected_on_public": true,
+  "private_score_known": false,
+  "same_public_possessions": true,
+  "public_frames": 7500,
+  "public_ground_truth_possessions": 17,
+  "method": "Replace v9 quality-only broadcast phase classifier with an 18-feature availability-aware binary logistic head. Train all 301 native public rows; preserve missing geometry as NaN, add observable availability, and predict over the existing primary-video coverage. Other five classifiers, phase weight, margins and temporal operations stay unchanged.",
+  "params": {
+    "player_margin": 5.0,
+    "max_player_speed": 12.0,
+    "vel_k": 2,
+    "ball_spike_speed": 45.0,
+    "ball_island_len": 3,
+    "ball_island_gap": 50,
+    "max_gap": 12,
+    "ball_source": "fused_full",
+    "ctrl_radius": 1.3,
+    "ctrl_softness": 0.35,
+    "sync_free": 2.5,
+    "sync_scale": 3.0,
+    "filled_trust": 0.6,
+    "corner_zone": 3.0,
+    "still_speed": 1.2,
+    "slow_window": 50,
+    "ball_smooth": 9,
+    "touch_k": 3,
+    "touch_dv": 3.5,
+    "touch_spacing": 6,
+    "touch_radius": 2.0,
+    "touch_margin": 1.5,
+    "duel_radius": 1.5,
+    "seq_max_gap": 100,
+    "pass_min_travel": 5.0,
+    "shot_speed": 18.0,
+    "shot_range": 35.0,
+    "out_margin": 0.5,
+    "out_min_frames": 3,
+    "vanish_min_frames": 50,
+    "vanish_horizon": 0.4,
+    "decel_window": 25,
+    "decel_drop": 1.2,
+    "decel_to": 1.6,
+    "decel_lead": 20,
+    "rest_speed": 1.8,
+    "placed_min_frames": 25,
+    "placed_calm_speed": 1.8,
+    "restart_kick_speed": 5.0,
+    "kick_within": 20,
+    "reappear_min_frames": 75,
+    "dead_min_gap": 50,
+    "dead_max_gap": 2250,
+    "hold_kinds": "goal_line,touchline,vanish",
+    "hold_goal_line": 200,
+    "hold_touchline": 75,
+    "shape_folds": 8,
+    "shape_guard": 250,
+    "shape_stride": 3,
+    "shape_iter": 150,
+    "shape_eps": 0.05,
+    "pretrained_shape": "",
+    "pretrained_mix": 1.0,
+    "shape_rounds": 2,
+    "shape_conf": 0.0,
+    "ownership_model": "pretrain_data/ownership_v2/ownership_all.joblib",
+    "supervised_shape_model": "pretrain_data/ownership_v2/shape_all.joblib",
+    "w_owner": 1.0,
+    "w_owner_switch": 12.0,
+    "w_contact": 1.0,
+    "contact_alpha": 0.5,
+    "contact_window": 125,
+    "contact_lock_dead": 1,
+    "contact_switch_cost": 4.0,
+    "contact_min_frames": 12,
+    "contact_local_switch": 0,
+    "hybrid_model": "pretrain_data/macro_v10/ensemble.joblib",
+    "hybrid_weight": 0.5,
+    "hybrid_lock_dead": 1,
+    "hybrid_prune_max_frames": 100,
+    "hybrid_prune_min_confidence": 0.5,
+    "hybrid_loose_threshold": 0.0,
+    "hybrid_dead_margin": 12,
+    "hybrid_dead_weight": 2.0,
+    "ctrl_eps": 0.05,
+    "near_radius": 1.3,
+    "near_margin": 0.5,
+    "w_near": 0.0,
+    "near_rounds": 0,
+    "w_ball": 1.0,
+    "w_shape": 1.0,
+    "w_shape_known": 0.0,
+    "w_tag": 0.0,
+    "w_dead": 1.0,
+    "d_bias": 0.0,
+    "w_out": 6.0,
+    "w_out_carry": 3.0,
+    "slow_speed": 1.3,
+    "slow_scale": 0.3,
+    "w_slow": 1.0,
+    "dead_gap": 75,
+    "w_missing": 0.0,
+    "w_missing_slow": 0.5,
+    "w_still": 2.0,
+    "w_shape_dead": 0.5,
+    "alive_ball_speed": 6.0,
+    "w_alive": 3.0,
+    "w_hold": 5.0,
+    "w_post_restart": 2.0,
+    "inner_restarts": 0,
+    "post_restart_frames": 50,
+    "w_tag_dead": 1.0,
+    "tag_dead_frames": 25,
+    "z_max": 4.0,
+    "pre_kickoff_dead": 1,
+    "goal_dead": 1,
+    "w_whistle": 10.0,
+    "w_whistle_dead": 2.0,
+    "whistle_thresh": 24.0,
+    "whistle_before": 5,
+    "whistle_after": 20,
+    "whistle_hold": 150,
+    "w_whistle_confirmed": 16.0,
+    "whistle_confirm_speed": 1.5,
+    "whistle_confirm_window": 125,
+    "whistle_lag": 10,
+    "whistle_min_speed": 1.8,
+    "loose_cost": 1.0,
+    "switch_cost": 16.0,
+    "tackle_extra": 5.0,
+    "dead_entry_cost": 20.0,
+    "dead_exit_cost": 30.0,
+    "dead_min_frames": 100,
+    "w_turnover": 8.0,
+    "w_touch": 4.0,
+    "w_duel": 2.0,
+    "w_deflection": 0.0,
+    "touch_before": 2,
+    "touch_after": 10,
+    "w_near_switch": 0.0,
+    "w_stoppage": 8.0,
+    "stop_before": 10,
+    "stop_after": 25,
+    "w_shot_dead": 3.0,
+    "shot_window": 75,
+    "w_restart": 8.0,
+    "restart_before": 10,
+    "restart_after": 10
+  },
+  "dead_head": {
+    "model": "dead_logreg",
+    "C": 10.0,
+    "features": 28,
+    "feature_group": "film_dead_motion",
+    "training_rows": 301,
+    "folds": 5,
+    "purge_frames": 125,
+    "blend_weight": 0.5,
+    "primary_conditional_team_preserved": true
+  },
+  "phase_head": {
+    "model": "dead_logreg",
+    "C": 0.3,
+    "features": 18,
+    "training_rows": 301,
+    "folds": 5,
+    "purge_frames": 125,
+    "purge_basis": "actual fold interval edges",
+    "weight": 0.75,
+    "dead_margin": 50,
+    "keep_teams": true,
+    "pointwise_before_stitching": true,
+    "feature_set": "broadcast_dead_available",
+    "quality_gate_used_as_feature": true,
+    "quality_gate_used_to_drop_training_rows": false,
+    "coverage": "primary video, including missing broadcast geometry"
+  },
+  "checkpoint": {
+    "public": {
+      "macro_f1": 0.9631665786415224,
+      "spell_f1_mean": 0.9032258064516128,
+      "spell_f1_at_headline": 0.9032258064516129,
+      "spell_iou_headline": 0.5,
+      "spell_bootstrap_low": null,
+      "spell_bootstrap_high": null,
+      "n_gt_spells": 17,
+      "n_pred_spells": 14,
+      "spell_count_error": -3,
+      "mean_spell_duration_s": 16.985714285714288,
+      "gt_mean_spell_duration_s": 14.190588235294117,
+      "accuracy": 0.9636,
+      "kappa": 0.9426548638660077,
+      "alive_dead_f1": 0.989812959251837,
+      "team_acc_gt_alive": 0.9577184546509699,
+      "team_acc_both_alive": 0.9745233676396153,
+      "gt_home_share": 0.5727076770021555,
+      "pred_home_share": 0.5640033641715727,
+      "share_err": 0.008704312830582817,
+      "share_defined": true,
+      "n_gt_segments": 21,
+      "n_pred_segments": 18,
+      "fragmentation": 0.8571428571428571,
+      "n_frames": 199319,
+      "n_graded": 7500,
+      "n_abstain_on_graded": 0,
+      "bootstrap_low": null,
+      "bootstrap_high": null,
+      "bootstrap_n": 0,
+      "confusion": [
+        [
+          3276,
+          91,
+          87,
+          0
+        ],
+        [
+          60,
+          2500,
+          17,
+          0
+        ],
+        [
+          17,
+          1,
+          1451,
+          0
+        ],
+        [
+          48412,
+          31542,
+          71403,
+          40462
+        ]
+      ],
+      "per_class": {
+        "H": {
+          "precision": 0.9770354906054279,
+          "recall": 0.9484655471916619,
+          "f1": 0.9625385632437197,
+          "support": 3454
+        },
+        "A": {
+          "precision": 0.9645061728395061,
+          "recall": 0.9701202949165697,
+          "f1": 0.967305088024763,
+          "support": 2577
+        },
+        "D": {
+          "precision": 0.9331189710610932,
+          "recall": 0.9877467665078284,
+          "f1": 0.9596560846560847,
+          "support": 1469
+        }
+      },
+      "transitions": {
+        "12": {
+          "precision": 0.5882352941176471,
+          "recall": 0.5,
+          "f1": 0.5405405405405405,
+          "n_gt": 20,
+          "n_pred": 17,
+          "n_matched": 10,
+          "n_missed": 10,
+          "n_spurious": 7,
+          "n_ambiguous": 0,
+          "mean_latency": -0.3,
+          "median_latency": 0.0,
+          "mean_abs_latency": 3.5,
+          "p90_abs_latency": 9.0
+        },
+        "25": {
+          "precision": 0.8823529411764706,
+          "recall": 0.75,
+          "f1": 0.8108108108108107,
+          "n_gt": 20,
+          "n_pred": 17,
+          "n_matched": 15,
+          "n_missed": 5,
+          "n_spurious": 2,
+          "n_ambiguous": 0,
+          "mean_latency": 0.3333333333333333,
+          "median_latency": 0.0,
+          "mean_abs_latency": 7.533333333333333,
+          "p90_abs_latency": 16.6
+        }
+      },
+      "spell_f1": {
+        "0.3": {
+          "precision": 1.0,
+          "recall": 0.8235294117647058,
+          "f1": 0.9032258064516129,
+          "n_matched": 14,
+          "n_spurious": 0,
+          "n_missed": 3
+        },
+        "0.4": {
+          "precision": 1.0,
+          "recall": 0.8235294117647058,
+          "f1": 0.9032258064516129,
+          "n_matched": 14,
+          "n_spurious": 0,
+          "n_missed": 3
+        },
+        "0.5": {
+          "precision": 1.0,
+          "recall": 0.8235294117647058,
+          "f1": 0.9032258064516129,
+          "n_matched": 14,
+          "n_spurious": 0,
+          "n_missed": 3
+        },
+        "0.6": {
+          "precision": 1.0,
+          "recall": 0.8235294117647058,
+          "f1": 0.9032258064516129,
+          "n_matched": 14,
+          "n_spurious": 0,
+          "n_missed": 3
+        },
+        "0.7": {
+          "precision": 1.0,
+          "recall": 0.8235294117647058,
+          "f1": 0.9032258064516129,
+          "n_matched": 14,
+          "n_spurious": 0,
+          "n_missed": 3
+        }
+      },
+      "gt_home_share_spells": 0.5727076770021555
+    },
+    "full": {
+      "possessions": 401,
+      "dead_spells": 130,
+      "graded_frames": 158857,
+      "label_counts": {
+        "H": 51765,
+        "A": 34134,
+        "D": 72958,
+        "X": 40462
+      },
+      "mean_duration_s": 8.56847880299252,
+      "home_alive_share": 0.6026263402367897,
+      "away_alive_share": 0.39737365976321026,
+      "dead_share": 0.4592683986226606,
+      "teams": {
+        "H": {
+          "possessions": 197,
+          "mean_duration_s": 10.510659898477156
+        },
+        "A": {
+          "possessions": 204,
+          "mean_duration_s": 6.692941176470588
+        }
+      }
+    },
+    "halves": [
+      {
+        "half": 1,
+        "graded_frames": 79467,
+        "possessions": 202,
+        "mean_duration_s": 8.813861386138614,
+        "home_alive_share": 0.6163334082228713,
+        "away_alive_share": 0.38366659177712875,
+        "dead_share": 0.4398932890382171,
+        "dead_spells": 62,
+        "label_counts": {
+          "H": 27433,
+          "A": 17077,
+          "D": 34957,
+          "X": 0
+        },
+        "teams": {
+          "H": {
+            "possessions": 100,
+            "mean_duration_s": 10.973199999999999
+          },
+          "A": {
+            "possessions": 102,
+            "mean_duration_s": 6.69686274509804
+          }
+        }
+      },
+      {
+        "half": 2,
+        "graded_frames": 79390,
+        "possessions": 199,
+        "mean_duration_s": 8.319396984924623,
+        "home_alive_share": 0.5878856701055836,
+        "away_alive_share": 0.4121143298944164,
+        "dead_share": 0.47866230003778815,
+        "dead_spells": 68,
+        "label_counts": {
+          "H": 24332,
+          "A": 17057,
+          "D": 38001,
+          "X": 0
+        },
+        "teams": {
+          "H": {
+            "possessions": 97,
+            "mean_duration_s": 10.03381443298969
+          },
+          "A": {
+            "possessions": 102,
+            "mean_duration_s": 6.689019607843137
+          }
+        }
+      }
+    ],
+    "changes": {
+      "total": 156,
+      "public": 19,
+      "dead": 156
+    },
+    "csv_sha256": "e6f0cae02ef06eed8971aaa2e96f39b05b6c9a2e2a250b622faaba89462ca76f",
+    "artifact_sha256": "7a483caceb0a1f296a66bfd906c3e435a6c7967d45bbdd6a98195509c1331e1d"
+  },
+  "sensitivity": {
+    "selection_used_public": true,
+    "same_public_possessions": true,
+    "params": {
+      "baseline": {
+        "player_margin": 5.0,
+        "max_player_speed": 12.0,
+        "vel_k": 2,
+        "ball_spike_speed": 45.0,
+        "ball_island_len": 3,
+        "ball_island_gap": 50,
+        "max_gap": 12,
+        "ball_source": "fused_full",
+        "ctrl_radius": 1.3,
+        "ctrl_softness": 0.35,
+        "sync_free": 2.5,
+        "sync_scale": 3.0,
+        "filled_trust": 0.6,
+        "corner_zone": 3.0,
+        "still_speed": 1.2,
+        "slow_window": 50,
+        "ball_smooth": 9,
+        "touch_k": 3,
+        "touch_dv": 3.5,
+        "touch_spacing": 6,
+        "touch_radius": 2.0,
+        "touch_margin": 1.5,
+        "duel_radius": 1.5,
+        "seq_max_gap": 100,
+        "pass_min_travel": 5.0,
+        "shot_speed": 18.0,
+        "shot_range": 35.0,
+        "out_margin": 0.5,
+        "out_min_frames": 3,
+        "vanish_min_frames": 50,
+        "vanish_horizon": 0.4,
+        "decel_window": 25,
+        "decel_drop": 1.2,
+        "decel_to": 1.6,
+        "decel_lead": 20,
+        "rest_speed": 1.8,
+        "placed_min_frames": 25,
+        "placed_calm_speed": 1.8,
+        "restart_kick_speed": 5.0,
+        "kick_within": 20,
+        "reappear_min_frames": 75,
+        "dead_min_gap": 50,
+        "dead_max_gap": 2250,
+        "hold_kinds": "goal_line,touchline,vanish",
+        "hold_goal_line": 200,
+        "hold_touchline": 75,
+        "shape_folds": 8,
+        "shape_guard": 250,
+        "shape_stride": 3,
+        "shape_iter": 150,
+        "shape_eps": 0.05,
+        "pretrained_shape": "",
+        "pretrained_mix": 1.0,
+        "shape_rounds": 2,
+        "shape_conf": 0.0,
+        "ownership_model": "pretrain_data/ownership_v2/ownership_all.joblib",
+        "supervised_shape_model": "pretrain_data/ownership_v2/shape_all.joblib",
+        "w_owner": 1.0,
+        "w_owner_switch": 12.0,
+        "w_contact": 1.0,
+        "contact_alpha": 0.5,
+        "contact_window": 125,
+        "contact_lock_dead": 1,
+        "contact_switch_cost": 4.0,
+        "contact_min_frames": 12,
+        "contact_local_switch": 0,
+        "hybrid_model": "pretrain_data/macro_v9/ensemble.joblib",
+        "hybrid_weight": 0.5,
+        "hybrid_lock_dead": 1,
+        "hybrid_prune_max_frames": 100,
+        "hybrid_prune_min_confidence": 0.5,
+        "hybrid_loose_threshold": 0.0,
+        "hybrid_dead_margin": 12,
+        "hybrid_dead_weight": 2.0,
+        "ctrl_eps": 0.05,
+        "near_radius": 1.3,
+        "near_margin": 0.5,
+        "w_near": 0.0,
+        "near_rounds": 0,
+        "w_ball": 1.0,
+        "w_shape": 1.0,
+        "w_shape_known": 0.0,
+        "w_tag": 0.0,
+        "w_dead": 1.0,
+        "d_bias": 0.0,
+        "w_out": 6.0,
+        "w_out_carry": 3.0,
+        "slow_speed": 1.3,
+        "slow_scale": 0.3,
+        "w_slow": 1.0,
+        "dead_gap": 75,
+        "w_missing": 0.0,
+        "w_missing_slow": 0.5,
+        "w_still": 2.0,
+        "w_shape_dead": 0.5,
+        "alive_ball_speed": 6.0,
+        "w_alive": 3.0,
+        "w_hold": 5.0,
+        "w_post_restart": 2.0,
+        "inner_restarts": 0,
+        "post_restart_frames": 50,
+        "w_tag_dead": 1.0,
+        "tag_dead_frames": 25,
+        "z_max": 4.0,
+        "pre_kickoff_dead": 1,
+        "goal_dead": 1,
+        "w_whistle": 10.0,
+        "w_whistle_dead": 2.0,
+        "whistle_thresh": 24.0,
+        "whistle_before": 5,
+        "whistle_after": 20,
+        "whistle_hold": 150,
+        "w_whistle_confirmed": 16.0,
+        "whistle_confirm_speed": 1.5,
+        "whistle_confirm_window": 125,
+        "whistle_lag": 10,
+        "whistle_min_speed": 1.8,
+        "loose_cost": 1.0,
+        "switch_cost": 16.0,
+        "tackle_extra": 5.0,
+        "dead_entry_cost": 20.0,
+        "dead_exit_cost": 30.0,
+        "dead_min_frames": 100,
+        "w_turnover": 8.0,
+        "w_touch": 4.0,
+        "w_duel": 2.0,
+        "w_deflection": 0.0,
+        "touch_before": 2,
+        "touch_after": 10,
+        "w_near_switch": 0.0,
+        "w_stoppage": 8.0,
+        "stop_before": 10,
+        "stop_after": 25,
+        "w_shot_dead": 3.0,
+        "shot_window": 75,
+        "w_restart": 8.0,
+        "restart_before": 10,
+        "restart_after": 10
+      },
+      "candidate": {
+        "player_margin": 5.0,
+        "max_player_speed": 12.0,
+        "vel_k": 2,
+        "ball_spike_speed": 45.0,
+        "ball_island_len": 3,
+        "ball_island_gap": 50,
+        "max_gap": 12,
+        "ball_source": "fused_full",
+        "ctrl_radius": 1.3,
+        "ctrl_softness": 0.35,
+        "sync_free": 2.5,
+        "sync_scale": 3.0,
+        "filled_trust": 0.6,
+        "corner_zone": 3.0,
+        "still_speed": 1.2,
+        "slow_window": 50,
+        "ball_smooth": 9,
+        "touch_k": 3,
+        "touch_dv": 3.5,
+        "touch_spacing": 6,
+        "touch_radius": 2.0,
+        "touch_margin": 1.5,
+        "duel_radius": 1.5,
+        "seq_max_gap": 100,
+        "pass_min_travel": 5.0,
+        "shot_speed": 18.0,
+        "shot_range": 35.0,
+        "out_margin": 0.5,
+        "out_min_frames": 3,
+        "vanish_min_frames": 50,
+        "vanish_horizon": 0.4,
+        "decel_window": 25,
+        "decel_drop": 1.2,
+        "decel_to": 1.6,
+        "decel_lead": 20,
+        "rest_speed": 1.8,
+        "placed_min_frames": 25,
+        "placed_calm_speed": 1.8,
+        "restart_kick_speed": 5.0,
+        "kick_within": 20,
+        "reappear_min_frames": 75,
+        "dead_min_gap": 50,
+        "dead_max_gap": 2250,
+        "hold_kinds": "goal_line,touchline,vanish",
+        "hold_goal_line": 200,
+        "hold_touchline": 75,
+        "shape_folds": 8,
+        "shape_guard": 250,
+        "shape_stride": 3,
+        "shape_iter": 150,
+        "shape_eps": 0.05,
+        "pretrained_shape": "",
+        "pretrained_mix": 1.0,
+        "shape_rounds": 2,
+        "shape_conf": 0.0,
+        "ownership_model": "pretrain_data/ownership_v2/ownership_all.joblib",
+        "supervised_shape_model": "pretrain_data/ownership_v2/shape_all.joblib",
+        "w_owner": 1.0,
+        "w_owner_switch": 12.0,
+        "w_contact": 1.0,
+        "contact_alpha": 0.5,
+        "contact_window": 125,
+        "contact_lock_dead": 1,
+        "contact_switch_cost": 4.0,
+        "contact_min_frames": 12,
+        "contact_local_switch": 0,
+        "hybrid_model": "pretrain_data/macro_v10/ensemble.joblib",
+        "hybrid_weight": 0.5,
+        "hybrid_lock_dead": 1,
+        "hybrid_prune_max_frames": 100,
+        "hybrid_prune_min_confidence": 0.5,
+        "hybrid_loose_threshold": 0.0,
+        "hybrid_dead_margin": 12,
+        "hybrid_dead_weight": 2.0,
+        "ctrl_eps": 0.05,
+        "near_radius": 1.3,
+        "near_margin": 0.5,
+        "w_near": 0.0,
+        "near_rounds": 0,
+        "w_ball": 1.0,
+        "w_shape": 1.0,
+        "w_shape_known": 0.0,
+        "w_tag": 0.0,
+        "w_dead": 1.0,
+        "d_bias": 0.0,
+        "w_out": 6.0,
+        "w_out_carry": 3.0,
+        "slow_speed": 1.3,
+        "slow_scale": 0.3,
+        "w_slow": 1.0,
+        "dead_gap": 75,
+        "w_missing": 0.0,
+        "w_missing_slow": 0.5,
+        "w_still": 2.0,
+        "w_shape_dead": 0.5,
+        "alive_ball_speed": 6.0,
+        "w_alive": 3.0,
+        "w_hold": 5.0,
+        "w_post_restart": 2.0,
+        "inner_restarts": 0,
+        "post_restart_frames": 50,
+        "w_tag_dead": 1.0,
+        "tag_dead_frames": 25,
+        "z_max": 4.0,
+        "pre_kickoff_dead": 1,
+        "goal_dead": 1,
+        "w_whistle": 10.0,
+        "w_whistle_dead": 2.0,
+        "whistle_thresh": 24.0,
+        "whistle_before": 5,
+        "whistle_after": 20,
+        "whistle_hold": 150,
+        "w_whistle_confirmed": 16.0,
+        "whistle_confirm_speed": 1.5,
+        "whistle_confirm_window": 125,
+        "whistle_lag": 10,
+        "whistle_min_speed": 1.8,
+        "loose_cost": 1.0,
+        "switch_cost": 16.0,
+        "tackle_extra": 5.0,
+        "dead_entry_cost": 20.0,
+        "dead_exit_cost": 30.0,
+        "dead_min_frames": 100,
+        "w_turnover": 8.0,
+        "w_touch": 4.0,
+        "w_duel": 2.0,
+        "w_deflection": 0.0,
+        "touch_before": 2,
+        "touch_after": 10,
+        "w_near_switch": 0.0,
+        "w_stoppage": 8.0,
+        "stop_before": 10,
+        "stop_after": 25,
+        "w_shot_dead": 3.0,
+        "shot_window": 75,
+        "w_restart": 8.0,
+        "restart_before": 10,
+        "restart_after": 10
+      }
+    },
+    "classifier_sha256": {
+      "baseline": "4a5081fc3858dda8552819ac525a9d879588378d8c773427db38afb991b48fe0",
+      "candidate": "7a483caceb0a1f296a66bfd906c3e435a6c7967d45bbdd6a98195509c1331e1d"
+    },
+    "results": [
+      {
+        "folds": 3,
+        "objective": "baseline",
+        "macroF1": 0.9507786243980916,
+        "spellF1": 0.7,
+        "possessions": 19,
+        "per_class": {
+          "H": {
+            "precision": 0.9667271627344223,
+            "recall": 0.9253039953676896,
+            "f1": 0.9455621301775148,
+            "support": 3454
+          },
+          "A": {
+            "precision": 0.9003215434083601,
+            "recall": 0.9778812572759022,
+            "f1": 0.9375000000000001,
+            "support": 2577
+          },
+          "D": {
+            "precision": 0.9949820788530466,
+            "recall": 0.944860449285228,
+            "f1": 0.9692737430167598,
+            "support": 1469
+          }
+        }
+      },
+      {
+        "folds": 3,
+        "objective": "candidate",
+        "macroF1": 0.9555255937874141,
+        "spellF1": 0.7,
+        "possessions": 19,
+        "per_class": {
+          "H": {
+            "precision": 0.9767726161369193,
+            "recall": 0.9253039953676896,
+            "f1": 0.9503419565863812,
+            "support": 3454
+          },
+          "A": {
+            "precision": 0.8987161198288159,
+            "recall": 0.9778812572759022,
+            "f1": 0.9366288793904479,
+            "support": 2577
+          },
+          "D": {
+            "precision": 0.9950842696629213,
+            "recall": 0.9646017699115044,
+            "f1": 0.979605945385413,
+            "support": 1469
+          }
+        }
+      },
+      {
+        "folds": 4,
+        "objective": "baseline",
+        "macroF1": 0.9470469298324757,
+        "spellF1": 0.7757575757575758,
+        "possessions": 16,
+        "per_class": {
+          "H": {
+            "precision": 0.9394895325494694,
+            "recall": 0.9484655471916619,
+            "f1": 0.943956202276329,
+            "support": 3454
+          },
+          "A": {
+            "precision": 0.9596122778675282,
+            "recall": 0.9220023282887078,
+            "f1": 0.9404314268751236,
+            "support": 2577
+          },
+          "D": {
+            "precision": 0.9355888093689004,
+            "recall": 0.9788972089857045,
+            "f1": 0.9567531603459747,
+            "support": 1469
+          }
+        }
+      },
+      {
+        "folds": 4,
+        "objective": "candidate",
+        "macroF1": 0.9483885929099308,
+        "spellF1": 0.7757575757575758,
+        "possessions": 16,
+        "per_class": {
+          "H": {
+            "precision": 0.9408385985066055,
+            "recall": 0.9484655471916619,
+            "f1": 0.9446366782006921,
+            "support": 3454
+          },
+          "A": {
+            "precision": 0.9626471782379212,
+            "recall": 0.9200620876988747,
+            "f1": 0.9408730158730159,
+            "support": 2577
+          },
+          "D": {
+            "precision": 0.9331189710610932,
+            "recall": 0.9877467665078284,
+            "f1": 0.9596560846560847,
+            "support": 1469
+          }
+        }
+      },
+      {
+        "folds": 5,
+        "objective": "baseline",
+        "macroF1": 0.9623208557996378,
+        "spellF1": 0.9032258064516128,
+        "possessions": 14,
+        "per_class": {
+          "H": {
+            "precision": 0.9755807027992853,
+            "recall": 0.9484655471916619,
+            "f1": 0.9618320610687023,
+            "support": 3454
+          },
+          "A": {
+            "precision": 0.9620107444359172,
+            "recall": 0.972836631742336,
+            "f1": 0.9673934015049199,
+            "support": 2577
+          },
+          "D": {
+            "precision": 0.9368489583333334,
+            "recall": 0.9795779441797141,
+            "f1": 0.9577371048252912,
+            "support": 1469
+          }
+        }
+      },
+      {
+        "folds": 5,
+        "objective": "candidate",
+        "macroF1": 0.9631665786415224,
+        "spellF1": 0.9032258064516128,
+        "possessions": 14,
+        "per_class": {
+          "H": {
+            "precision": 0.9770354906054279,
+            "recall": 0.9484655471916619,
+            "f1": 0.9625385632437197,
+            "support": 3454
+          },
+          "A": {
+            "precision": 0.9645061728395061,
+            "recall": 0.9701202949165697,
+            "f1": 0.967305088024763,
+            "support": 2577
+          },
+          "D": {
+            "precision": 0.9331189710610932,
+            "recall": 0.9877467665078284,
+            "f1": 0.9596560846560847,
+            "support": 1469
+          }
+        }
+      },
+      {
+        "folds": 6,
+        "objective": "baseline",
+        "macroF1": 0.9499789206276357,
+        "spellF1": 0.825,
+        "possessions": 15,
+        "per_class": {
+          "H": {
+            "precision": 0.9564454837766735,
+            "recall": 0.9473074696004632,
+            "f1": 0.9518545454545454,
+            "support": 3454
+          },
+          "A": {
+            "precision": 0.9523992322456813,
+            "recall": 0.9627473806752037,
+            "f1": 0.9575453492859899,
+            "support": 2577
+          },
+          "D": {
+            "precision": 0.9389416553595658,
+            "recall": 0.94213750850919,
+            "f1": 0.9405368671423717,
+            "support": 1469
+          }
+        }
+      },
+      {
+        "folds": 6,
+        "objective": "candidate",
+        "macroF1": 0.9530396314054027,
+        "spellF1": 0.825,
+        "possessions": 15,
+        "per_class": {
+          "H": {
+            "precision": 0.9578454332552693,
+            "recall": 0.9473074696004632,
+            "f1": 0.9525473071324599,
+            "support": 3454
+          },
+          "A": {
+            "precision": 0.96,
+            "recall": 0.959254947613504,
+            "f1": 0.9596273291925465,
+            "support": 2577
+          },
+          "D": {
+            "precision": 0.9343936381709742,
+            "recall": 0.9598366235534377,
+            "f1": 0.9469442578912022,
+            "support": 1469
+          }
+        }
+      }
+    ]
+  },
+  "broadcast": {
+    "provenance": {
+      "version": 1,
+      "inputs": {
+        "version": 1,
+        "sources": {
+          "atd_meta": "53d387bcdef718c2034ee2e05c3036c7edfa3cfcd5bbe8270a43695bd252dbe9",
+          "atd_raw": "a71c1c9391e564032446be91ffbd7564205b47966060181532d80a338685e458",
+          "homography": "9ed07e7085bb0f200e171929948ae378cdba760d844bd18266c0b7caa4ba4afb"
+        },
+        "tactical_ball_sha256": "81040b87ba3b71bbc847396035b8b1b82b0d58ab59b301efc6af9d1da6bbd0e2",
+        "tactical_players_sha256": "45af2a674e075d9e9ef00b1f4d0a4c8b0c60d4e4634edaf08b7c643071cf6900",
+        "fused_ball_sha256": "fe31bca8048c63663c87ccd7b997ecfcb48fdbe916ddf9926a3fd6732afd841d",
+        "pitch": [
+          105.3,
+          68.0
+        ],
+        "blocks": [
+          [
+            1,
+            11185,
+            90651
+          ],
+          [
+            2,
+            110808,
+            190197
+          ]
+        ],
+        "params": {
+          "player_margin": 5.0,
+          "max_player_speed": 12.0,
+          "vel_k": 2,
+          "ball_spike_speed": 45.0,
+          "ball_island_len": 3,
+          "ball_island_gap": 50,
+          "max_gap": 12,
+          "ball_source": "fused_full",
+          "ctrl_radius": 1.3,
+          "ctrl_softness": 0.35,
+          "sync_free": 2.5,
+          "sync_scale": 3.0,
+          "filled_trust": 0.6,
+          "corner_zone": 3.0,
+          "still_speed": 1.2,
+          "slow_window": 50,
+          "ball_smooth": 9,
+          "touch_k": 3,
+          "touch_dv": 3.5,
+          "touch_spacing": 6,
+          "touch_radius": 2.0,
+          "touch_margin": 1.5,
+          "duel_radius": 1.5,
+          "seq_max_gap": 100,
+          "pass_min_travel": 5.0,
+          "shot_speed": 18.0,
+          "shot_range": 35.0,
+          "out_margin": 0.5,
+          "out_min_frames": 3,
+          "vanish_min_frames": 50,
+          "vanish_horizon": 0.4,
+          "decel_window": 25,
+          "decel_drop": 1.2,
+          "decel_to": 1.6,
+          "decel_lead": 20,
+          "rest_speed": 1.8,
+          "placed_min_frames": 25,
+          "placed_calm_speed": 1.8,
+          "restart_kick_speed": 5.0,
+          "kick_within": 20,
+          "reappear_min_frames": 75,
+          "dead_min_gap": 50,
+          "dead_max_gap": 2250,
+          "hold_kinds": "goal_line,touchline,vanish",
+          "hold_goal_line": 200,
+          "hold_touchline": 75,
+          "shape_folds": 8,
+          "shape_guard": 250,
+          "shape_stride": 3,
+          "shape_iter": 150,
+          "shape_eps": 0.05,
+          "pretrained_shape": "",
+          "pretrained_mix": 1.0,
+          "shape_rounds": 2,
+          "shape_conf": 0.0,
+          "ownership_model": "pretrain_data/ownership_v2/ownership_all.joblib",
+          "supervised_shape_model": "pretrain_data/ownership_v2/shape_all.joblib",
+          "w_owner": 1.0,
+          "w_owner_switch": 12.0,
+          "w_contact": 1.0,
+          "contact_alpha": 0.5,
+          "contact_window": 125,
+          "contact_lock_dead": 1,
+          "contact_switch_cost": 4.0,
+          "contact_min_frames": 12,
+          "contact_local_switch": 0,
+          "ctrl_eps": 0.05,
+          "near_radius": 1.3,
+          "near_margin": 0.5,
+          "w_near": 0.0,
+          "near_rounds": 0,
+          "w_ball": 1.0,
+          "w_shape": 1.0,
+          "w_shape_known": 0.0,
+          "w_tag": 0.0,
+          "w_dead": 1.0,
+          "d_bias": 0.0,
+          "w_out": 6.0,
+          "w_out_carry": 3.0,
+          "slow_speed": 1.3,
+          "slow_scale": 0.3,
+          "w_slow": 1.0,
+          "dead_gap": 75,
+          "w_missing": 0.0,
+          "w_missing_slow": 0.5,
+          "w_still": 2.0,
+          "w_shape_dead": 0.5,
+          "alive_ball_speed": 6.0,
+          "w_alive": 3.0,
+          "w_hold": 5.0,
+          "w_post_restart": 2.0,
+          "inner_restarts": 0,
+          "post_restart_frames": 50,
+          "w_tag_dead": 1.0,
+          "tag_dead_frames": 25,
+          "z_max": 4.0,
+          "pre_kickoff_dead": 1,
+          "goal_dead": 1,
+          "w_whistle": 10.0,
+          "w_whistle_dead": 2.0,
+          "whistle_thresh": 24.0,
+          "whistle_before": 5,
+          "whistle_after": 20,
+          "whistle_hold": 150,
+          "w_whistle_confirmed": 16.0,
+          "whistle_confirm_speed": 1.5,
+          "whistle_confirm_window": 125,
+          "whistle_lag": 10,
+          "whistle_min_speed": 1.8,
+          "loose_cost": 1.0,
+          "switch_cost": 16.0,
+          "tackle_extra": 5.0,
+          "dead_entry_cost": 20.0,
+          "dead_exit_cost": 30.0,
+          "dead_min_frames": 100,
+          "w_turnover": 8.0,
+          "w_touch": 4.0,
+          "w_duel": 2.0,
+          "w_deflection": 0.0,
+          "touch_before": 2,
+          "touch_after": 10,
+          "w_near_switch": 0.0,
+          "w_stoppage": 8.0,
+          "stop_before": 10,
+          "stop_after": 25,
+          "w_shot_dead": 3.0,
+          "shot_window": 75,
+          "w_restart": 8.0,
+          "restart_before": 10,
+          "restart_after": 10
+        }
+      },
+      "alignment": [
+        {
+          "half": 1,
+          "offset": -4014,
+          "anchors": 10,
+          "offset_range": 3
+        },
+        {
+          "half": 2,
+          "offset": -26919,
+          "anchors": 10,
+          "offset_range": 2
+        }
+      ],
+      "feature_cache_sha256": "40e29470fe661b039eac38c8180c13e6a1f93cf14755c4bde2f428e9f0df4534",
+      "public_labels_used": false,
+      "columns": [
+        "broadcast_quality",
+        "broadcast_player_match",
+        "broadcast_players",
+        "broadcast_ball_seen",
+        "broadcast_since_ball",
+        "broadcast_ball_speed",
+        "broadcast_contact_team",
+        "broadcast_dist_home",
+        "broadcast_relative_home",
+        "broadcast_player_speed_home",
+        "broadcast_count_home",
+        "broadcast_dist_away",
+        "broadcast_relative_away",
+        "broadcast_player_speed_away",
+        "broadcast_count_away",
+        "broadcast_team_distance",
+        "broadcast_ball_disagreement"
+      ]
+    },
+    "quality_supported_frames": 94058,
+    "public_quality_supported_frames": 5590,
+    "public_ball_observed_frames": 4899,
+    "median_player_alignment_m": 0.28817859292030334,
+    "native_training_rows": 301,
+    "public_labels_used_for_alignment_or_feature_extraction": false,
+    "quality_native_training_rows": 223
+  },
+  "experiments": {
+    "temporal_team": [
+      {
+        "group": "basic",
+        "model": "logreg",
+        "mode": "uncertain",
+        "features": 17,
+        "training_rows": 1049,
+        "macroF1": 0.9506541984608011,
+        "spellF1": 0.7741935483870968,
+        "possessions": 14,
+        "per_class": {
+          "H": {
+            "precision": 0.9598333829217495,
+            "recall": 0.9339895773016792,
+            "f1": 0.9467351430667644,
+            "support": 3454
+          },
+          "A": {
+            "precision": 0.9427583557433731,
+            "recall": 0.9522700814901047,
+            "f1": 0.9474903474903474,
+            "support": 2577
+          },
+          "D": {
+            "precision": 0.9368489583333334,
+            "recall": 0.9795779441797141,
+            "f1": 0.9577371048252912,
+            "support": 1469
+          }
+        },
+        "changed_frames": 108,
+        "public_changes": 103
+      },
+      {
+        "group": "basic",
+        "model": "logreg",
+        "mode": "mix25",
+        "features": 17,
+        "training_rows": 1049,
+        "macroF1": 0.9523633297954127,
+        "spellF1": 0.7741935483870968,
+        "possessions": 14,
+        "per_class": {
+          "H": {
+            "precision": 0.9641362821279139,
+            "recall": 0.9339895773016792,
+            "f1": 0.9488235294117647,
+            "support": 3454
+          },
+          "A": {
+            "precision": 0.9430863254392666,
+            "recall": 0.9580908032596042,
+            "f1": 0.9505293551491819,
+            "support": 2577
+          },
+          "D": {
+            "precision": 0.9368489583333334,
+            "recall": 0.9795779441797141,
+            "f1": 0.9577371048252912,
+            "support": 1469
+          }
+        },
+        "changed_frames": 162,
+        "public_changes": 112
+      },
+      {
+        "group": "basic",
+        "model": "logreg",
+        "mode": "contact",
+        "features": 17,
+        "training_rows": 1049,
+        "macroF1": 0.9288257672309862,
+        "spellF1": 0.5818181818181818,
+        "possessions": 16,
+        "per_class": {
+          "H": {
+            "precision": 0.9152105413921513,
+            "recall": 0.92501447596989,
+            "f1": 0.9200863930885529,
+            "support": 3454
+          },
+          "A": {
+            "precision": 0.9272433306386418,
+            "recall": 0.8901823826154444,
+            "f1": 0.9083349831716493,
+            "support": 2577
+          },
+          "D": {
+            "precision": 0.9374592833876222,
+            "recall": 0.9795779441797141,
+            "f1": 0.9580559254327564,
+            "support": 1469
+          }
+        },
+        "changed_frames": 633,
+        "public_changes": 364
+      },
+      {
+        "group": "basic",
+        "model": "hist_gbm",
+        "mode": "uncertain",
+        "features": 17,
+        "training_rows": 1049,
+        "macroF1": 0.9489422409445503,
+        "spellF1": 0.7354838709677418,
+        "possessions": 14,
+        "per_class": {
+          "H": {
+            "precision": 0.955568720379147,
+            "recall": 0.9339895773016792,
+            "f1": 0.9446559297218156,
+            "support": 3454
+          },
+          "A": {
+            "precision": 0.9424265842349304,
+            "recall": 0.9464493597206054,
+            "f1": 0.9444336882865441,
+            "support": 2577
+          },
+          "D": {
+            "precision": 0.9368489583333334,
+            "recall": 0.9795779441797141,
+            "f1": 0.9577371048252912,
+            "support": 1469
+          }
+        },
+        "changed_frames": 126,
+        "public_changes": 118
+      },
+      {
+        "group": "basic",
+        "model": "hist_gbm",
+        "mode": "mix25",
+        "features": 17,
+        "training_rows": 1049,
+        "macroF1": 0.9521897754946768,
+        "spellF1": 0.7741935483870968,
+        "possessions": 14,
+        "per_class": {
+          "H": {
+            "precision": 0.9641362821279139,
+            "recall": 0.9339895773016792,
+            "f1": 0.9488235294117647,
+            "support": 3454
+          },
+          "A": {
+            "precision": 0.9430645777607948,
+            "recall": 0.9577027551416376,
+            "f1": 0.9503273007316134,
+            "support": 2577
+          },
+          "D": {
+            "precision": 0.9362394274560832,
+            "recall": 0.9795779441797141,
+            "f1": 0.957418496340652,
+            "support": 1469
+          }
+        },
+        "changed_frames": 165,
+        "public_changes": 113
+      },
+      {
+        "group": "basic",
+        "model": "hist_gbm",
+        "mode": "contact",
+        "features": 17,
+        "training_rows": 1049,
+        "macroF1": 0.9343816476510615,
+        "spellF1": 0.7393939393939395,
+        "possessions": 16,
+        "per_class": {
+          "H": {
+            "precision": 0.9245608983587676,
+            "recall": 0.9296467863346844,
+            "f1": 0.9270968673307348,
+            "support": 3454
+          },
+          "A": {
+            "precision": 0.9341629867523084,
+            "recall": 0.902987970508343,
+            "f1": 0.9183109707971586,
+            "support": 2577
+          },
+          "D": {
+            "precision": 0.9368489583333334,
+            "recall": 0.9795779441797141,
+            "f1": 0.9577371048252912,
+            "support": 1469
+          }
+        },
+        "changed_frames": 438,
+        "public_changes": 325
+      },
+      {
+        "group": "temporal",
+        "model": "logreg",
+        "mode": "uncertain",
+        "features": 33,
+        "training_rows": 1049,
+        "macroF1": 0.9509962485411716,
+        "spellF1": 0.7741935483870968,
+        "possessions": 14,
+        "per_class": {
+          "H": {
+            "precision": 0.9606908874329958,
+            "recall": 0.9339895773016792,
+            "f1": 0.9471520845566647,
+            "support": 3454
+          },
+          "A": {
+            "precision": 0.9428242517267843,
+            "recall": 0.9534342258440046,
+            "f1": 0.948099556241559,
+            "support": 2577
+          },
+          "D": {
+            "precision": 0.9368489583333334,
+            "recall": 0.9795779441797141,
+            "f1": 0.9577371048252912,
+            "support": 1469
+          }
+        },
+        "changed_frames": 132,
+        "public_changes": 100
+      },
+      {
+        "group": "temporal",
+        "model": "logreg",
+        "mode": "mix25",
+        "features": 33,
+        "training_rows": 1049,
+        "macroF1": 0.951463448293639,
+        "spellF1": 0.7741935483870968,
+        "possessions": 14,
+        "per_class": {
+          "H": {
+            "precision": 0.9640503295386459,
+            "recall": 0.931673422119282,
+            "f1": 0.947585394581861,
+            "support": 3454
+          },
+          "A": {
+            "precision": 0.9402132520944402,
+            "recall": 0.9580908032596042,
+            "f1": 0.949067845473765,
+            "support": 2577
+          },
+          "D": {
+            "precision": 0.9368489583333334,
+            "recall": 0.9795779441797141,
+            "f1": 0.9577371048252912,
+            "support": 1469
+          }
+        },
+        "changed_frames": 134,
+        "public_changes": 120
+      },
+      {
+        "group": "temporal",
+        "model": "logreg",
+        "mode": "contact",
+        "features": 33,
+        "training_rows": 1049,
+        "macroF1": 0.9272758673077112,
+        "spellF1": 0.6709677419354838,
+        "possessions": 14,
+        "per_class": {
+          "H": {
+            "precision": 0.9099431818181818,
+            "recall": 0.9273306311522872,
+            "f1": 0.9185546314883855,
+            "support": 3454
+          },
+          "A": {
+            "precision": 0.9296523517382413,
+            "recall": 0.8820333721381451,
+            "f1": 0.9052170450019913,
+            "support": 2577
+          },
+          "D": {
+            "precision": 0.9374592833876222,
+            "recall": 0.9795779441797141,
+            "f1": 0.9580559254327564,
+            "support": 1469
+          }
+        },
+        "changed_frames": 831,
+        "public_changes": 375
+      },
+      {
+        "group": "temporal",
+        "model": "hist_gbm",
+        "mode": "uncertain",
+        "features": 33,
+        "training_rows": 1049,
+        "macroF1": 0.9509962485411716,
+        "spellF1": 0.7741935483870968,
+        "possessions": 14,
+        "per_class": {
+          "H": {
+            "precision": 0.9606908874329958,
+            "recall": 0.9339895773016792,
+            "f1": 0.9471520845566647,
+            "support": 3454
+          },
+          "A": {
+            "precision": 0.9428242517267843,
+            "recall": 0.9534342258440046,
+            "f1": 0.948099556241559,
+            "support": 2577
+          },
+          "D": {
+            "precision": 0.9368489583333334,
+            "recall": 0.9795779441797141,
+            "f1": 0.9577371048252912,
+            "support": 1469
+          }
+        },
+        "changed_frames": 181,
+        "public_changes": 100
+      },
+      {
+        "group": "temporal",
+        "model": "hist_gbm",
+        "mode": "mix25",
+        "features": 33,
+        "training_rows": 1049,
+        "macroF1": 0.9497237343581016,
+        "spellF1": 0.6482758620689655,
+        "possessions": 12,
+        "per_class": {
+          "H": {
+            "precision": 0.9652987326493663,
+            "recall": 0.9261725535610886,
+            "f1": 0.9453309692671394,
+            "support": 3454
+          },
+          "A": {
+            "precision": 0.9335598338995847,
+            "recall": 0.9596429957314707,
+            "f1": 0.9464217374665136,
+            "support": 2577
+          },
+          "D": {
+            "precision": 0.9362394274560832,
+            "recall": 0.9795779441797141,
+            "f1": 0.957418496340652,
+            "support": 1469
+          }
+        },
+        "changed_frames": 162,
+        "public_changes": 145
+      },
+      {
+        "group": "temporal",
+        "model": "hist_gbm",
+        "mode": "contact",
+        "features": 33,
+        "training_rows": 1049,
+        "macroF1": 0.9401792252248672,
+        "spellF1": 0.7314285714285713,
+        "possessions": 18,
+        "per_class": {
+          "H": {
+            "precision": 0.9310344827586207,
+            "recall": 0.9380428488708743,
+            "f1": 0.9345255263916932,
+            "support": 3454
+          },
+          "A": {
+            "precision": 0.9456521739130435,
+            "recall": 0.9115250291036089,
+            "f1": 0.928275044457617,
+            "support": 2577
+          },
+          "D": {
+            "precision": 0.9368489583333334,
+            "recall": 0.9795779441797141,
+            "f1": 0.9577371048252912,
+            "support": 1469
+          }
+        },
+        "changed_frames": 516,
+        "public_changes": 304
+      },
+      {
+        "group": "soft_temporal",
+        "model": "logreg",
+        "mode": "uncertain",
+        "features": 67,
+        "training_rows": 1049,
+        "macroF1": 0.9565658919631783,
+        "spellF1": 0.8121212121212121,
+        "possessions": 16,
+        "per_class": {
+          "H": {
+            "precision": 0.9743434953214609,
+            "recall": 0.9345686160972785,
+            "f1": 0.9540416728239988,
+            "support": 3454
+          },
+          "A": {
+            "precision": 0.944549226706903,
+            "recall": 0.9716724873884361,
+            "f1": 0.9579188982402448,
+            "support": 2577
+          },
+          "D": {
+            "precision": 0.9368489583333334,
+            "recall": 0.9795779441797141,
+            "f1": 0.9577371048252912,
+            "support": 1469
+          }
+        },
+        "changed_frames": 58,
+        "public_changes": 51
+      },
+      {
+        "group": "soft_temporal",
+        "model": "logreg",
+        "mode": "mix25",
+        "features": 67,
+        "training_rows": 1049,
+        "macroF1": 0.9505086826627521,
+        "spellF1": 0.6482758620689655,
+        "possessions": 12,
+        "per_class": {
+          "H": {
+            "precision": 0.9650917845320494,
+            "recall": 0.9284887087434858,
+            "f1": 0.9464364763169544,
+            "support": 3454
+          },
+          "A": {
+            "precision": 0.9363636363636364,
+            "recall": 0.959254947613504,
+            "f1": 0.9476710753306499,
+            "support": 2577
+          },
+          "D": {
+            "precision": 0.9362394274560832,
+            "recall": 0.9795779441797141,
+            "f1": 0.957418496340652,
+            "support": 1469
+          }
+        },
+        "changed_frames": 227,
+        "public_changes": 136
+      },
+      {
+        "group": "soft_temporal",
+        "model": "logreg",
+        "mode": "contact",
+        "features": 67,
+        "training_rows": 1049,
+        "macroF1": 0.9512811854211499,
+        "spellF1": 0.8,
+        "possessions": 18,
+        "per_class": {
+          "H": {
+            "precision": 0.9604284439155013,
+            "recall": 0.9345686160972785,
+            "f1": 0.9473220836390316,
+            "support": 3454
+          },
+          "A": {
+            "precision": 0.9435483870967742,
+            "recall": 0.9534342258440046,
+            "f1": 0.9484655471916618,
+            "support": 2577
+          },
+          "D": {
+            "precision": 0.9374592833876222,
+            "recall": 0.9795779441797141,
+            "f1": 0.9580559254327564,
+            "support": 1469
+          }
+        },
+        "changed_frames": 230,
+        "public_changes": 118
+      },
+      {
+        "group": "soft_temporal",
+        "model": "hist_gbm",
+        "mode": "uncertain",
+        "features": 67,
+        "training_rows": 1049,
+        "macroF1": 0.9618683692210087,
+        "spellF1": 0.9032258064516128,
+        "possessions": 14,
+        "per_class": {
+          "H": {
+            "precision": 0.9752681764004768,
+            "recall": 0.9475969889982628,
+            "f1": 0.9612334801762115,
+            "support": 3454
+          },
+          "A": {
+            "precision": 0.9608895705521472,
+            "recall": 0.9724485836243694,
+            "f1": 0.9666345226615236,
+            "support": 2577
+          },
+          "D": {
+            "precision": 0.9368489583333334,
+            "recall": 0.9795779441797141,
+            "f1": 0.9577371048252912,
+            "support": 1469
+          }
+        },
+        "changed_frames": 10,
+        "public_changes": 4
+      },
+      {
+        "group": "soft_temporal",
+        "model": "hist_gbm",
+        "mode": "mix25",
+        "features": 67,
+        "training_rows": 1049,
+        "macroF1": 0.9483577482628333,
+        "spellF1": 0.6482758620689655,
+        "possessions": 12,
+        "per_class": {
+          "H": {
+            "precision": 0.9618159951894167,
+            "recall": 0.9261725535610886,
+            "f1": 0.9436578171091444,
+            "support": 3454
+          },
+          "A": {
+            "precision": 0.9332574895714827,
+            "recall": 0.9549864183158712,
+            "f1": 0.9439969313387035,
+            "support": 2577
+          },
+          "D": {
+            "precision": 0.9362394274560832,
+            "recall": 0.9795779441797141,
+            "f1": 0.957418496340652,
+            "support": 1469
+          }
+        },
+        "changed_frames": 245,
+        "public_changes": 133
+      },
+      {
+        "group": "soft_temporal",
+        "model": "hist_gbm",
+        "mode": "contact",
+        "features": 67,
+        "training_rows": 1049,
+        "macroF1": 0.9620347233547156,
+        "spellF1": 0.9032258064516128,
+        "possessions": 14,
+        "per_class": {
+          "H": {
+            "precision": 0.9752902649598094,
+            "recall": 0.9484655471916619,
+            "f1": 0.9616908850726552,
+            "support": 3454
+          },
+          "A": {
+            "precision": 0.9619815668202765,
+            "recall": 0.9720605355064028,
+            "f1": 0.9669947886508395,
+            "support": 2577
+          },
+          "D": {
+            "precision": 0.9362394274560832,
+            "recall": 0.9795779441797141,
+            "f1": 0.957418496340652,
+            "support": 1469
+          }
+        },
+        "changed_frames": 43,
+        "public_changes": 2
+      }
+    ],
+    "temporal_phase": [
+      {
+        "group": "basic",
+        "model": "dead_logreg",
+        "mode": "phase",
+        "features": 17,
+        "training_rows": 223,
+        "macroF1": 0.9623208557996378,
+        "spellF1": 0.9032258064516128,
+        "possessions": 14,
+        "per_class": {
+          "H": {
+            "precision": 0.9755807027992853,
+            "recall": 0.9484655471916619,
+            "f1": 0.9618320610687023,
+            "support": 3454
+          },
+          "A": {
+            "precision": 0.9620107444359172,
+            "recall": 0.972836631742336,
+            "f1": 0.9673934015049199,
+            "support": 2577
+          },
+          "D": {
+            "precision": 0.9368489583333334,
+            "recall": 0.9795779441797141,
+            "f1": 0.9577371048252912,
+            "support": 1469
+          }
+        },
+        "changed_frames": 0,
+        "public_changes": 0
+      },
+      {
+        "group": "basic",
+        "model": "hist_gbm",
+        "mode": "phase",
+        "features": 17,
+        "training_rows": 223,
+        "macroF1": 0.9558742673950088,
+        "spellF1": 0.8749999999999998,
+        "possessions": 15,
+        "per_class": {
+          "H": {
+            "precision": 0.9658018867924528,
+            "recall": 0.9484655471916619,
+            "f1": 0.9570552147239264,
+            "support": 3454
+          },
+          "A": {
+            "precision": 0.9612284069097888,
+            "recall": 0.9716724873884361,
+            "f1": 0.9664222307989193,
+            "support": 2577
+          },
+          "D": {
+            "precision": 0.9334664005322688,
+            "recall": 0.955071477195371,
+            "f1": 0.9441453566621804,
+            "support": 1469
+          }
+        },
+        "changed_frames": 102,
+        "public_changes": 39
+      },
+      {
+        "group": "temporal",
+        "model": "dead_logreg",
+        "mode": "phase",
+        "features": 33,
+        "training_rows": 223,
+        "macroF1": 0.9621482303161762,
+        "spellF1": 0.9032258064516128,
+        "possessions": 14,
+        "per_class": {
+          "H": {
+            "precision": 0.9755807027992853,
+            "recall": 0.9484655471916619,
+            "f1": 0.9618320610687023,
+            "support": 3454
+          },
+          "A": {
+            "precision": 0.9619961612284069,
+            "recall": 0.9724485836243694,
+            "f1": 0.9671941335391739,
+            "support": 2577
+          },
+          "D": {
+            "precision": 0.9362394274560832,
+            "recall": 0.9795779441797141,
+            "f1": 0.957418496340652,
+            "support": 1469
+          }
+        },
+        "changed_frames": 43,
+        "public_changes": 1
+      },
+      {
+        "group": "temporal",
+        "model": "hist_gbm",
+        "mode": "phase",
+        "features": 33,
+        "training_rows": 223,
+        "macroF1": 0.9558742673950088,
+        "spellF1": 0.8749999999999998,
+        "possessions": 15,
+        "per_class": {
+          "H": {
+            "precision": 0.9658018867924528,
+            "recall": 0.9484655471916619,
+            "f1": 0.9570552147239264,
+            "support": 3454
+          },
+          "A": {
+            "precision": 0.9612284069097888,
+            "recall": 0.9716724873884361,
+            "f1": 0.9664222307989193,
+            "support": 2577
+          },
+          "D": {
+            "precision": 0.9334664005322688,
+            "recall": 0.955071477195371,
+            "f1": 0.9441453566621804,
+            "support": 1469
+          }
+        },
+        "changed_frames": 103,
+        "public_changes": 39
+      },
+      {
+        "group": "motion_temporal",
+        "model": "dead_logreg",
+        "mode": "phase",
+        "features": 61,
+        "training_rows": 223,
+        "macroF1": 0.9558329678689809,
+        "spellF1": 0.8749999999999998,
+        "possessions": 15,
+        "per_class": {
+          "H": {
+            "precision": 0.9658018867924528,
+            "recall": 0.9484655471916619,
+            "f1": 0.9570552147239264,
+            "support": 3454
+          },
+          "A": {
+            "precision": 0.9594646271510516,
+            "recall": 0.9736127279782693,
+            "f1": 0.9664869029275808,
+            "support": 2577
+          },
+          "D": {
+            "precision": 0.9363697253851306,
+            "recall": 0.9516678012253234,
+            "f1": 0.9439567859554355,
+            "support": 1469
+          }
+        },
+        "changed_frames": 149,
+        "public_changes": 43
+      },
+      {
+        "group": "motion_temporal",
+        "model": "hist_gbm",
+        "mode": "phase",
+        "features": 61,
+        "training_rows": 223,
+        "macroF1": 0.9558329678689809,
+        "spellF1": 0.8749999999999998,
+        "possessions": 15,
+        "per_class": {
+          "H": {
+            "precision": 0.9658018867924528,
+            "recall": 0.9484655471916619,
+            "f1": 0.9570552147239264,
+            "support": 3454
+          },
+          "A": {
+            "precision": 0.9594646271510516,
+            "recall": 0.9736127279782693,
+            "f1": 0.9664869029275808,
+            "support": 2577
+          },
+          "D": {
+            "precision": 0.9363697253851306,
+            "recall": 0.9516678012253234,
+            "f1": 0.9439567859554355,
+            "support": 1469
+          }
+        },
+        "changed_frames": 144,
+        "public_changes": 43
+      }
+    ],
+    "crossfade_motion": [
+      {
+        "group": "motion",
+        "model": "logreg",
+        "mode": "uncertain",
+        "features": 12,
+        "training_rows": 223,
+        "macroF1": 0.9623208557996378,
+        "spellF1": 0.9032258064516128,
+        "possessions": 14,
+        "per_class": {
+          "H": {
+            "precision": 0.9755807027992853,
+            "recall": 0.9484655471916619,
+            "f1": 0.9618320610687023,
+            "support": 3454
+          },
+          "A": {
+            "precision": 0.9620107444359172,
+            "recall": 0.972836631742336,
+            "f1": 0.9673934015049199,
+            "support": 2577
+          },
+          "D": {
+            "precision": 0.9368489583333334,
+            "recall": 0.9795779441797141,
+            "f1": 0.9577371048252912,
+            "support": 1469
+          }
+        },
+        "changed_frames": 0,
+        "public_changes": 0
+      },
+      {
+        "group": "motion",
+        "model": "logreg",
+        "mode": "mix25",
+        "features": 12,
+        "training_rows": 223,
+        "macroF1": 0.9505086826627521,
+        "spellF1": 0.6482758620689655,
+        "possessions": 12,
+        "per_class": {
+          "H": {
+            "precision": 0.9650917845320494,
+            "recall": 0.9284887087434858,
+            "f1": 0.9464364763169544,
+            "support": 3454
+          },
+          "A": {
+            "precision": 0.9363636363636364,
+            "recall": 0.959254947613504,
+            "f1": 0.9476710753306499,
+            "support": 2577
+          },
+          "D": {
+            "precision": 0.9362394274560832,
+            "recall": 0.9795779441797141,
+            "f1": 0.957418496340652,
+            "support": 1469
+          }
+        },
+        "changed_frames": 381,
+        "public_changes": 136
+      },
+      {
+        "group": "motion",
+        "model": "hist_gbm",
+        "mode": "uncertain",
+        "features": 12,
+        "training_rows": 223,
+        "macroF1": 0.9623208557996378,
+        "spellF1": 0.9032258064516128,
+        "possessions": 14,
+        "per_class": {
+          "H": {
+            "precision": 0.9755807027992853,
+            "recall": 0.9484655471916619,
+            "f1": 0.9618320610687023,
+            "support": 3454
+          },
+          "A": {
+            "precision": 0.9620107444359172,
+            "recall": 0.972836631742336,
+            "f1": 0.9673934015049199,
+            "support": 2577
+          },
+          "D": {
+            "precision": 0.9368489583333334,
+            "recall": 0.9795779441797141,
+            "f1": 0.9577371048252912,
+            "support": 1469
+          }
+        },
+        "changed_frames": 6,
+        "public_changes": 0
+      },
+      {
+        "group": "motion",
+        "model": "dead_logreg",
+        "mode": "phase",
+        "features": 12,
+        "training_rows": 223,
+        "macroF1": 0.9558329678689809,
+        "spellF1": 0.8749999999999998,
+        "possessions": 15,
+        "per_class": {
+          "H": {
+            "precision": 0.9658018867924528,
+            "recall": 0.9484655471916619,
+            "f1": 0.9570552147239264,
+            "support": 3454
+          },
+          "A": {
+            "precision": 0.9594646271510516,
+            "recall": 0.9736127279782693,
+            "f1": 0.9664869029275808,
+            "support": 2577
+          },
+          "D": {
+            "precision": 0.9363697253851306,
+            "recall": 0.9516678012253234,
+            "f1": 0.9439567859554355,
+            "support": 1469
+          }
+        },
+        "changed_frames": 151,
+        "public_changes": 43
+      },
+      {
+        "group": "geometry_motion",
+        "model": "logreg",
+        "mode": "uncertain",
+        "features": 29,
+        "training_rows": 223,
+        "macroF1": 0.9607406203014627,
+        "spellF1": 0.7862068965517242,
+        "possessions": 12,
+        "per_class": {
+          "H": {
+            "precision": 0.9760479041916168,
+            "recall": 0.9438332368268674,
+            "f1": 0.9596702973211657,
+            "support": 3454
+          },
+          "A": {
+            "precision": 0.9561737804878049,
+            "recall": 0.9736127279782693,
+            "f1": 0.9648144587579311,
+            "support": 2577
+          },
+          "D": {
+            "precision": 0.9368489583333334,
+            "recall": 0.9795779441797141,
+            "f1": 0.9577371048252912,
+            "support": 1469
+          }
+        },
+        "changed_frames": 69,
+        "public_changes": 30
+      },
+      {
+        "group": "geometry_motion",
+        "model": "logreg",
+        "mode": "mix25",
+        "features": 29,
+        "training_rows": 223,
+        "macroF1": 0.9508223819767077,
+        "spellF1": 0.7741935483870968,
+        "possessions": 14,
+        "per_class": {
+          "H": {
+            "precision": 0.9606908874329958,
+            "recall": 0.9339895773016792,
+            "f1": 0.9471520845566647,
+            "support": 3454
+          },
+          "A": {
+            "precision": 0.9428023032629559,
+            "recall": 0.9530461777260381,
+            "f1": 0.947896565032806,
+            "support": 2577
+          },
+          "D": {
+            "precision": 0.9362394274560832,
+            "recall": 0.9795779441797141,
+            "f1": 0.957418496340652,
+            "support": 1469
+          }
+        },
+        "changed_frames": 145,
+        "public_changes": 101
+      },
+      {
+        "group": "geometry_motion",
+        "model": "hist_gbm",
+        "mode": "uncertain",
+        "features": 29,
+        "training_rows": 223,
+        "macroF1": 0.9489509825619583,
+        "spellF1": 0.7225806451612902,
+        "possessions": 14,
+        "per_class": {
+          "H": {
+            "precision": 0.9569221628045157,
+            "recall": 0.932541980312681,
+            "f1": 0.944574780058651,
+            "support": 3454
+          },
+          "A": {
+            "precision": 0.9407236335642802,
+            "recall": 0.9483896003104385,
+            "f1": 0.9445410628019324,
+            "support": 2577
+          },
+          "D": {
+            "precision": 0.9368489583333334,
+            "recall": 0.9795779441797141,
+            "f1": 0.9577371048252912,
+            "support": 1469
+          }
+        },
+        "changed_frames": 124,
+        "public_changes": 122
+      },
+      {
+        "group": "geometry_motion",
+        "model": "dead_logreg",
+        "mode": "phase",
+        "features": 29,
+        "training_rows": 223,
+        "macroF1": 0.9558329678689809,
+        "spellF1": 0.8749999999999998,
+        "possessions": 15,
+        "per_class": {
+          "H": {
+            "precision": 0.9658018867924528,
+            "recall": 0.9484655471916619,
+            "f1": 0.9570552147239264,
+            "support": 3454
+          },
+          "A": {
+            "precision": 0.9594646271510516,
+            "recall": 0.9736127279782693,
+            "f1": 0.9664869029275808,
+            "support": 2577
+          },
+          "D": {
+            "precision": 0.9363697253851306,
+            "recall": 0.9516678012253234,
+            "f1": 0.9439567859554355,
+            "support": 1469
+          }
+        },
+        "changed_frames": 108,
+        "public_changes": 43
+      },
+      {
+        "group": "soft_geometry_motion",
+        "model": "logreg",
+        "mode": "uncertain",
+        "features": 63,
+        "training_rows": 223,
+        "macroF1": 0.9623208557996378,
+        "spellF1": 0.9032258064516128,
+        "possessions": 14,
+        "per_class": {
+          "H": {
+            "precision": 0.9755807027992853,
+            "recall": 0.9484655471916619,
+            "f1": 0.9618320610687023,
+            "support": 3454
+          },
+          "A": {
+            "precision": 0.9620107444359172,
+            "recall": 0.972836631742336,
+            "f1": 0.9673934015049199,
+            "support": 2577
+          },
+          "D": {
+            "precision": 0.9368489583333334,
+            "recall": 0.9795779441797141,
+            "f1": 0.9577371048252912,
+            "support": 1469
+          }
+        },
+        "changed_frames": 1,
+        "public_changes": 0
+      },
+      {
+        "group": "soft_geometry_motion",
+        "model": "logreg",
+        "mode": "mix25",
+        "features": 63,
+        "training_rows": 223,
+        "macroF1": 0.9492562754803865,
+        "spellF1": 0.6482758620689655,
+        "possessions": 12,
+        "per_class": {
+          "H": {
+            "precision": 0.9619076184763048,
+            "recall": 0.9284887087434858,
+            "f1": 0.9449027695934001,
+            "support": 3454
+          },
+          "A": {
+            "precision": 0.9360973754279194,
+            "recall": 0.9549864183158712,
+            "f1": 0.9454475605071072,
+            "support": 2577
+          },
+          "D": {
+            "precision": 0.9362394274560832,
+            "recall": 0.9795779441797141,
+            "f1": 0.957418496340652,
+            "support": 1469
+          }
+        },
+        "changed_frames": 137,
+        "public_changes": 125
+      },
+      {
+        "group": "soft_geometry_motion",
+        "model": "hist_gbm",
+        "mode": "uncertain",
+        "features": 63,
+        "training_rows": 223,
+        "macroF1": 0.9619818464282887,
+        "spellF1": 0.9032258064516128,
+        "possessions": 14,
+        "per_class": {
+          "H": {
+            "precision": 0.975558867362146,
+            "recall": 0.9475969889982628,
+            "f1": 0.9613746511969452,
+            "support": 3454
+          },
+          "A": {
+            "precision": 0.9609045611345343,
+            "recall": 0.972836631742336,
+            "f1": 0.96683378326263,
+            "support": 2577
+          },
+          "D": {
+            "precision": 0.9368489583333334,
+            "recall": 0.9795779441797141,
+            "f1": 0.9577371048252912,
+            "support": 1469
+          }
+        },
+        "changed_frames": 10,
+        "public_changes": 3
+      },
+      {
+        "group": "soft_geometry_motion",
+        "model": "dead_logreg",
+        "mode": "phase",
+        "features": 63,
+        "training_rows": 223,
+        "macroF1": 0.9563916085003522,
+        "spellF1": 0.8749999999999998,
+        "possessions": 15,
+        "per_class": {
+          "H": {
+            "precision": 0.9658018867924528,
+            "recall": 0.9484655471916619,
+            "f1": 0.9570552147239264,
+            "support": 3454
+          },
+          "A": {
+            "precision": 0.9612730061349694,
+            "recall": 0.972836631742336,
+            "f1": 0.96702025072324,
+            "support": 2577
+          },
+          "D": {
+            "precision": 0.9353333333333333,
+            "recall": 0.955071477195371,
+            "f1": 0.9450993600538902,
+            "support": 1469
+          }
+        },
+        "changed_frames": 164,
+        "public_changes": 36
+      }
+    ],
+    "FILM_pilot": [
+      {
+        "group": "motion",
+        "model": "logreg",
+        "mode": "uncertain",
+        "features": 20,
+        "training_rows": 222,
+        "macroF1": 0.9623208557996378,
+        "spellF1": 0.9032258064516128,
+        "possessions": 14,
+        "per_class": {
+          "H": {
+            "precision": 0.9755807027992853,
+            "recall": 0.9484655471916619,
+            "f1": 0.9618320610687023,
+            "support": 3454
+          },
+          "A": {
+            "precision": 0.9620107444359172,
+            "recall": 0.972836631742336,
+            "f1": 0.9673934015049199,
+            "support": 2577
+          },
+          "D": {
+            "precision": 0.9368489583333334,
+            "recall": 0.9795779441797141,
+            "f1": 0.9577371048252912,
+            "support": 1469
+          }
+        },
+        "changed_frames": 0,
+        "public_changes": 0
+      },
+      {
+        "group": "motion",
+        "model": "logreg",
+        "mode": "mix25",
+        "features": 20,
+        "training_rows": 222,
+        "macroF1": 0.9577553624816589,
+        "spellF1": 0.8121212121212121,
+        "possessions": 16,
+        "per_class": {
+          "H": {
+            "precision": 0.978465271458902,
+            "recall": 0.9339895773016792,
+            "f1": 0.9557102651459043,
+            "support": 3454
+          },
+          "A": {
+            "precision": 0.9441110277569392,
+            "recall": 0.9767171129220024,
+            "f1": 0.9601373259584207,
+            "support": 2577
+          },
+          "D": {
+            "precision": 0.9362394274560832,
+            "recall": 0.9795779441797141,
+            "f1": 0.957418496340652,
+            "support": 1469
+          }
+        },
+        "changed_frames": 62,
+        "public_changes": 62
+      },
+      {
+        "group": "motion",
+        "model": "hist_gbm",
+        "mode": "uncertain",
+        "features": 20,
+        "training_rows": 222,
+        "macroF1": 0.9623208557996378,
+        "spellF1": 0.9032258064516128,
+        "possessions": 14,
+        "per_class": {
+          "H": {
+            "precision": 0.9755807027992853,
+            "recall": 0.9484655471916619,
+            "f1": 0.9618320610687023,
+            "support": 3454
+          },
+          "A": {
+            "precision": 0.9620107444359172,
+            "recall": 0.972836631742336,
+            "f1": 0.9673934015049199,
+            "support": 2577
+          },
+          "D": {
+            "precision": 0.9368489583333334,
+            "recall": 0.9795779441797141,
+            "f1": 0.9577371048252912,
+            "support": 1469
+          }
+        },
+        "changed_frames": 0,
+        "public_changes": 0
+      },
+      {
+        "group": "motion",
+        "model": "dead_logreg",
+        "mode": "phase",
+        "features": 20,
+        "training_rows": 222,
+        "macroF1": 0.9558329678689809,
+        "spellF1": 0.8749999999999998,
+        "possessions": 15,
+        "per_class": {
+          "H": {
+            "precision": 0.9658018867924528,
+            "recall": 0.9484655471916619,
+            "f1": 0.9570552147239264,
+            "support": 3454
+          },
+          "A": {
+            "precision": 0.9594646271510516,
+            "recall": 0.9736127279782693,
+            "f1": 0.9664869029275808,
+            "support": 2577
+          },
+          "D": {
+            "precision": 0.9363697253851306,
+            "recall": 0.9516678012253234,
+            "f1": 0.9439567859554355,
+            "support": 1469
+          }
+        },
+        "changed_frames": 280,
+        "public_changes": 43
+      },
+      {
+        "group": "geometry_motion",
+        "model": "logreg",
+        "mode": "uncertain",
+        "features": 37,
+        "training_rows": 222,
+        "macroF1": 0.9623194553112935,
+        "spellF1": 0.9032258064516128,
+        "possessions": 14,
+        "per_class": {
+          "H": {
+            "precision": 0.9747324613555292,
+            "recall": 0.9493341053850608,
+            "f1": 0.9618656497506601,
+            "support": 3454
+          },
+          "A": {
+            "precision": 0.963076923076923,
+            "recall": 0.9716724873884361,
+            "f1": 0.9673556113579294,
+            "support": 2577
+          },
+          "D": {
+            "precision": 0.9368489583333334,
+            "recall": 0.9795779441797141,
+            "f1": 0.9577371048252912,
+            "support": 1469
+          }
+        },
+        "changed_frames": 6,
+        "public_changes": 6
+      },
+      {
+        "group": "geometry_motion",
+        "model": "logreg",
+        "mode": "mix25",
+        "features": 37,
+        "training_rows": 222,
+        "macroF1": 0.9492562754803865,
+        "spellF1": 0.6482758620689655,
+        "possessions": 12,
+        "per_class": {
+          "H": {
+            "precision": 0.9619076184763048,
+            "recall": 0.9284887087434858,
+            "f1": 0.9449027695934001,
+            "support": 3454
+          },
+          "A": {
+            "precision": 0.9360973754279194,
+            "recall": 0.9549864183158712,
+            "f1": 0.9454475605071072,
+            "support": 2577
+          },
+          "D": {
+            "precision": 0.9362394274560832,
+            "recall": 0.9795779441797141,
+            "f1": 0.957418496340652,
+            "support": 1469
+          }
+        },
+        "changed_frames": 125,
+        "public_changes": 125
+      },
+      {
+        "group": "geometry_motion",
+        "model": "hist_gbm",
+        "mode": "uncertain",
+        "features": 37,
+        "training_rows": 222,
+        "macroF1": 0.9477993305347173,
+        "spellF1": 0.7225806451612902,
+        "possessions": 14,
+        "per_class": {
+          "H": {
+            "precision": 0.9527466036621383,
+            "recall": 0.9339895773016792,
+            "f1": 0.9432748538011696,
+            "support": 3454
+          },
+          "A": {
+            "precision": 0.9422032583397983,
+            "recall": 0.9425688785409391,
+            "f1": 0.9423860329776916,
+            "support": 2577
+          },
+          "D": {
+            "precision": 0.9368489583333334,
+            "recall": 0.9795779441797141,
+            "f1": 0.9577371048252912,
+            "support": 1469
+          }
+        },
+        "changed_frames": 128,
+        "public_changes": 128
+      },
+      {
+        "group": "geometry_motion",
+        "model": "dead_logreg",
+        "mode": "phase",
+        "features": 37,
+        "training_rows": 222,
+        "macroF1": 0.9558329678689809,
+        "spellF1": 0.8749999999999998,
+        "possessions": 15,
+        "per_class": {
+          "H": {
+            "precision": 0.9658018867924528,
+            "recall": 0.9484655471916619,
+            "f1": 0.9570552147239264,
+            "support": 3454
+          },
+          "A": {
+            "precision": 0.9594646271510516,
+            "recall": 0.9736127279782693,
+            "f1": 0.9664869029275808,
+            "support": 2577
+          },
+          "D": {
+            "precision": 0.9363697253851306,
+            "recall": 0.9516678012253234,
+            "f1": 0.9439567859554355,
+            "support": 1469
+          }
+        },
+        "changed_frames": 280,
+        "public_changes": 43
+      },
+      {
+        "group": "soft_geometry_motion",
+        "model": "logreg",
+        "mode": "uncertain",
+        "features": 71,
+        "training_rows": 222,
+        "macroF1": 0.96220737447904,
+        "spellF1": 0.9032258064516128,
+        "possessions": 14,
+        "per_class": {
+          "H": {
+            "precision": 0.9752902649598094,
+            "recall": 0.9484655471916619,
+            "f1": 0.9616908850726552,
+            "support": 3454
+          },
+          "A": {
+            "precision": 0.9619961612284069,
+            "recall": 0.9724485836243694,
+            "f1": 0.9671941335391739,
+            "support": 2577
+          },
+          "D": {
+            "precision": 0.9368489583333334,
+            "recall": 0.9795779441797141,
+            "f1": 0.9577371048252912,
+            "support": 1469
+          }
+        },
+        "changed_frames": 1,
+        "public_changes": 1
+      },
+      {
+        "group": "soft_geometry_motion",
+        "model": "logreg",
+        "mode": "mix25",
+        "features": 71,
+        "training_rows": 222,
+        "macroF1": 0.9508223819767077,
+        "spellF1": 0.7741935483870968,
+        "possessions": 14,
+        "per_class": {
+          "H": {
+            "precision": 0.9606908874329958,
+            "recall": 0.9339895773016792,
+            "f1": 0.9471520845566647,
+            "support": 3454
+          },
+          "A": {
+            "precision": 0.9428023032629559,
+            "recall": 0.9530461777260381,
+            "f1": 0.947896565032806,
+            "support": 2577
+          },
+          "D": {
+            "precision": 0.9362394274560832,
+            "recall": 0.9795779441797141,
+            "f1": 0.957418496340652,
+            "support": 1469
+          }
+        },
+        "changed_frames": 101,
+        "public_changes": 101
+      },
+      {
+        "group": "soft_geometry_motion",
+        "model": "hist_gbm",
+        "mode": "uncertain",
+        "features": 71,
+        "training_rows": 222,
+        "macroF1": 0.9619818464282887,
+        "spellF1": 0.9032258064516128,
+        "possessions": 14,
+        "per_class": {
+          "H": {
+            "precision": 0.975558867362146,
+            "recall": 0.9475969889982628,
+            "f1": 0.9613746511969452,
+            "support": 3454
+          },
+          "A": {
+            "precision": 0.9609045611345343,
+            "recall": 0.972836631742336,
+            "f1": 0.96683378326263,
+            "support": 2577
+          },
+          "D": {
+            "precision": 0.9368489583333334,
+            "recall": 0.9795779441797141,
+            "f1": 0.9577371048252912,
+            "support": 1469
+          }
+        },
+        "changed_frames": 3,
+        "public_changes": 3
+      },
+      {
+        "group": "soft_geometry_motion",
+        "model": "dead_logreg",
+        "mode": "phase",
+        "features": 71,
+        "training_rows": 222,
+        "macroF1": 0.9561946417799835,
+        "spellF1": 0.8749999999999998,
+        "possessions": 15,
+        "per_class": {
+          "H": {
+            "precision": 0.9658018867924528,
+            "recall": 0.9484655471916619,
+            "f1": 0.9570552147239264,
+            "support": 3454
+          },
+          "A": {
+            "precision": 0.9601990049751243,
+            "recall": 0.9736127279782693,
+            "f1": 0.966859344894027,
+            "support": 2577
+          },
+          "D": {
+            "precision": 0.9364548494983278,
+            "recall": 0.9530292716133424,
+            "f1": 0.9446693657219973,
+            "support": 1469
+          }
+        },
+        "changed_frames": 278,
+        "public_changes": 41
+      }
+    ],
+    "broadcast_audio": [
+      {
+        "group": "audio",
+        "model": "dead_logreg",
+        "features": 5,
+        "training_rows": 301,
+        "macroF1": 0.9593875474168089,
+        "spellF1": 0.8749999999999998,
+        "possessions": 15,
+        "changed_frames": 404,
+        "public_changes": 111,
+        "per_class": {
+          "H": {
+            "precision": 0.9633933759442185,
+            "recall": 0.9600463231036479,
+            "f1": 0.9617169373549884,
+            "support": 3454
+          },
+          "A": {
+            "precision": 0.9562238294632661,
+            "recall": 0.9747768723321691,
+            "f1": 0.9654112221368178,
+            "support": 2577
+          },
+          "D": {
+            "precision": 0.9636617749825297,
+            "recall": 0.9387338325391422,
+            "f1": 0.9510344827586207,
+            "support": 1469
+          }
+        }
+      },
+      {
+        "group": "audio",
+        "model": "hist_gbm",
+        "features": 5,
+        "training_rows": 301,
+        "macroF1": 0.9568129613487116,
+        "spellF1": 0.8749999999999998,
+        "possessions": 15,
+        "changed_frames": 437,
+        "public_changes": 127,
+        "per_class": {
+          "H": {
+            "precision": 0.963673350770125,
+            "recall": 0.9600463231036479,
+            "f1": 0.961856417693981,
+            "support": 3454
+          },
+          "A": {
+            "precision": 0.9507948523845572,
+            "recall": 0.9747768723321691,
+            "f1": 0.9626365204062081,
+            "support": 2577
+          },
+          "D": {
+            "precision": 0.963302752293578,
+            "recall": 0.9292035398230089,
+            "f1": 0.9459459459459459,
+            "support": 1469
+          }
+        }
+      },
+      {
+        "group": "geometry_audio",
+        "model": "dead_logreg",
+        "features": 22,
+        "training_rows": 301,
+        "macroF1": 0.9617874081102228,
+        "spellF1": 0.9032258064516128,
+        "possessions": 14,
+        "changed_frames": 309,
+        "public_changes": 5,
+        "per_class": {
+          "H": {
+            "precision": 0.9755879726108961,
+            "recall": 0.9487550665894615,
+            "f1": 0.9619844415088802,
+            "support": 3454
+          },
+          "A": {
+            "precision": 0.9619523443504996,
+            "recall": 0.9712844392704696,
+            "f1": 0.9665958679281715,
+            "support": 2577
+          },
+          "D": {
+            "precision": 0.9350227420402859,
+            "recall": 0.9795779441797141,
+            "f1": 0.956781914893617,
+            "support": 1469
+          }
+        }
+      },
+      {
+        "group": "geometry_audio",
+        "model": "hist_gbm",
+        "features": 22,
+        "training_rows": 301,
+        "macroF1": 0.9570484053338206,
+        "spellF1": 0.8749999999999998,
+        "possessions": 15,
+        "changed_frames": 309,
+        "public_changes": 66,
+        "per_class": {
+          "H": {
+            "precision": 0.9683806146572104,
+            "recall": 0.9487550665894615,
+            "f1": 0.9584673881251828,
+            "support": 3454
+          },
+          "A": {
+            "precision": 0.9636785162287481,
+            "recall": 0.9677920062087699,
+            "f1": 0.9657308809293321,
+            "support": 2577
+          },
+          "D": {
+            "precision": 0.9286649214659686,
+            "recall": 0.9659632402995235,
+            "f1": 0.9469469469469469,
+            "support": 1469
+          }
+        }
+      },
+      {
+        "group": "video_geometry_audio",
+        "model": "dead_logreg",
+        "features": 50,
+        "training_rows": 301,
+        "macroF1": 0.9579348601475489,
+        "spellF1": 0.8749999999999998,
+        "possessions": 15,
+        "changed_frames": 461,
+        "public_changes": 122,
+        "per_class": {
+          "H": {
+            "precision": 0.9631135637525414,
+            "recall": 0.9600463231036479,
+            "f1": 0.9615774974626649,
+            "support": 3454
+          },
+          "A": {
+            "precision": 0.9554963864587296,
+            "recall": 0.9747768723321691,
+            "f1": 0.9650403380714561,
+            "support": 2577
+          },
+          "D": {
+            "precision": 0.9607843137254902,
+            "recall": 0.9339686861810755,
+            "f1": 0.9471867449085261,
+            "support": 1469
+          }
+        }
+      },
+      {
+        "group": "video_geometry_audio",
+        "model": "hist_gbm",
+        "features": 50,
+        "training_rows": 301,
+        "macroF1": 0.9560140195023178,
+        "spellF1": 0.8749999999999998,
+        "possessions": 15,
+        "changed_frames": 328,
+        "public_changes": 114,
+        "per_class": {
+          "H": {
+            "precision": 0.9633933759442185,
+            "recall": 0.9600463231036479,
+            "f1": 0.9617169373549884,
+            "support": 3454
+          },
+          "A": {
+            "precision": 0.9538167938931298,
+            "recall": 0.969732246798603,
+            "f1": 0.9617086780835097,
+            "support": 2577
+          },
+          "D": {
+            "precision": 0.954798331015299,
+            "recall": 0.9346494213750851,
+            "f1": 0.9446164430684554,
+            "support": 1469
+          }
+        }
+      },
+      {
+        "group": "geometry_control",
+        "model": "dead_logreg",
+        "features": 17,
+        "training_rows": 301,
+        "macroF1": 0.9624573397393211,
+        "spellF1": 0.9032258064516128,
+        "possessions": 14,
+        "changed_frames": 328,
+        "public_changes": 29,
+        "per_class": {
+          "H": {
+            "precision": 0.9755879726108961,
+            "recall": 0.9487550665894615,
+            "f1": 0.9619844415088802,
+            "support": 3454
+          },
+          "A": {
+            "precision": 0.9605967865340475,
+            "recall": 0.9743888242142026,
+            "f1": 0.9674436524754383,
+            "support": 2577
+          },
+          "D": {
+            "precision": 0.9397511460379829,
+            "recall": 0.9768550034036759,
+            "f1": 0.9579439252336448,
+            "support": 1469
+          }
+        }
+      },
+      {
+        "group": "geometry_control",
+        "model": "hist_gbm",
+        "features": 17,
+        "training_rows": 301,
+        "macroF1": 0.9574085395473196,
+        "spellF1": 0.8749999999999998,
+        "possessions": 15,
+        "changed_frames": 229,
+        "public_changes": 62,
+        "per_class": {
+          "H": {
+            "precision": 0.968371268105232,
+            "recall": 0.9484655471916619,
+            "f1": 0.9583150504607283,
+            "support": 3454
+          },
+          "A": {
+            "precision": 0.9637205712080278,
+            "recall": 0.9689561505626698,
+            "f1": 0.9663312693498451,
+            "support": 2577
+          },
+          "D": {
+            "precision": 0.9298820445609436,
+            "recall": 0.9659632402995235,
+            "f1": 0.9475792988313855,
+            "support": 1469
+          }
+        }
+      }
+    ],
+    "availability": [
+      {
+        "group": "geometry",
+        "model": "dead_logreg",
+        "mode": "phase",
+        "features": 17,
+        "training_rows": 301,
+        "macroF1": 0.9624573397393211,
+        "spellF1": 0.9032258064516128,
+        "possessions": 14,
+        "per_class": {
+          "H": {
+            "precision": 0.9755879726108961,
+            "recall": 0.9487550665894615,
+            "f1": 0.9619844415088802,
+            "support": 3454
+          },
+          "A": {
+            "precision": 0.9605967865340475,
+            "recall": 0.9743888242142026,
+            "f1": 0.9674436524754383,
+            "support": 2577
+          },
+          "D": {
+            "precision": 0.9397511460379829,
+            "recall": 0.9768550034036759,
+            "f1": 0.9579439252336448,
+            "support": 1469
+          }
+        },
+        "changed_frames": 328,
+        "public_changes": 29
+      },
+      {
+        "group": "geometry_available",
+        "model": "dead_logreg",
+        "mode": "phase",
+        "features": 18,
+        "training_rows": 301,
+        "macroF1": 0.9631665786415224,
+        "spellF1": 0.9032258064516128,
+        "possessions": 14,
+        "per_class": {
+          "H": {
+            "precision": 0.9770354906054279,
+            "recall": 0.9484655471916619,
+            "f1": 0.9625385632437197,
+            "support": 3454
+          },
+          "A": {
+            "precision": 0.9645061728395061,
+            "recall": 0.9701202949165697,
+            "f1": 0.967305088024763,
+            "support": 2577
+          },
+          "D": {
+            "precision": 0.9331189710610932,
+            "recall": 0.9877467665078284,
+            "f1": 0.9596560846560847,
+            "support": 1469
+          }
+        },
+        "changed_frames": 156,
+        "public_changes": 19
+      }
+    ],
+    "no_indicator_fold_audit": [
+      {
+        "folds": 3,
+        "variant": "baseline",
+        "macroF1": 0.9507786243980916,
+        "spellF1": 0.7,
+        "possessions": 19,
+        "per_class": {
+          "H": {
+            "precision": 0.9667271627344223,
+            "recall": 0.9253039953676896,
+            "f1": 0.9455621301775148,
+            "support": 3454
+          },
+          "A": {
+            "precision": 0.9003215434083601,
+            "recall": 0.9778812572759022,
+            "f1": 0.9375000000000001,
+            "support": 2577
+          },
+          "D": {
+            "precision": 0.9949820788530466,
+            "recall": 0.944860449285228,
+            "f1": 0.9692737430167598,
+            "support": 1469
+          }
+        }
+      },
+      {
+        "folds": 3,
+        "variant": "candidate",
+        "macroF1": 0.9478213986244262,
+        "spellF1": 0.7,
+        "possessions": 19,
+        "per_class": {
+          "H": {
+            "precision": 0.974390243902439,
+            "recall": 0.9253039953676896,
+            "f1": 0.9492129492129492,
+            "support": 3454
+          },
+          "A": {
+            "precision": 0.8873239436619719,
+            "recall": 0.9778812572759022,
+            "f1": 0.9304042828133654,
+            "support": 2577
+          },
+          "D": {
+            "precision": 0.994927536231884,
+            "recall": 0.9346494213750851,
+            "f1": 0.9638469638469638,
+            "support": 1469
+          }
+        }
+      },
+      {
+        "folds": 4,
+        "variant": "baseline",
+        "macroF1": 0.9470469298324757,
+        "spellF1": 0.7757575757575758,
+        "possessions": 16,
+        "per_class": {
+          "H": {
+            "precision": 0.9394895325494694,
+            "recall": 0.9484655471916619,
+            "f1": 0.943956202276329,
+            "support": 3454
+          },
+          "A": {
+            "precision": 0.9596122778675282,
+            "recall": 0.9220023282887078,
+            "f1": 0.9404314268751236,
+            "support": 2577
+          },
+          "D": {
+            "precision": 0.9355888093689004,
+            "recall": 0.9788972089857045,
+            "f1": 0.9567531603459747,
+            "support": 1469
+          }
+        }
+      },
+      {
+        "folds": 4,
+        "variant": "candidate",
+        "macroF1": 0.9489639563938339,
+        "spellF1": 0.7757575757575758,
+        "possessions": 16,
+        "per_class": {
+          "H": {
+            "precision": 0.939506880733945,
+            "recall": 0.9487550665894615,
+            "f1": 0.9441083261307981,
+            "support": 3454
+          },
+          "A": {
+            "precision": 0.9590361445783132,
+            "recall": 0.9266589057043073,
+            "f1": 0.9425695677915927,
+            "support": 2577
+          },
+          "D": {
+            "precision": 0.9434954007884363,
+            "recall": 0.9775357385976855,
+            "f1": 0.9602139752591107,
+            "support": 1469
+          }
+        }
+      },
+      {
+        "folds": 5,
+        "variant": "baseline",
+        "macroF1": 0.9623208557996378,
+        "spellF1": 0.9032258064516128,
+        "possessions": 14,
+        "per_class": {
+          "H": {
+            "precision": 0.9755807027992853,
+            "recall": 0.9484655471916619,
+            "f1": 0.9618320610687023,
+            "support": 3454
+          },
+          "A": {
+            "precision": 0.9620107444359172,
+            "recall": 0.972836631742336,
+            "f1": 0.9673934015049199,
+            "support": 2577
+          },
+          "D": {
+            "precision": 0.9368489583333334,
+            "recall": 0.9795779441797141,
+            "f1": 0.9577371048252912,
+            "support": 1469
+          }
+        }
+      },
+      {
+        "folds": 5,
+        "variant": "candidate",
+        "macroF1": 0.9624573397393211,
+        "spellF1": 0.9032258064516128,
+        "possessions": 14,
+        "per_class": {
+          "H": {
+            "precision": 0.9755879726108961,
+            "recall": 0.9487550665894615,
+            "f1": 0.9619844415088802,
+            "support": 3454
+          },
+          "A": {
+            "precision": 0.9605967865340475,
+            "recall": 0.9743888242142026,
+            "f1": 0.9674436524754383,
+            "support": 2577
+          },
+          "D": {
+            "precision": 0.9397511460379829,
+            "recall": 0.9768550034036759,
+            "f1": 0.9579439252336448,
+            "support": 1469
+          }
+        }
+      },
+      {
+        "folds": 6,
+        "variant": "baseline",
+        "macroF1": 0.9499789206276357,
+        "spellF1": 0.825,
+        "possessions": 15,
+        "per_class": {
+          "H": {
+            "precision": 0.9564454837766735,
+            "recall": 0.9473074696004632,
+            "f1": 0.9518545454545454,
+            "support": 3454
+          },
+          "A": {
+            "precision": 0.9523992322456813,
+            "recall": 0.9627473806752037,
+            "f1": 0.9575453492859899,
+            "support": 2577
+          },
+          "D": {
+            "precision": 0.9389416553595658,
+            "recall": 0.94213750850919,
+            "f1": 0.9405368671423717,
+            "support": 1469
+          }
+        }
+      },
+      {
+        "folds": 6,
+        "variant": "candidate",
+        "macroF1": 0.9507488513385386,
+        "spellF1": 0.825,
+        "possessions": 15,
+        "per_class": {
+          "H": {
+            "precision": 0.95645821157218,
+            "recall": 0.9475969889982628,
+            "f1": 0.9520069808027922,
+            "support": 3454
+          },
+          "A": {
+            "precision": 0.9535508637236084,
+            "recall": 0.9639115250291036,
+            "f1": 0.958703203396372,
+            "support": 2577
+          },
+          "D": {
+            "precision": 0.9402579769178547,
+            "recall": 0.9428182437031994,
+            "f1": 0.9415363698164514,
+            "support": 1469
+          }
+        }
+      }
+    ],
+    "availability_fold_audit": [
+      {
+        "folds": 3,
+        "variant": "baseline",
+        "macroF1": 0.9507786243980916,
+        "spellF1": 0.7,
+        "possessions": 19,
+        "per_class": {
+          "H": {
+            "precision": 0.9667271627344223,
+            "recall": 0.9253039953676896,
+            "f1": 0.9455621301775148,
+            "support": 3454
+          },
+          "A": {
+            "precision": 0.9003215434083601,
+            "recall": 0.9778812572759022,
+            "f1": 0.9375000000000001,
+            "support": 2577
+          },
+          "D": {
+            "precision": 0.9949820788530466,
+            "recall": 0.944860449285228,
+            "f1": 0.9692737430167598,
+            "support": 1469
+          }
+        }
+      },
+      {
+        "folds": 3,
+        "variant": "candidate",
+        "macroF1": 0.9555255937874141,
+        "spellF1": 0.7,
+        "possessions": 19,
+        "per_class": {
+          "H": {
+            "precision": 0.9767726161369193,
+            "recall": 0.9253039953676896,
+            "f1": 0.9503419565863812,
+            "support": 3454
+          },
+          "A": {
+            "precision": 0.8987161198288159,
+            "recall": 0.9778812572759022,
+            "f1": 0.9366288793904479,
+            "support": 2577
+          },
+          "D": {
+            "precision": 0.9950842696629213,
+            "recall": 0.9646017699115044,
+            "f1": 0.979605945385413,
+            "support": 1469
+          }
+        }
+      },
+      {
+        "folds": 4,
+        "variant": "baseline",
+        "macroF1": 0.9470469298324757,
+        "spellF1": 0.7757575757575758,
+        "possessions": 16,
+        "per_class": {
+          "H": {
+            "precision": 0.9394895325494694,
+            "recall": 0.9484655471916619,
+            "f1": 0.943956202276329,
+            "support": 3454
+          },
+          "A": {
+            "precision": 0.9596122778675282,
+            "recall": 0.9220023282887078,
+            "f1": 0.9404314268751236,
+            "support": 2577
+          },
+          "D": {
+            "precision": 0.9355888093689004,
+            "recall": 0.9788972089857045,
+            "f1": 0.9567531603459747,
+            "support": 1469
+          }
+        }
+      },
+      {
+        "folds": 4,
+        "variant": "candidate",
+        "macroF1": 0.9483885929099308,
+        "spellF1": 0.7757575757575758,
+        "possessions": 16,
+        "per_class": {
+          "H": {
+            "precision": 0.9408385985066055,
+            "recall": 0.9484655471916619,
+            "f1": 0.9446366782006921,
+            "support": 3454
+          },
+          "A": {
+            "precision": 0.9626471782379212,
+            "recall": 0.9200620876988747,
+            "f1": 0.9408730158730159,
+            "support": 2577
+          },
+          "D": {
+            "precision": 0.9331189710610932,
+            "recall": 0.9877467665078284,
+            "f1": 0.9596560846560847,
+            "support": 1469
+          }
+        }
+      },
+      {
+        "folds": 5,
+        "variant": "baseline",
+        "macroF1": 0.9623208557996378,
+        "spellF1": 0.9032258064516128,
+        "possessions": 14,
+        "per_class": {
+          "H": {
+            "precision": 0.9755807027992853,
+            "recall": 0.9484655471916619,
+            "f1": 0.9618320610687023,
+            "support": 3454
+          },
+          "A": {
+            "precision": 0.9620107444359172,
+            "recall": 0.972836631742336,
+            "f1": 0.9673934015049199,
+            "support": 2577
+          },
+          "D": {
+            "precision": 0.9368489583333334,
+            "recall": 0.9795779441797141,
+            "f1": 0.9577371048252912,
+            "support": 1469
+          }
+        }
+      },
+      {
+        "folds": 5,
+        "variant": "candidate",
+        "macroF1": 0.9631665786415224,
+        "spellF1": 0.9032258064516128,
+        "possessions": 14,
+        "per_class": {
+          "H": {
+            "precision": 0.9770354906054279,
+            "recall": 0.9484655471916619,
+            "f1": 0.9625385632437197,
+            "support": 3454
+          },
+          "A": {
+            "precision": 0.9645061728395061,
+            "recall": 0.9701202949165697,
+            "f1": 0.967305088024763,
+            "support": 2577
+          },
+          "D": {
+            "precision": 0.9331189710610932,
+            "recall": 0.9877467665078284,
+            "f1": 0.9596560846560847,
+            "support": 1469
+          }
+        }
+      },
+      {
+        "folds": 6,
+        "variant": "baseline",
+        "macroF1": 0.9499789206276357,
+        "spellF1": 0.825,
+        "possessions": 15,
+        "per_class": {
+          "H": {
+            "precision": 0.9564454837766735,
+            "recall": 0.9473074696004632,
+            "f1": 0.9518545454545454,
+            "support": 3454
+          },
+          "A": {
+            "precision": 0.9523992322456813,
+            "recall": 0.9627473806752037,
+            "f1": 0.9575453492859899,
+            "support": 2577
+          },
+          "D": {
+            "precision": 0.9389416553595658,
+            "recall": 0.94213750850919,
+            "f1": 0.9405368671423717,
+            "support": 1469
+          }
+        }
+      },
+      {
+        "folds": 6,
+        "variant": "candidate",
+        "macroF1": 0.9530396314054027,
+        "spellF1": 0.825,
+        "possessions": 15,
+        "per_class": {
+          "H": {
+            "precision": 0.9578454332552693,
+            "recall": 0.9473074696004632,
+            "f1": 0.9525473071324599,
+            "support": 3454
+          },
+          "A": {
+            "precision": 0.96,
+            "recall": 0.959254947613504,
+            "f1": 0.9596273291925465,
+            "support": 2577
+          },
+          "D": {
+            "precision": 0.9343936381709742,
+            "recall": 0.9598366235534377,
+            "f1": 0.9469442578912022,
+            "support": 1469
+          }
+        }
+      }
+    ],
+    "contact_timing_decode_only": [
+      {
+        "video_contact_alpha": 0.5,
+        "macroF1": 0.9623208557996378,
+        "spellF1": 0.9032258064516128,
+        "possessions": 14,
+        "per_class": {
+          "H": {
+            "precision": 0.9755807027992853,
+            "recall": 0.9484655471916619,
+            "f1": 0.9618320610687023,
+            "support": 3454
+          },
+          "A": {
+            "precision": 0.9620107444359172,
+            "recall": 0.972836631742336,
+            "f1": 0.9673934015049199,
+            "support": 2577
+          },
+          "D": {
+            "precision": 0.9368489583333334,
+            "recall": 0.9795779441797141,
+            "f1": 0.9577371048252912,
+            "support": 1469
+          }
+        },
+        "changed_frames": 0,
+        "public_changes": 0
+      },
+      {
+        "video_contact_alpha": 0.0,
+        "macroF1": 0.9460014710198434,
+        "spellF1": 0.6133333333333333,
+        "possessions": 13,
+        "per_class": {
+          "H": {
+            "precision": 0.9525222551928784,
+            "recall": 0.9293572669368848,
+            "f1": 0.9407971864009379,
+            "support": 3454
+          },
+          "A": {
+            "precision": 0.9363916730917502,
+            "recall": 0.9425688785409391,
+            "f1": 0.939470121833301,
+            "support": 2577
+          },
+          "D": {
+            "precision": 0.9368489583333334,
+            "recall": 0.9795779441797141,
+            "f1": 0.9577371048252912,
+            "support": 1469
+          }
+        },
+        "changed_frames": 438,
+        "public_changes": 158
+      },
+      {
+        "video_contact_alpha": 0.25,
+        "macroF1": 0.9481712196523713,
+        "spellF1": 0.6344827586206897,
+        "possessions": 12,
+        "per_class": {
+          "H": {
+            "precision": 0.9579230080572964,
+            "recall": 0.9293572669368848,
+            "f1": 0.9434239529757531,
+            "support": 3454
+          },
+          "A": {
+            "precision": 0.9368541905855339,
+            "recall": 0.9499417927823051,
+            "f1": 0.9433526011560693,
+            "support": 2577
+          },
+          "D": {
+            "precision": 0.9368489583333334,
+            "recall": 0.9795779441797141,
+            "f1": 0.9577371048252912,
+            "support": 1469
+          }
+        },
+        "changed_frames": 255,
+        "public_changes": 139
+      },
+      {
+        "video_contact_alpha": 0.75,
+        "macroF1": 0.9613024638570601,
+        "spellF1": 0.8774193548387096,
+        "possessions": 14,
+        "per_class": {
+          "H": {
+            "precision": 0.9746646795827124,
+            "recall": 0.9467284308048639,
+            "f1": 0.9604934645322368,
+            "support": 3454
+          },
+          "A": {
+            "precision": 0.95975469528555,
+            "recall": 0.9716724873884361,
+            "f1": 0.9656768222136521,
+            "support": 2577
+          },
+          "D": {
+            "precision": 0.9368489583333334,
+            "recall": 0.9795779441797141,
+            "f1": 0.9577371048252912,
+            "support": 1469
+          }
+        },
+        "changed_frames": 83,
+        "public_changes": 37
+      },
+      {
+        "video_contact_alpha": 1.0,
+        "macroF1": 0.954308606215915,
+        "spellF1": 0.6709677419354838,
+        "possessions": 14,
+        "per_class": {
+          "H": {
+            "precision": 0.9721802237677654,
+            "recall": 0.930804863925883,
+            "f1": 0.9510427451560419,
+            "support": 3454
+          },
+          "A": {
+            "precision": 0.9397817086940158,
+            "recall": 0.9689561505626698,
+            "f1": 0.9541459686664119,
+            "support": 2577
+          },
+          "D": {
+            "precision": 0.9368489583333334,
+            "recall": 0.9795779441797141,
+            "f1": 0.9577371048252912,
+            "support": 1469
+          }
+        },
+        "changed_frames": 284,
+        "public_changes": 121
+      }
+    ]
+  },
+  "extraction_metadata": {
+    "crossfade_motion": {
+      "inputs": {
+        "version": 1,
+        "interpolator": "naive",
+        "algorithm": "naive +/-2 frame residual and Farneback flow, existing Extractor",
+        "broadcast": {
+          "version": 1,
+          "inputs": {
+            "version": 1,
+            "sources": {
+              "atd_meta": "53d387bcdef718c2034ee2e05c3036c7edfa3cfcd5bbe8270a43695bd252dbe9",
+              "atd_raw": "a71c1c9391e564032446be91ffbd7564205b47966060181532d80a338685e458",
+              "homography": "9ed07e7085bb0f200e171929948ae378cdba760d844bd18266c0b7caa4ba4afb"
+            },
+            "tactical_ball_sha256": "81040b87ba3b71bbc847396035b8b1b82b0d58ab59b301efc6af9d1da6bbd0e2",
+            "tactical_players_sha256": "45af2a674e075d9e9ef00b1f4d0a4c8b0c60d4e4634edaf08b7c643071cf6900",
+            "fused_ball_sha256": "fe31bca8048c63663c87ccd7b997ecfcb48fdbe916ddf9926a3fd6732afd841d",
+            "pitch": [
+              105.3,
+              68.0
+            ],
+            "blocks": [
+              [
+                1,
+                11185,
+                90651
+              ],
+              [
+                2,
+                110808,
+                190197
+              ]
+            ],
+            "params": {
+              "player_margin": 5.0,
+              "max_player_speed": 12.0,
+              "vel_k": 2,
+              "ball_spike_speed": 45.0,
+              "ball_island_len": 3,
+              "ball_island_gap": 50,
+              "max_gap": 12,
+              "ball_source": "fused_full",
+              "ctrl_radius": 1.3,
+              "ctrl_softness": 0.35,
+              "sync_free": 2.5,
+              "sync_scale": 3.0,
+              "filled_trust": 0.6,
+              "corner_zone": 3.0,
+              "still_speed": 1.2,
+              "slow_window": 50,
+              "ball_smooth": 9,
+              "touch_k": 3,
+              "touch_dv": 3.5,
+              "touch_spacing": 6,
+              "touch_radius": 2.0,
+              "touch_margin": 1.5,
+              "duel_radius": 1.5,
+              "seq_max_gap": 100,
+              "pass_min_travel": 5.0,
+              "shot_speed": 18.0,
+              "shot_range": 35.0,
+              "out_margin": 0.5,
+              "out_min_frames": 3,
+              "vanish_min_frames": 50,
+              "vanish_horizon": 0.4,
+              "decel_window": 25,
+              "decel_drop": 1.2,
+              "decel_to": 1.6,
+              "decel_lead": 20,
+              "rest_speed": 1.8,
+              "placed_min_frames": 25,
+              "placed_calm_speed": 1.8,
+              "restart_kick_speed": 5.0,
+              "kick_within": 20,
+              "reappear_min_frames": 75,
+              "dead_min_gap": 50,
+              "dead_max_gap": 2250,
+              "hold_kinds": "goal_line,touchline,vanish",
+              "hold_goal_line": 200,
+              "hold_touchline": 75,
+              "shape_folds": 8,
+              "shape_guard": 250,
+              "shape_stride": 3,
+              "shape_iter": 150,
+              "shape_eps": 0.05,
+              "pretrained_shape": "",
+              "pretrained_mix": 1.0,
+              "shape_rounds": 2,
+              "shape_conf": 0.0,
+              "ownership_model": "pretrain_data/ownership_v2/ownership_all.joblib",
+              "supervised_shape_model": "pretrain_data/ownership_v2/shape_all.joblib",
+              "w_owner": 1.0,
+              "w_owner_switch": 12.0,
+              "w_contact": 1.0,
+              "contact_alpha": 0.5,
+              "contact_window": 125,
+              "contact_lock_dead": 1,
+              "contact_switch_cost": 4.0,
+              "contact_min_frames": 12,
+              "contact_local_switch": 0,
+              "ctrl_eps": 0.05,
+              "near_radius": 1.3,
+              "near_margin": 0.5,
+              "w_near": 0.0,
+              "near_rounds": 0,
+              "w_ball": 1.0,
+              "w_shape": 1.0,
+              "w_shape_known": 0.0,
+              "w_tag": 0.0,
+              "w_dead": 1.0,
+              "d_bias": 0.0,
+              "w_out": 6.0,
+              "w_out_carry": 3.0,
+              "slow_speed": 1.3,
+              "slow_scale": 0.3,
+              "w_slow": 1.0,
+              "dead_gap": 75,
+              "w_missing": 0.0,
+              "w_missing_slow": 0.5,
+              "w_still": 2.0,
+              "w_shape_dead": 0.5,
+              "alive_ball_speed": 6.0,
+              "w_alive": 3.0,
+              "w_hold": 5.0,
+              "w_post_restart": 2.0,
+              "inner_restarts": 0,
+              "post_restart_frames": 50,
+              "w_tag_dead": 1.0,
+              "tag_dead_frames": 25,
+              "z_max": 4.0,
+              "pre_kickoff_dead": 1,
+              "goal_dead": 1,
+              "w_whistle": 10.0,
+              "w_whistle_dead": 2.0,
+              "whistle_thresh": 24.0,
+              "whistle_before": 5,
+              "whistle_after": 20,
+              "whistle_hold": 150,
+              "w_whistle_confirmed": 16.0,
+              "whistle_confirm_speed": 1.5,
+              "whistle_confirm_window": 125,
+              "whistle_lag": 10,
+              "whistle_min_speed": 1.8,
+              "loose_cost": 1.0,
+              "switch_cost": 16.0,
+              "tackle_extra": 5.0,
+              "dead_entry_cost": 20.0,
+              "dead_exit_cost": 30.0,
+              "dead_min_frames": 100,
+              "w_turnover": 8.0,
+              "w_touch": 4.0,
+              "w_duel": 2.0,
+              "w_deflection": 0.0,
+              "touch_before": 2,
+              "touch_after": 10,
+              "w_near_switch": 0.0,
+              "w_stoppage": 8.0,
+              "stop_before": 10,
+              "stop_after": 25,
+              "w_shot_dead": 3.0,
+              "shot_window": 75,
+              "w_restart": 8.0,
+              "restart_before": 10,
+              "restart_after": 10
+            }
+          },
+          "alignment": [
+            {
+              "half": 1,
+              "offset": -4014,
+              "anchors": 10,
+              "offset_range": 3
+            },
+            {
+              "half": 2,
+              "offset": -26919,
+              "anchors": 10,
+              "offset_range": 2
+            }
+          ],
+          "feature_cache_sha256": "40e29470fe661b039eac38c8180c13e6a1f93cf14755c4bde2f428e9f0df4534",
+          "public_labels_used": false,
+          "columns": [
+            "broadcast_quality",
+            "broadcast_player_match",
+            "broadcast_players",
+            "broadcast_ball_seen",
+            "broadcast_since_ball",
+            "broadcast_ball_speed",
+            "broadcast_contact_team",
+            "broadcast_dist_home",
+            "broadcast_relative_home",
+            "broadcast_player_speed_home",
+            "broadcast_count_home",
+            "broadcast_dist_away",
+            "broadcast_relative_away",
+            "broadcast_player_speed_away",
+            "broadcast_count_away",
+            "broadcast_team_distance",
+            "broadcast_ball_disagreement"
+          ]
+        },
+        "video_sha256": "3dc2a7d952302d33df69a26e3d8935648015f8d7e1b86bf614436b7009abf9f8",
+        "plan_sha256": "b255f986e47bf0217d756441c6f1dc12f5926568e58a00f8c4fa626562bed038",
+        "public_labels_used": false,
+        "public_pilot": null,
+        "model_files": null,
+        "features": [
+          "film_res_mean",
+          "film_res_p99",
+          "naive_res_mean",
+          "film_explained",
+          "film_res_ball",
+          "film_res_home",
+          "film_res_away",
+          "film_near_home",
+          "film_near_away",
+          "film_cnt_home",
+          "film_cnt_away",
+          "naive_res_p99",
+          "naive_res_ball",
+          "naive_res_home",
+          "naive_res_away",
+          "naive_near_home",
+          "naive_near_away",
+          "flow_cam",
+          "flow_act",
+          "diff_global"
+        ],
+        "crop": [
+          256,
+          192
+        ],
+        "code_sha256": {
+          "film_features.py": "6b8f8316d90e360ed97ba5c05807af1ccc4967c997bb8d5526e58067ba645706",
+          "film.py": "8b9ac48c2f9bfd755548a35de9db906df1d9dd94b43569a0e371fdc3456ef871",
+          "video.py": "99fc12f54bdbbe12bc0ecf0886ed22c35b18116696bd00da73dd28f55c84b227",
+          "features_v2.py": "6a43f0239f409094e251a5161dbc5cd373c64bea0722b74d5fb027aecaa65df1",
+          "homography.py": "65f8855895db8a468789b8ea5a6d865fa25797f0e7ca86a3eecc01c52254e2f8"
+        }
+      },
+      "cache_sha256": "c98c84ddbec8144d647b3d9adb6aa28b261876175799c7b4b169d16a3f7d8219",
+      "frames": 1299,
+      "complete": true,
+      "finite": {
+        "film_res_mean": 1299,
+        "film_res_p99": 1299,
+        "naive_res_mean": 1299,
+        "film_explained": 1299,
+        "film_res_ball": 1274,
+        "film_res_home": 1299,
+        "film_res_away": 1299,
+        "film_near_home": 1299,
+        "film_near_away": 1299,
+        "film_cnt_home": 1299,
+        "film_cnt_away": 1299,
+        "naive_res_p99": 1299,
+        "naive_res_ball": 1274,
+        "naive_res_home": 1299,
+        "naive_res_away": 1299,
+        "naive_near_home": 1299,
+        "naive_near_away": 1299,
+        "flow_cam": 1299,
+        "flow_act": 1299,
+        "diff_global": 1299
+      }
+    },
+    "FILM_pilot": {
+      "inputs": {
+        "version": 1,
+        "interpolator": "film",
+        "algorithm": "FILM +/-2 frame residual and Farneback flow",
+        "broadcast": {
+          "version": 1,
+          "inputs": {
+            "version": 1,
+            "sources": {
+              "atd_meta": "53d387bcdef718c2034ee2e05c3036c7edfa3cfcd5bbe8270a43695bd252dbe9",
+              "atd_raw": "a71c1c9391e564032446be91ffbd7564205b47966060181532d80a338685e458",
+              "homography": "9ed07e7085bb0f200e171929948ae378cdba760d844bd18266c0b7caa4ba4afb"
+            },
+            "tactical_ball_sha256": "81040b87ba3b71bbc847396035b8b1b82b0d58ab59b301efc6af9d1da6bbd0e2",
+            "tactical_players_sha256": "45af2a674e075d9e9ef00b1f4d0a4c8b0c60d4e4634edaf08b7c643071cf6900",
+            "fused_ball_sha256": "fe31bca8048c63663c87ccd7b997ecfcb48fdbe916ddf9926a3fd6732afd841d",
+            "pitch": [
+              105.3,
+              68.0
+            ],
+            "blocks": [
+              [
+                1,
+                11185,
+                90651
+              ],
+              [
+                2,
+                110808,
+                190197
+              ]
+            ],
+            "params": {
+              "player_margin": 5.0,
+              "max_player_speed": 12.0,
+              "vel_k": 2,
+              "ball_spike_speed": 45.0,
+              "ball_island_len": 3,
+              "ball_island_gap": 50,
+              "max_gap": 12,
+              "ball_source": "fused_full",
+              "ctrl_radius": 1.3,
+              "ctrl_softness": 0.35,
+              "sync_free": 2.5,
+              "sync_scale": 3.0,
+              "filled_trust": 0.6,
+              "corner_zone": 3.0,
+              "still_speed": 1.2,
+              "slow_window": 50,
+              "ball_smooth": 9,
+              "touch_k": 3,
+              "touch_dv": 3.5,
+              "touch_spacing": 6,
+              "touch_radius": 2.0,
+              "touch_margin": 1.5,
+              "duel_radius": 1.5,
+              "seq_max_gap": 100,
+              "pass_min_travel": 5.0,
+              "shot_speed": 18.0,
+              "shot_range": 35.0,
+              "out_margin": 0.5,
+              "out_min_frames": 3,
+              "vanish_min_frames": 50,
+              "vanish_horizon": 0.4,
+              "decel_window": 25,
+              "decel_drop": 1.2,
+              "decel_to": 1.6,
+              "decel_lead": 20,
+              "rest_speed": 1.8,
+              "placed_min_frames": 25,
+              "placed_calm_speed": 1.8,
+              "restart_kick_speed": 5.0,
+              "kick_within": 20,
+              "reappear_min_frames": 75,
+              "dead_min_gap": 50,
+              "dead_max_gap": 2250,
+              "hold_kinds": "goal_line,touchline,vanish",
+              "hold_goal_line": 200,
+              "hold_touchline": 75,
+              "shape_folds": 8,
+              "shape_guard": 250,
+              "shape_stride": 3,
+              "shape_iter": 150,
+              "shape_eps": 0.05,
+              "pretrained_shape": "",
+              "pretrained_mix": 1.0,
+              "shape_rounds": 2,
+              "shape_conf": 0.0,
+              "ownership_model": "pretrain_data/ownership_v2/ownership_all.joblib",
+              "supervised_shape_model": "pretrain_data/ownership_v2/shape_all.joblib",
+              "w_owner": 1.0,
+              "w_owner_switch": 12.0,
+              "w_contact": 1.0,
+              "contact_alpha": 0.5,
+              "contact_window": 125,
+              "contact_lock_dead": 1,
+              "contact_switch_cost": 4.0,
+              "contact_min_frames": 12,
+              "contact_local_switch": 0,
+              "ctrl_eps": 0.05,
+              "near_radius": 1.3,
+              "near_margin": 0.5,
+              "w_near": 0.0,
+              "near_rounds": 0,
+              "w_ball": 1.0,
+              "w_shape": 1.0,
+              "w_shape_known": 0.0,
+              "w_tag": 0.0,
+              "w_dead": 1.0,
+              "d_bias": 0.0,
+              "w_out": 6.0,
+              "w_out_carry": 3.0,
+              "slow_speed": 1.3,
+              "slow_scale": 0.3,
+              "w_slow": 1.0,
+              "dead_gap": 75,
+              "w_missing": 0.0,
+              "w_missing_slow": 0.5,
+              "w_still": 2.0,
+              "w_shape_dead": 0.5,
+              "alive_ball_speed": 6.0,
+              "w_alive": 3.0,
+              "w_hold": 5.0,
+              "w_post_restart": 2.0,
+              "inner_restarts": 0,
+              "post_restart_frames": 50,
+              "w_tag_dead": 1.0,
+              "tag_dead_frames": 25,
+              "z_max": 4.0,
+              "pre_kickoff_dead": 1,
+              "goal_dead": 1,
+              "w_whistle": 10.0,
+              "w_whistle_dead": 2.0,
+              "whistle_thresh": 24.0,
+              "whistle_before": 5,
+              "whistle_after": 20,
+              "whistle_hold": 150,
+              "w_whistle_confirmed": 16.0,
+              "whistle_confirm_speed": 1.5,
+              "whistle_confirm_window": 125,
+              "whistle_lag": 10,
+              "whistle_min_speed": 1.8,
+              "loose_cost": 1.0,
+              "switch_cost": 16.0,
+              "tackle_extra": 5.0,
+              "dead_entry_cost": 20.0,
+              "dead_exit_cost": 30.0,
+              "dead_min_frames": 100,
+              "w_turnover": 8.0,
+              "w_touch": 4.0,
+              "w_duel": 2.0,
+              "w_deflection": 0.0,
+              "touch_before": 2,
+              "touch_after": 10,
+              "w_near_switch": 0.0,
+              "w_stoppage": 8.0,
+              "stop_before": 10,
+              "stop_after": 25,
+              "w_shot_dead": 3.0,
+              "shot_window": 75,
+              "w_restart": 8.0,
+              "restart_before": 10,
+              "restart_after": 10
+            }
+          },
+          "alignment": [
+            {
+              "half": 1,
+              "offset": -4014,
+              "anchors": 10,
+              "offset_range": 3
+            },
+            {
+              "half": 2,
+              "offset": -26919,
+              "anchors": 10,
+              "offset_range": 2
+            }
+          ],
+          "feature_cache_sha256": "40e29470fe661b039eac38c8180c13e6a1f93cf14755c4bde2f428e9f0df4534",
+          "public_labels_used": false,
+          "columns": [
+            "broadcast_quality",
+            "broadcast_player_match",
+            "broadcast_players",
+            "broadcast_ball_seen",
+            "broadcast_since_ball",
+            "broadcast_ball_speed",
+            "broadcast_contact_team",
+            "broadcast_dist_home",
+            "broadcast_relative_home",
+            "broadcast_player_speed_home",
+            "broadcast_count_home",
+            "broadcast_dist_away",
+            "broadcast_relative_away",
+            "broadcast_player_speed_away",
+            "broadcast_count_away",
+            "broadcast_team_distance",
+            "broadcast_ball_disagreement"
+          ]
+        },
+        "video_sha256": "3dc2a7d952302d33df69a26e3d8935648015f8d7e1b86bf614436b7009abf9f8",
+        "plan_sha256": "b255f986e47bf0217d756441c6f1dc12f5926568e58a00f8c4fa626562bed038",
+        "public_labels_used": false,
+        "public_pilot": {
+          "first": 11185,
+          "stop": 18685,
+          "stride": 25
+        },
+        "model_files": {
+          "keras_metadata.pb": "0291f451e35e62a042fa49a1341af1dc8a94632188a24a16b71a9516e9fc6853",
+          "saved_model.pb": "4df311e80e9a7282b362a7e93bef22a1ce4f84e7cdeda01f246894545eaaf985",
+          "variables/variables.data-00000-of-00001": "8c47323923bc4826b730dd882c8c7700761aa3ac03b2c8180d3ffc82d18111f9",
+          "variables/variables.index": "d19bb117eb9abe6121b5711649bb7d5d1c4fe1912b9deabbdafa2be3f5a273e5"
+        },
+        "features": [
+          "film_res_mean",
+          "film_res_p99",
+          "naive_res_mean",
+          "film_explained",
+          "film_res_ball",
+          "film_res_home",
+          "film_res_away",
+          "film_near_home",
+          "film_near_away",
+          "film_cnt_home",
+          "film_cnt_away",
+          "naive_res_p99",
+          "naive_res_ball",
+          "naive_res_home",
+          "naive_res_away",
+          "naive_near_home",
+          "naive_near_away",
+          "flow_cam",
+          "flow_act",
+          "diff_global"
+        ],
+        "crop": [
+          256,
+          192
+        ],
+        "code_sha256": {
+          "film_features.py": "6b8f8316d90e360ed97ba5c05807af1ccc4967c997bb8d5526e58067ba645706",
+          "film.py": "8b9ac48c2f9bfd755548a35de9db906df1d9dd94b43569a0e371fdc3456ef871",
+          "video.py": "99fc12f54bdbbe12bc0ecf0886ed22c35b18116696bd00da73dd28f55c84b227",
+          "features_v2.py": "6a43f0239f409094e251a5161dbc5cd373c64bea0722b74d5fb027aecaa65df1",
+          "homography.py": "65f8855895db8a468789b8ea5a6d865fa25797f0e7ca86a3eecc01c52254e2f8"
+        }
+      },
+      "cache_sha256": "dd22f4d0eec1518e8d98156a821b004e65a3aa86452bf9376cd65036c529dcdf",
+      "frames": 223,
+      "complete": true,
+      "finite": {
+        "film_res_mean": 223,
+        "film_res_p99": 223,
+        "naive_res_mean": 223,
+        "film_explained": 223,
+        "film_res_ball": 219,
+        "film_res_home": 223,
+        "film_res_away": 223,
+        "film_near_home": 223,
+        "film_near_away": 223,
+        "film_cnt_home": 223,
+        "film_cnt_away": 223,
+        "naive_res_p99": 223,
+        "naive_res_ball": 219,
+        "naive_res_home": 223,
+        "naive_res_away": 223,
+        "naive_near_home": 223,
+        "naive_near_away": 223,
+        "flow_cam": 223,
+        "flow_act": 223,
+        "diff_global": 223
+      }
+    },
+    "broadcast_audio": {
+      "version": 1,
+      "video_sha256": "3dc2a7d952302d33df69a26e3d8935648015f8d7e1b86bf614436b7009abf9f8",
+      "score_sha256": "9357b8a760ba0b461e4336a42714ad4f2f1c0c1778767d6670e6b111efab2eaa",
+      "raw_sha256": "616f29941bbee12749ce83ce8d152b54ea5a988c39a01808aa9280ea08906101",
+      "detector_sha256": "7e3b8ff5f231376e862224b644f86b61a3a07ee9e313c9175215de32af087679",
+      "broadcast": {
+        "version": 1,
+        "inputs": {
+          "version": 1,
+          "sources": {
+            "atd_meta": "53d387bcdef718c2034ee2e05c3036c7edfa3cfcd5bbe8270a43695bd252dbe9",
+            "atd_raw": "a71c1c9391e564032446be91ffbd7564205b47966060181532d80a338685e458",
+            "homography": "9ed07e7085bb0f200e171929948ae378cdba760d844bd18266c0b7caa4ba4afb"
+          },
+          "tactical_ball_sha256": "81040b87ba3b71bbc847396035b8b1b82b0d58ab59b301efc6af9d1da6bbd0e2",
+          "tactical_players_sha256": "45af2a674e075d9e9ef00b1f4d0a4c8b0c60d4e4634edaf08b7c643071cf6900",
+          "fused_ball_sha256": "fe31bca8048c63663c87ccd7b997ecfcb48fdbe916ddf9926a3fd6732afd841d",
+          "pitch": [
+            105.3,
+            68.0
+          ],
+          "blocks": [
+            [
+              1,
+              11185,
+              90651
+            ],
+            [
+              2,
+              110808,
+              190197
+            ]
+          ],
+          "params": {
+            "player_margin": 5.0,
+            "max_player_speed": 12.0,
+            "vel_k": 2,
+            "ball_spike_speed": 45.0,
+            "ball_island_len": 3,
+            "ball_island_gap": 50,
+            "max_gap": 12,
+            "ball_source": "fused_full",
+            "ctrl_radius": 1.3,
+            "ctrl_softness": 0.35,
+            "sync_free": 2.5,
+            "sync_scale": 3.0,
+            "filled_trust": 0.6,
+            "corner_zone": 3.0,
+            "still_speed": 1.2,
+            "slow_window": 50,
+            "ball_smooth": 9,
+            "touch_k": 3,
+            "touch_dv": 3.5,
+            "touch_spacing": 6,
+            "touch_radius": 2.0,
+            "touch_margin": 1.5,
+            "duel_radius": 1.5,
+            "seq_max_gap": 100,
+            "pass_min_travel": 5.0,
+            "shot_speed": 18.0,
+            "shot_range": 35.0,
+            "out_margin": 0.5,
+            "out_min_frames": 3,
+            "vanish_min_frames": 50,
+            "vanish_horizon": 0.4,
+            "decel_window": 25,
+            "decel_drop": 1.2,
+            "decel_to": 1.6,
+            "decel_lead": 20,
+            "rest_speed": 1.8,
+            "placed_min_frames": 25,
+            "placed_calm_speed": 1.8,
+            "restart_kick_speed": 5.0,
+            "kick_within": 20,
+            "reappear_min_frames": 75,
+            "dead_min_gap": 50,
+            "dead_max_gap": 2250,
+            "hold_kinds": "goal_line,touchline,vanish",
+            "hold_goal_line": 200,
+            "hold_touchline": 75,
+            "shape_folds": 8,
+            "shape_guard": 250,
+            "shape_stride": 3,
+            "shape_iter": 150,
+            "shape_eps": 0.05,
+            "pretrained_shape": "",
+            "pretrained_mix": 1.0,
+            "shape_rounds": 2,
+            "shape_conf": 0.0,
+            "ownership_model": "pretrain_data/ownership_v2/ownership_all.joblib",
+            "supervised_shape_model": "pretrain_data/ownership_v2/shape_all.joblib",
+            "w_owner": 1.0,
+            "w_owner_switch": 12.0,
+            "w_contact": 1.0,
+            "contact_alpha": 0.5,
+            "contact_window": 125,
+            "contact_lock_dead": 1,
+            "contact_switch_cost": 4.0,
+            "contact_min_frames": 12,
+            "contact_local_switch": 0,
+            "ctrl_eps": 0.05,
+            "near_radius": 1.3,
+            "near_margin": 0.5,
+            "w_near": 0.0,
+            "near_rounds": 0,
+            "w_ball": 1.0,
+            "w_shape": 1.0,
+            "w_shape_known": 0.0,
+            "w_tag": 0.0,
+            "w_dead": 1.0,
+            "d_bias": 0.0,
+            "w_out": 6.0,
+            "w_out_carry": 3.0,
+            "slow_speed": 1.3,
+            "slow_scale": 0.3,
+            "w_slow": 1.0,
+            "dead_gap": 75,
+            "w_missing": 0.0,
+            "w_missing_slow": 0.5,
+            "w_still": 2.0,
+            "w_shape_dead": 0.5,
+            "alive_ball_speed": 6.0,
+            "w_alive": 3.0,
+            "w_hold": 5.0,
+            "w_post_restart": 2.0,
+            "inner_restarts": 0,
+            "post_restart_frames": 50,
+            "w_tag_dead": 1.0,
+            "tag_dead_frames": 25,
+            "z_max": 4.0,
+            "pre_kickoff_dead": 1,
+            "goal_dead": 1,
+            "w_whistle": 10.0,
+            "w_whistle_dead": 2.0,
+            "whistle_thresh": 24.0,
+            "whistle_before": 5,
+            "whistle_after": 20,
+            "whistle_hold": 150,
+            "w_whistle_confirmed": 16.0,
+            "whistle_confirm_speed": 1.5,
+            "whistle_confirm_window": 125,
+            "whistle_lag": 10,
+            "whistle_min_speed": 1.8,
+            "loose_cost": 1.0,
+            "switch_cost": 16.0,
+            "tackle_extra": 5.0,
+            "dead_entry_cost": 20.0,
+            "dead_exit_cost": 30.0,
+            "dead_min_frames": 100,
+            "w_turnover": 8.0,
+            "w_touch": 4.0,
+            "w_duel": 2.0,
+            "w_deflection": 0.0,
+            "touch_before": 2,
+            "touch_after": 10,
+            "w_near_switch": 0.0,
+            "w_stoppage": 8.0,
+            "stop_before": 10,
+            "stop_after": 25,
+            "w_shot_dead": 3.0,
+            "shot_window": 75,
+            "w_restart": 8.0,
+            "restart_before": 10,
+            "restart_after": 10
+          }
+        },
+        "alignment": [
+          {
+            "half": 1,
+            "offset": -4014,
+            "anchors": 10,
+            "offset_range": 3
+          },
+          {
+            "half": 2,
+            "offset": -26919,
+            "anchors": 10,
+            "offset_range": 2
+          }
+        ],
+        "feature_cache_sha256": "40e29470fe661b039eac38c8180c13e6a1f93cf14755c4bde2f428e9f0df4534",
+        "public_labels_used": false,
+        "columns": [
+          "broadcast_quality",
+          "broadcast_player_match",
+          "broadcast_players",
+          "broadcast_ball_seen",
+          "broadcast_since_ball",
+          "broadcast_ball_speed",
+          "broadcast_contact_team",
+          "broadcast_dist_home",
+          "broadcast_relative_home",
+          "broadcast_player_speed_home",
+          "broadcast_count_home",
+          "broadcast_dist_away",
+          "broadcast_relative_away",
+          "broadcast_player_speed_away",
+          "broadcast_count_away",
+          "broadcast_team_distance",
+          "broadcast_ball_disagreement"
+        ]
+      },
+      "public_labels_used": false,
+      "n_frames": 164488,
+      "score_min": -16.886981964111328,
+      "score_max": 45.96171951293945,
+      "threshold": 24.0
+    }
+  },
+  "experimental_provenance": {
+    "temporal_team": {
+      "folds": 5,
+      "training_stride": 5,
+      "strict_fold_edges": true,
+      "params_sha256": "9191ccfdc99c1b640c900baabd7ac9e45aa73aafe625e13b33a3457caa3ab559",
+      "model_sha256": "4a5081fc3858dda8552819ac525a9d879588378d8c773427db38afb991b48fe0",
+      "source_sha256": "e419565dc10ec0d169a74a027f29986b1f6fa5a2b8347653203aa2107453477d",
+      "support": 15419,
+      "public_support": 5590
+    },
+    "temporal_phase": {
+      "folds": 5,
+      "training_stride": 25,
+      "strict_fold_edges": true,
+      "params_sha256": "9191ccfdc99c1b640c900baabd7ac9e45aa73aafe625e13b33a3457caa3ab559",
+      "model_sha256": "4a5081fc3858dda8552819ac525a9d879588378d8c773427db38afb991b48fe0",
+      "source_sha256": "e419565dc10ec0d169a74a027f29986b1f6fa5a2b8347653203aa2107453477d",
+      "support": 15419,
+      "public_support": 5590
+    },
+    "crossfade_motion": {
+      "folds": 5,
+      "training_stride": 25,
+      "strict_fold_edges": true,
+      "params_sha256": "9191ccfdc99c1b640c900baabd7ac9e45aa73aafe625e13b33a3457caa3ab559",
+      "model_sha256": "4a5081fc3858dda8552819ac525a9d879588378d8c773427db38afb991b48fe0",
+      "source_sha256": "e419565dc10ec0d169a74a027f29986b1f6fa5a2b8347653203aa2107453477d",
+      "support": 14814,
+      "public_support": 5503
+    },
+    "FILM_pilot": {
+      "folds": 5,
+      "training_stride": 25,
+      "strict_fold_edges": true,
+      "params_sha256": "9191ccfdc99c1b640c900baabd7ac9e45aa73aafe625e13b33a3457caa3ab559",
+      "model_sha256": "4a5081fc3858dda8552819ac525a9d879588378d8c773427db38afb991b48fe0",
+      "source_sha256": "e419565dc10ec0d169a74a027f29986b1f6fa5a2b8347653203aa2107453477d",
+      "support": 5237,
+      "public_support": 5237
+    },
+    "broadcast_audio": {
+      "folds": 5,
+      "training_stride": 25,
+      "strict_fold_edges": true,
+      "source_sha256": "b7f818f220cba08ff821332d58d215e52cbe74d81f149eaac1011754837e8e81",
+      "protocol_sha256": "e419565dc10ec0d169a74a027f29986b1f6fa5a2b8347653203aa2107453477d",
+      "support": 21175,
+      "public_support": 7500
+    },
+    "availability": {
+      "folds": 5,
+      "training_stride": 25,
+      "strict_fold_edges": true,
+      "params_sha256": "9191ccfdc99c1b640c900baabd7ac9e45aa73aafe625e13b33a3457caa3ab559",
+      "model_sha256": "4a5081fc3858dda8552819ac525a9d879588378d8c773427db38afb991b48fe0",
+      "source_sha256": "086666026d0c043ad69e4f489dc824a4f4bc96b9c8d73ba459ce0ae869317364",
+      "support": 21175,
+      "public_support": 7500
+    }
+  },
+  "validation": {
+    "tests_passed": 56,
+    "tests_failed": 0,
+    "official_validator_valid": true,
+    "official_scorer_confirmed": true,
+    "production_fold_audit_matches_prototype": true,
+    "temporal_and_crossfade_candidate_arrays_reproduced_exactly": 36,
+    "portable_motion_extraction_reproduced_exactly": true,
+    "film_crossfade_control_max_abs_difference": {
+      "naive_res_mean": 7.450580596923828e-09,
+      "naive_res_p99": 0.0,
+      "naive_res_ball": 0.0,
+      "naive_res_home": 0.0,
+      "naive_res_away": 0.0,
+      "naive_near_home": 0.0,
+      "naive_near_away": 0.0,
+      "film_cnt_home": 0.0,
+      "film_cnt_away": 0.0,
+      "flow_cam": 0.0,
+      "flow_act": 1.9073486328125e-06,
+      "diff_global": 0.0
+    },
+    "rows": 199319,
+    "prototype_builder_production_tuner_identical": true,
+    "macro_v9_reproduced_exactly": true,
+    "uncovered_video_preserved": true,
+    "dead_changes_within_flexibility": true,
+    "phase_probabilities_reproduced_exactly": true,
+    "primary_video_frames": 21175,
+    "phase_expert_frames": 21175,
+    "old_phase_expert_frames": 15419,
+    "training_rows": 301,
+    "public_errors_fixed": 12,
+    "public_correct_frames_regressed": 7,
+    "public_wrong_class_changes": 0,
+    "public_accuracy_before": 0.9629333333333333,
+    "public_accuracy_after": 0.9636,
+    "legacy_csv_sha256": "7821dfa01fed05b4506ff3de101e49a8568209cc5b457fcccc1d79adbbdcd019"
+  },
+  "sha256": {
+    "pretrain_data/macro_v10/ensemble.joblib": "7a483caceb0a1f296a66bfd906c3e435a6c7967d45bbdd6a98195509c1331e1d",
+    "pretrain_data/broadcast_dead_available/broadcast_dead_available_dead_logreg.joblib": "ba0bbdd0ac3659df1134277d84405b3e4e0d55a07ea52e8f89439c548a2027e8",
+    "evaluation/results/barca.csv": "e6f0cae02ef06eed8971aaa2e96f39b05b6c9a2e2a250b622faaba89462ca76f",
+    "evaluation/results/Borrow_Khan.csv": "e6f0cae02ef06eed8971aaa2e96f39b05b6c9a2e2a250b622faaba89462ca76f",
+    "evaluation/results/macro_v10.csv": "e6f0cae02ef06eed8971aaa2e96f39b05b6c9a2e2a250b622faaba89462ca76f",
+    "src/params.json": "aeb01411a18be43e14a7208ff6729c278dd9d5e355742a8c0dbb3757004d25e1"
+  },
+  "source_sha256": {
+    "src/possession/hybrid.py": "60e64825287a5c838b9098bca22405c89ccb2c7dce6caa9c6dd930b3b219f2aa",
+    "src/bench/test_broadcast_phase.py": "ecc61345492bede0e3246adaa295f7e8db047bd8d8800b780dc049b24d07f227",
+    "src/bench/broadcast_followup_bench.py": "086666026d0c043ad69e4f489dc824a4f4bc96b9c8d73ba459ce0ae869317364",
+    "src/bench/broadcast_motion_extract.py": "bc3c6fc7e03e52c04f09b7a56fcc39179d0873a277de0edd69789f022df1636b",
+    "src/bench/broadcast_audio_bench.py": "b7f818f220cba08ff821332d58d215e52cbe74d81f149eaac1011754837e8e81",
+    "src/run_hybrid.py": "d27ea2e85adb911fd76b218da4ad667da0fafb7d1b20f91cdd9ab33d479875d7",
+    "src/run_ensemble.py": "719091a7ae1b3d9ef011aea1467e37c1516fffb52340b76c858931d422f53980",
+    "src/bench/macro_bench.py": "ca844ccda88873c7160df04ce093587a8f1cb2525158d8d1624eec74c8e3d061"
+  },
+  "feature_inputs": {
+    "baseline_sha256": "043fd4e2c071769c1793662d33f8c0a424f0e3a5b32cfdf092ad7d5bdc1f8b3c",
+    "raw_ball_sha256": "81040b87ba3b71bbc847396035b8b1b82b0d58ab59b301efc6af9d1da6bbd0e2",
+    "fused_ball_sha256": "fe31bca8048c63663c87ccd7b997ecfcb48fdbe916ddf9926a3fd6732afd841d",
+    "fused_columns": [
+      "v2_team",
+      "v2_dead",
+      "v2_is_H",
+      "v2_is_A",
+      "v2_is_D",
+      "v2_since_change",
+      "v2_until_change",
+      "dist_home",
+      "dist_away",
+      "ball_seen",
+      "ball_filled",
+      "since_seen",
+      "last_edge_m",
+      "z_player_speed",
+      "pan_speed",
+      "dead_memory",
+      "quality",
+      "players_in_view"
+    ],
+    "baseline_verified": true
+  },
+  "document_ablation": [
+    {
+      "configuration": "V7 baseline",
+      "macroF1": 0.9576036123814177,
+      "spellF1": 0.8749999999999998
+    },
+    {
+      "configuration": "Broadcast, 50f, joint teams",
+      "macroF1": 0.9588495842730843,
+      "spellF1": 0.8484848484848484
+    },
+    {
+      "configuration": "Retained teams, 50% broadcast",
+      "macroF1": 0.9621455234182225,
+      "spellF1": 0.9032258064516128
+    },
+    {
+      "configuration": "Quality-only broadcast (v9)",
+      "macroF1": 0.9623208557996378,
+      "spellF1": 0.9032258064516128
+    },
+    {
+      "configuration": "All rows, no availability",
+      "macroF1": 0.9624573397393211,
+      "spellF1": 0.9032258064516128
+    },
+    {
+      "configuration": "Final: explicit availability",
+      "macroF1": 0.9631665786415224,
+      "spellF1": 0.9032258064516128
+    }
+  ],
+  "document_baseline": "Previous (v9)",
+  "teammate_heads_checked": {
+    "kevinza": "a0cdd64",
+    "feat/kevinza-valdi": "81e220d",
+    "valdi": "1e82466",
+    "neo/loop-pipeline": "51e7833"
+  },
+  "limitations": [
+    "All selection reuses the same 17 public possessions; partitions are sensitivity checks, not independent tests.",
+    "Five-fold macro gain is 0.000846 with 12 corrected and 7 regressed public frames, a net gain of five.",
+    "Dead recall increases while dead precision and away F1 decrease.",
+    "Missingness patterns can depend on the recording; unseen-match transfer is unknown.",
+    "The same three GT possessions remain missed.",
+    "Private or full-match accuracy is unknown; match statistics describe predictions.",
+    "Restricted geometry, audio/video, per-frame features and prediction labels stay gitignored."
+  ]
+}

@@ -48,6 +48,10 @@ FEATURE_SETS['film_dead_motion'] = tuple(k for k in FEATURE_SETS['film_motion']
     ('ball_seen', 'ball_filled', 'since_seen', 'quality', 'players_in_view', 'pan_speed'))
 from .broadcast import FEATURES as BROADCAST_FEATURES
 FEATURE_SETS['broadcast_dead'] = BROADCAST_FEATURES
+# Missing second-camera geometry is itself observable. This explicit feature
+# opts into training/inference on primary-video frames without valid broadcast
+# tracking; ordinary broadcast heads retain their quality-only coverage.
+FEATURE_SETS['broadcast_dead_available'] = BROADCAST_FEATURES + ('broadcast_available',)
 
 
 def covered_intervals(frames, mask, max_gap=25):
@@ -101,8 +105,11 @@ def features(inputs, p, labels, emit, shape, kind='film', legacy_params=None, fe
         from . import broadcast
         extra, coverage, _ = broadcast.features(inputs, p)
         columns.update(extra)
-        mask &= coverage
-        frames = frames[coverage[frames]]
+        if 'broadcast_available' in feature_names:
+            columns['broadcast_available'] = coverage.astype(float)
+        else:
+            mask &= coverage
+            frames = frames[coverage[frames]]
     if any(name.startswith('spatial_') for name in feature_names):
         raw, names = inputs.shape_features(p)
         for name in MOTION:
