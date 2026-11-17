@@ -3,7 +3,7 @@
 Four-page English technical report using the IEEEtran conference template:
 two columns, 10 pt body text, and eight explanatory/data figures. Author names
 and registered team name are in `team.tex`.
-The described algorithm is frozen at code revision `0308dae` on `taufiq` (macro v9).
+The described algorithm is frozen at code revision `188b66d` on `taufiq` (macro v10).
 
 Build from the repository root with Python 3, Matplotlib and either Tectonic or pdfLaTeX:
 

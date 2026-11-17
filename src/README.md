@@ -29,7 +29,7 @@ The previous macro checkpoint (**0.9473** / **0.7647**) is in `configs/macro_v1.
 the retained spell-focused alternative (**0.9355** / **0.7882**) is in `configs/spell_best.json`.
 
 Borrow Khan's four-page IEEE submission document with eight figures and editable LaTeX source is
-in [submission/](submission/README.md). Its results describe the frozen `0308dae`
+in [submission/](submission/README.md). Its results describe the frozen `188b66d`
 algorithm checkpoint.
 
 The earlier video-gated decoder and bounded dead-ball edges are documented in
