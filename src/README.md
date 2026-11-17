@@ -6,12 +6,14 @@ the possession rules and what was tried and dropped are in [TECHNICAL.md](TECHNI
 
 Latest (November 17): the default prioritises **macroF1**, as requested. Two video-cadence
 heads, ordered motion/aligned-crop experts, temporal agreement and aligned broadcast phase
-evidence reach public macroF1 **0.96317**, spellF1 **0.9032**. The broadcast head now
-learns explicit tracking availability. Approach, statistics and validation:
-[MACRO_V10.md](MACRO_V10.md), `configs/macro_v10.json`. Paired macroF1 rises at all four
-tested fold counts versus v9; spellF1 is unchanged. Twelve public errors are corrected
-and seven correct frames regress, a net gain of five. All partitions reuse the same
-public possessions. The **0.96232 / 0.9032** model remains in `configs/macro_v9.json`,
+evidence reach public macroF1 **0.96397**, spellF1 **0.9032**. The phase model
+averages the original availability-aware head and a head with four availability-history
+features. Approach, statistics and validation: [MACRO_V11.md](MACRO_V11.md),
+`configs/macro_v11.json`. Paired macroF1 rises at all four tested fold counts versus
+v10; spellF1 is unchanged. Six public errors are corrected and one correct frame
+regresses, a net gain of five. All partitions reuse the same public possessions.
+The **0.96317 / 0.9032** checkpoint remains in `configs/macro_v10.json`, described
+in [MACRO_V10.md](MACRO_V10.md). The **0.96232 / 0.9032** model remains in `configs/macro_v9.json`,
 described in [MACRO_V9.md](MACRO_V9.md). The **0.96215 / 0.9032** model remains
 in `configs/macro_v8.json`, described in [MACRO_V8.md](MACRO_V8.md). The previous
 **0.95760 / 0.8750** model remains in `configs/macro_v7.json`, described in [MACRO_V7.md](MACRO_V7.md).
@@ -29,7 +31,7 @@ The previous macro checkpoint (**0.9473** / **0.7647**) is in `configs/macro_v1.
 the retained spell-focused alternative (**0.9355** / **0.7882**) is in `configs/spell_best.json`.
 
 Borrow Khan's four-page IEEE submission document with eight figures and editable LaTeX source is
-in [submission/](submission/README.md). Its results describe the frozen `188b66d`
+in [submission/](submission/README.md). Its results describe the frozen `977ee78`
 algorithm checkpoint.
 
 The earlier video-gated decoder and bounded dead-ball edges are documented in

@@ -3,7 +3,7 @@
 Four-page English technical report using the IEEEtran conference template:
 two columns, 10 pt body text, and eight explanatory/data figures. Author names
 and registered team name are in `team.tex`.
-The described algorithm is frozen at code revision `188b66d` on `taufiq` (macro v10).
+The described algorithm is frozen at code revision `977ee78` on `taufiq` (macro v11).
 The report explains team ownership before alive/dead refinement, then validation,
 error tradeoffs and match-statistic denominators. Four full pages retain the
 IEEE 10 pt body, eight figures and two explanatory tables.

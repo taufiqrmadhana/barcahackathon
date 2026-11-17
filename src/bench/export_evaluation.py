@@ -53,13 +53,17 @@ def error_counts(report):
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument('--out', type=Path, default=ROOT / 'src/submission/build/evaluation')
+    parser.add_argument('--report', type=Path, default=ROOT / 'src/bench/results/macro_v11_2026-11-17.json')
+    parser.add_argument('--baseline', type=Path, default=ROOT / 'src/bench/results/macro_v10_2026-11-17.json')
+    parser.add_argument('--learning-report', type=Path, default=ROOT / 'src/bench/results/macro_v11_learning_curve_2026-11-17.json')
     args = parser.parse_args()
-    paths = dict(checkpoint=ROOT / 'src/bench/results/macro_v10_2026-11-17.json',
-                 baseline=ROOT / 'src/bench/results/macro_v9_2026-11-17.json',
-                 learning_curve=ROOT / 'src/bench/results/macro_v10_learning_curve_2026-11-17.json')
+    paths = dict(checkpoint=args.report, baseline=args.baseline, learning_curve=args.learning_report)
     report, baseline, learning = (json.loads(paths[k].read_text())
                                   for k in ('checkpoint', 'baseline', 'learning_curve'))
     public = report['checkpoint']['public']
+    profile = Path(report['params']['hybrid_model']).parent.name
+    baseline_profile = Path(baseline['params']['hybrid_model']).parent.name
+    full_count = report['checkpoint']['full']['possessions']
     assert learning['baseline']['macroF1'] == public['macro_f1']
     assert learning['baseline']['spellF1'] == public['spell_f1_mean']
     assert learning['model_sha256'] == report['checkpoint']['artifact_sha256']
@@ -109,7 +113,7 @@ def main():
 
     with PdfPages(output / 'evaluation_tables.pdf') as pdf:
         fig = plt.figure(figsize=(8.27, 11.69))
-        fig.suptitle('Borrow Khan — evaluation of macro v10', x=.07, ha='left',
+        fig.suptitle(f'Borrow Khan — evaluation of {profile}', x=.07, ha='left',
                      y=.965, fontsize=17, weight='bold', color=BLUE)
         table(fig, [.07, .725, .86, .18], 'Public metrics: 7,500 frames', ['Metric', 'Score'],
               [[name, f'{value:.6f}'] for name, value in metrics], widths=[.72, .28])
@@ -117,10 +121,10 @@ def main():
               [[name, f'{p:.6f}', f'{r:.6f}', f'{f:.6f}', str(n)] for name, p, r, f, n in classes])
         table(fig, [.07, .285, .86, .14], 'Keep evaluation scopes separate', ['Window', 'GT spells', 'Predicted spells'],
               [[row[0], str(row[1]), str(row[2])] for row in scope], widths=[.48, .22, .30])
-        table(fig, [.07, .08, .86, .14], 'Error tradeoff on public frames', ['Error type', 'Quality-only', 'Final'],
+        table(fig, [.07, .08, .86, .14], 'Error tradeoff on public frames', ['Error type', baseline_profile, 'Final'],
               [[name, str(a), str(b)] for name, a, b in errors], widths=[.56, .22, .22])
         fig.text(.07, .035, 'Public: 17 GT possessions; 14 predictions, all matched; 3 GT possessions missed.\n'
-                 'Full match: 401 predicted possessions. Private/unseen-match accuracy is unknown.', fontsize=9)
+                 f'Full match: {full_count} predicted possessions. Private/unseen-match accuracy is unknown.', fontsize=9)
         pdf.savefig(fig)
         fig.savefig(output / 'evaluation_summary.png', dpi=180)
         plt.close(fig)
@@ -145,8 +149,8 @@ def main():
         fig.savefig(output / 'kfold_results.png', dpi=180)
         plt.close(fig)
 
-    fig, axes = plt.subplots(1, 2, figsize=(10.5, 3.75))
-    fig.suptitle('Data-size learning curve — phase logistic regression (18 features, C=0.3)',
+    fig, axes = plt.subplots(1, 2, figsize=(10.5, 4.25))
+    fig.suptitle(f'Phase learning curve — {learning["feature_count"]} features, C={learning["C"]} (training data size)',
                  x=.07, ha='left', y=.98, fontsize=12, weight='bold', color=BLUE)
     x = np.array([r['fraction']*100 for r in learning['results']])
     for key, label, color in [('train_log_loss', 'Training', BLUE),
@@ -155,7 +159,7 @@ def main():
         std = np.array([r[key]['std'] for r in learning['results']])
         axes[0].plot(x, mean, marker='o', color=color, label=label)
         axes[0].fill_between(x, np.maximum(0, mean-std), mean+std, color=color, alpha=.12)
-    axes[0].set_title('Training / held-out binary log loss', loc='left', weight='bold')
+    axes[0].set_title('Phase expert: alive/dead log loss', loc='left', weight='bold')
     axes[0].set_ylabel('Log loss (lower is better)')
     axes[0].set_ylim(bottom=0)
     axes[0].legend(frameon=False, fontsize=9)
@@ -166,7 +170,7 @@ def main():
         for xi, value in zip(x, values):
             axes[1].annotate(f'{value:.6f}', (xi, value), xytext=(0, 8 if key == 'pipeline_macroF1' else -14),
                              textcoords='offset points', ha='center', fontsize=8, color=color)
-    axes[1].set_title('Full pipeline on public frames', loc='left', weight='bold')
+    axes[1].set_title('Final H/A/D pipeline: public scores', loc='left', weight='bold')
     axes[1].set_ylim(.84, .99)
     axes[1].legend(frameon=False, fontsize=9, loc='center left')
     for ax in axes:
@@ -178,9 +182,9 @@ def main():
         ax.set_axisbelow(True)
         for spine in ax.spines.values():
             spine.set_visible(False)
-    fig.text(.07, .025, 'Only the phase classifier is refitted; other models and decoder stay fixed. '
-        'Shading: ±1 fold SD (5 time folds), not a confidence interval.', fontsize=8.5)
-    fig.subplots_adjust(left=.07, right=.98, top=.84, bottom=.23, wspace=.28)
+    fig.text(.07, .025, 'Only phase heads are refitted; other members/decoder stay fixed. Shading: ±1 fold SD, not a CI.\n'
+        'CSV output has H/A/D/X; public Macro-F1 scores H/A/D. X on a graded frame counts as a miss.', fontsize=8.5)
+    fig.subplots_adjust(left=.07, right=.98, top=.84, bottom=.28, wspace=.28)
     fig.savefig(output / 'learning_curve.png', dpi=200)
     fig.savefig(output / 'learning_curve.pdf')
     plt.close(fig)
@@ -188,22 +192,24 @@ def main():
     (output / 'README.md').write_text(
         '# Paket evaluasi Borrow Khan (terpisah dari laporan IEEE)\n\n'
         'Public window 5 menit: 17 possession GT, 14 prediksi, 14 cocok, 3 terlewat, 0 spurious. '
-        'Angka 401 adalah prediksi seluruh pertandingan, bukan GT public.\n\n'
+        f'Angka {full_count} adalah prediksi seluruh pertandingan, bukan GT public.\n\n'
         'evaluation_tables.pdf: tabel metrik, kelas, scope, error, sensitivitas K, dan setiap fold. '
         'Semua tabel juga tersedia sebagai CSV.\n\n'
         'learning_curve.png/.pdf: kurva ukuran data latih, bukan kurva epoch. Model yang diuji '
-        'adalah classifier fase logistic regression, 18 fitur, C=0.3. Lima model lain dan decoder '
+        f'adalah {learning["model"]}, {learning["feature_count"]} fitur, C={learning["C"]}. Lima model lain dan decoder '
         'tetap. Pool ada 301 baris native 1 Hz; setelah held-out fold dan purge, 100% berarti '
         'rata-rata 232.8 baris latih per fold. Subset 25/50/75/100% bersarang dan stratified '
         'di dalam data latih, dengan seed 20261117. Preprocessing hanya di-fit di subset itu.\n\n'
         'Panel kiri: binary log loss train vs held-out pada baris native, mean ± SD lima fold. '
         'Panel kanan: Macro-F1 H/A/D dan Spell-F1 pipeline pada semua 7.500 prediksi held-out '
         'yang digabung. Keduanya tugas/metrik yang berbeda. SD bukan confidence interval. '
-        'Loss held-out tidak monoton; 75% dan 100% menghasilkan skor pipeline yang sama. '
+        'Output CSV tetap H/A/D/X: model binary hanya expert alive/dead; primary memprediksi H/A/D. '
+        'X di luar window graded dikecualikan; prediksi X pada GT H/A/D tetap dihitung salah. '
+        'Baca pola loss dan skor pada nilai terukur di CSV; kurva tidak dipaksakan monoton. '
         'Ini tidak membuktikan konvergensi atau generalisasi ke match lain.\n\n'
         'Tabel individual fold selalu menghitung Macro-F1 tiga kelas, termasuk F1=0 untuk kelas '
         'yang absen. Karena itu fold 1/3 terlihat rendah meskipun akurasi tinggi. Macro-F1 resmi '
-        '0.963167 dihitung dari seluruh prediksi OOF gabungan, bukan rata-rata skor per fold. '
+        f'{public["macro_f1"]:.6f} dihitung dari seluruh prediksi OOF gabungan, bukan rata-rata skor per fold. '
         'Semua repartisi memakai public slice yang sama; skor private belum diketahui. '
         'Hasil kurva tidak mengubah submission; 100% mereproduksi seluruh label checkpoint.\n')
     manifest = dict(source_reports={key:dict(path=str(path.relative_to(ROOT)),

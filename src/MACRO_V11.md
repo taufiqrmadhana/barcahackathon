@@ -83,6 +83,12 @@ without hurting another audited partition. Timing-only reaches 0.964138 at five
 folds but falls by 0.000354 at three folds versus v11. The default stays v11.
 `bench/phase_blend_bench.py --folds 5` reproduces these checks.
 
+A further H/A-only expert screen uses 241 alive training rows from raw video,
+motion and fused crops (C=0.3/1/3, plus balanced motion). None of ten candidates
+improves the deployed score; stronger variants introduce wrong switches. Those
+results are retained separately in `bench/results/team_alive_2026-11-17.json`,
+reproduced with `bench/team_alive_bench.py`. No extra expert is deployed.
+
 The final public output has 14 predictions against 17 GT spells: all 14 match at
 every IoU threshold 0.3--0.7, with three missed GT spells and zero spurious
 predictions. One-second transition F1 remains 0.810811.

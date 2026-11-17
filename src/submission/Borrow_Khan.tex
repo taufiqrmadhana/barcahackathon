@@ -39,7 +39,8 @@ The challenge requires H (home), A (away), D (dead ball), or X outside the grade
 half windows for 199,319 tactical frames at 25\,Hz~\cite{challenge}. A possession
 \emph{spell} is an uninterrupted H or A interval. Correct frame labels and
 correct spell boundaries are both needed: a brief wrong-team island can split
-one real possession into three predictions.
+one real possession into three predictions. The scorer averages H/A/D F1;
+GT X is ungraded, while predicted X on a graded frame counts as a miss.
 
 Our design separates two questions: \emph{who owns the ball?} and \emph{is play
 alive?} The primary branch answers both using tracking and tactical video.
@@ -100,7 +101,8 @@ Refits on all public labels apply only outside that window.}
 \begin{figure*}[!t]
 \centering\includegraphics[width=.98\textwidth]{figures/ablation.pdf}
 \caption{Public ablation under the same five-fold protocol. The stages compare joint
-team/phase updates, retention of primary teams, and explicit broadcast availability.
+team/phase updates, availability, context and their probability average.
+Context-only and bagged replacements lose paired robustness and are not selected.
 All bars start at zero; exact scores are annotated.}
 \label{fig:ablation}
 \end{figure*}
@@ -148,7 +150,7 @@ Raw video (5\,Hz) & Primary team mixture (25\%) & 3\\
 Video + motion & Team specialist; auxiliary & 1\\
 Fused-ball crops & Second team specialist & 3\\
 Video dead-ball & Binary P(D), 28 features & 10\\
-Broadcast phase & Phase P(D), 18 features & 0.3\\
+Broadcast phase & Average 18/22-feature P(D) & 0.3\\
 \bottomrule
 \end{tabular}
 \end{table}
@@ -258,14 +260,15 @@ and 8 tactical players with median same-team discrepancy $<1.5$\,m. The gate
 supports 5,590 public frames (74.53\%); supported player discrepancy has median
 0.288\,m. This is agreement between recordings, not independent location accuracy.
 
-\textbf{Phase classifier.} A binary logistic model ($C=0.3$) uses 17 geometric
-features and an availability flag. Its 301-row pool retains frames with rejected
-geometry. The flag records that these imputed features were originally missing.
-The flag is an observable camera-quality result, not a possession label:
-unavailable broadcast tracking does not automatically imply D. The head covers primary video
-and purges 125 frames from actual fold edges. Combine 75\% broadcast P(D) with
-25\% primary P(D), preserving conditional H/A. Independently decode the phase
-branch with 50-frame edges and the same temporal operations.
+\textbf{Phase classifiers.} Two binary logistic heads ($C=0.3$) estimate
+alive/dead, leaving team identity to the primary branch. One uses 17 geometry
+features plus availability; the other adds four context features: time since/until
+valid tracking (capped at 5\,s) and availability fractions in centred 1/5\,s
+windows. Context is computed independently per half, using no possession labels.
+Missing tracking does not imply D. Both heads share 301 native training rows, retaining rejected geometry, and
+a 125-frame purge from actual fold edges. Preprocessing uses training rows only. Average their P(D) equally, then combine
+75\% of that result with 25\% primary P(D), preserving conditional H/A. Decode
+this phase branch with 50-frame edges and the same temporal operations.
 
 Take the phase D mask and retain primary H/A where both branches predict alive.
 Where primary D becomes alive, use the phase team (Fig.~\ref{fig:phase}). Merge
@@ -301,12 +304,11 @@ The public slice has 7,500 frames (300\,s) and 17 ground-truth (GT) possessions.
 decoded and corrected before copying its held-out slice (Fig.~\ref{fig:validation}).
 Refits on all public labels apply only outside this window.
 
-All neighbours in a held-out fold's whole-half decode must use that same
-excluded training interval. Otherwise, smoothing could bring information from
-a classifier trained on the held-out labels back into its predictions.
-This protects fitting-time isolation. Method selection still reuses the same
-17 public spells: the four repartitions test sensitivity, not independent
-match generalisation. Private and unseen-match performance are unknown.
+Whole-half correction uses the same excluded training interval for every
+neighbour. Otherwise, smoothing could import predictions from a model fitted
+to the held-out labels. This protects fitting-time isolation. Method selection
+still reuses the same 17 spells; repartitions measure sensitivity, not
+independent match generalisation. Private and unseen-match scores are unknown.
 
 \begin{figure}[!t]
 \centering
@@ -341,24 +343,23 @@ duration of a same-team predicted/GT pair. A correct team at most frames can
 still score poorly if one possession is split into several intervals.
 \textbf{Public scope:} 17 GT spells and 14 predictions in the five-minute window.
 All 14 match at every threshold, with three missed GT spells and zero spurious
-predictions: $2\times14/(14+17)=0.903226$. The 401 spells in Fig.~\ref{fig:match}
+predictions: $2\times14/(14+17)=0.903226$. The 400 spells in Fig.~\ref{fig:match}
 are full-match predictions and do not enter this public score.
-H/A/D F1 is 0.962539/0.967305/0.959656; one-second transition F1 is 0.810811.
+H/A/D F1 is 0.963257/0.967318/0.961322; one-second transition F1 is 0.810811.
 
-Figure~\ref{fig:ablation} explains the separation: allowing broadcast to change
-teams scores lower than retaining primary teams. At five folds, explicit
-availability improves on quality-only training and the all-rows/no-flag control. Mean macro-F1
-across partitions rises from 0.952531 to 0.955030; spell-F1 stays equal
-(Fig.~\ref{fig:sensitivity}). Additional broadcast motion, FILM, audio and
-temporal geometry variants gave no gain and are excluded.
+Figure~\ref{fig:ablation} shows why broadcast phase and team ownership are
+separate. The final availability/context average improves macro-F1 over the
+18-feature head in all four partitions: mean 0.955030 to 0.955782, with spell-F1
+unchanged (Fig.~\ref{fig:sensitivity}). Context alone and bagging help
+at five folds but hurt the paired mean and are rejected. All choices reuse
+the same labels; these small gains do not establish generalisation.
 
 \subsection{What Improved and What Remains Wrong}
-Table~\ref{tab:errors} separates team errors from alive/dead errors. Relative to
-the quality-only broadcast model, the final model restores 12 GT dead frames,
-but labels seven additional alive frames as dead. Its D recall rises from
-0.979578 to 0.987747 while D precision falls from 0.936849 to 0.933119.
-The unchanged 151 H/A confusions explain why the update should be interpreted
-as a phase-timing improvement rather than stronger team recognition.
+Table~\ref{tab:errors} separates team and phase errors. Relative to the
+18-feature head, six public errors are corrected and one correct frame regresses.
+D recall rises from 0.987747 to 0.989789 and precision from 0.933119 to 0.934447.
+The 151 H/A confusions remain unchanged. The gain comes from better alive/dead
+timing rather than improved team recognition.
 
 \begin{table}[!t]
 \centering
@@ -367,13 +368,13 @@ as a phase-timing improvement rather than stronger team recognition.
 \footnotesize
 \begin{tabular}{@{}lrr@{}}
 \toprule
-Error type & Quality-only & Final\\
+Error type & Flag head & Final\\
 \midrule
 Wrong team while alive (H $\leftrightarrow$ A) & 151 & 151\\
-Alive as D & 97 & 104\\
-D as alive & 30 & 18\\
+Alive as D & 104 & 102\\
+D as alive & 18 & 15\\
 \midrule
-Total incorrect frames & 278 & 273\\
+Total incorrect frames & 273 & 268\\
 \bottomrule
 \end{tabular}
 \end{table}
@@ -382,13 +383,13 @@ Both outputs have 14 predicted spells, all matched at every threshold; the
 three missed GT possessions remain unresolved.
 
 \subsection{Predicted Match Statistics}
-Figure~\ref{fig:match} reports 401 possessions averaging 8.57\,s: 202 in the first
-half and 199 in the second. Home has 60.26\% of alive time (197 spells,
-10.51\,s mean); away has 39.74\% (204 spells, 6.69\,s mean). D occupies
+Figure~\ref{fig:match} reports 400 possessions averaging 8.59\,s: 202 in the first
+half and 198 in the second. Home has 60.28\% of alive time (197 spells,
+10.51\,s mean); away has 39.72\% (203 spells, 6.72\,s mean). D occupies
 45.93\% of graded time in 130 intervals counted separately by half.
 
 Home share divides H frames by H+A; dead share divides D by all 158,857 graded
-frames. Mean duration divides H+A time by 401 spells. The 40,462 X frames
+frames. Mean duration divides H+A time by 400 spells. The 40,462 X frames
 outside the halves enter neither denominator. These summaries describe
 predictions over the match; measured accuracy is limited to the public slice.
 
@@ -401,28 +402,28 @@ cleanup can remove a genuine turnover as well as an erroneous island; new
 labelled matches are needed to measure that tradeoff.
 
 \textbf{Reproduction.} The public \file{taufiq} branch at
-\texttt{\CodeRevision} uses \file{src/configs/macro_v10.json} and Python 3.11.
+\texttt{\CodeRevision} uses \file{src/configs/macro_v11.json} and Python 3.11.
 Dependencies are pinned in \file{requirements-src.txt}; CV/FILM use separate
 environments. Prepare the provided bundle and regenerate model/video caches
 first. Commands are in \file{src/README.md}, \file{src/bench/README.md} and
-\file{src/MACRO_V9.md}/\file{src/MACRO_V10.md}.
+\file{src/MACRO_V10.md}/\file{src/MACRO_V11.md}.
 \begin{lstlisting}
 OMP_NUM_THREADS=3 OPENBLAS_NUM_THREADS=3 \
   .venv/bin/python src/run.py \
-  --params src/configs/macro_v10.json --name Borrow_Khan
+  --params src/configs/macro_v11.json --name Borrow_Khan
 .venv/bin/python evaluation/validate_submission.py \
   evaluation/results/Borrow_Khan.csv
 .venv/bin/python evaluation/run_evaluation.py \
   --gt public --bootstrap 0 --no-detail
 \end{lstlisting}
 Expect 199,319 rows; the scorer reads every CSV in its results directory.
-All 56 contract tests pass; prototype, builder, production and tuner agree
+All 59 contract tests pass; prototype, builder, production and tuner agree
 on every frame. Metrics, CSV checksum and asset/model fingerprints are in
-\file{src/bench/results/macro_v10_2026-11-17.json}.
+\file{src/bench/results/macro_v11_2026-11-17.json}.
 
 \begin{thebibliography}{4}
 \bibitem{challenge} More than a Hack 2027, ``Phase 1: Ball Possession,'' 2026.
-\url{https://github.com/taufiqrmadhana/barcahackathon/tree/188b66d}.
+\url{https://github.com/taufiqrmadhana/barcahackathon/tree/977ee78}.
 \bibitem{yolo} Ultralytics, ``YOLO11.'' \url{https://docs.ultralytics.com/models/yolo11/}.
 \bibitem{film} F. Reda et al., ``FILM: Frame Interpolation for Large Motion,'' ECCV, 2022.
 \url{https://github.com/google-research/frame-interpolation}.
