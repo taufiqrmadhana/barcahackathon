@@ -180,7 +180,7 @@ both models' support and primary H/A labels.}
 \begin{figure*}[!t]
 \centering\includegraphics[width=.98\textwidth]{figures/fold_sensitivity.pdf}
 \caption{Paired repartitions of the same public possessions, refitting all heads.
-Macro-F1 rises at 3/4/5 folds and falls 0.001797 at 6; spell-F1 rises at 4/5 and is equal at 3/6.
+Macro-F1 rises at all four fold counts; spell-F1 falls 0.029412 at 3 folds and is equal at 4/5/6.
 These are sensitivity checks, not independent test sets.}
 \label{fig:sensitivity}
 \end{figure*}
@@ -221,8 +221,8 @@ supports 5,590 public frames (74.53\%); supported player discrepancy has median
 
 \textbf{Phase head.} A binary logistic head ($C=0.3$) uses 17 quality, ball-motion,
 nearest-player and contact features on 223 supported native rows. Purge 125 frames
-from the actual fold edges despite coverage holes. At supported frames, average
-its P(D) with the primary's, 50:50, preserving conditional H/A. Independently
+from the actual fold edges despite coverage holes. At supported frames, combine
+75\% broadcast P(D) with 25\% primary P(D), preserving conditional H/A. Independently
 decode the phase branch with 50-frame edges and the same temporal operations.
 
 Take its D mask, retain primary H/A where both branches predict alive, and use
@@ -288,15 +288,15 @@ the matching held-out head before temporal corrections and public stitching.}
 Spell-F1 averages matching at IoU 0.3/0.4/0.5/0.6/0.7; macro-F1 averages H/A/D.
 The final output has 14 predicted spells: 14 matched, zero spurious and three
 GT spells missed at every threshold, giving $2\times14/(14+17)=0.903226$.
-H/A/D F1 is 0.961832/0.968141/0.956464; one-second transition F1 is 0.810811.
+H/A/D F1 is 0.961832/0.967393/0.957737; one-second transition F1 is 0.810811.
 
 Figure~\ref{fig:ablation} separates contributions. Wider edges alone leave V7's
-0.957604/0.875000 unchanged. The broadcast phase with joint team output reaches
-0.958850/0.848485; retaining primary teams gives \MacroScore{}/\SpellScore{}.
-Of 32 public label changes, 26 fix errors and none regress correct labels.
-Away F1 still falls slightly from 0.968889. Figure~\ref{fig:sensitivity} shows
-the six-fold regression. Frozen class/patch embeddings, extra contact rules and
-nested dead-head calibration did not improve the retained checkpoint.
+0.957604/0.875000 unchanged. With 50\% broadcast, joint team output reaches
+0.958850/0.848485; retained teams give 0.962146/0.903226. Increasing broadcast
+to 75\% gives \MacroScore{}/\SpellScore{}. Four false-D frames become false-A:
+exact frame accuracy stays 0.962933 while D F1 rises and A F1 falls.
+Figure~\ref{fig:sensitivity} shows the three-fold spell regression. Frozen
+embeddings, contact variants, nested calibration and broadcast ownership gave no gain.
 
 \textbf{Selection limit.} Features, weights and temporal rules were selected
 using the same 17 public possessions. OOF fitting does not remove this
@@ -305,10 +305,10 @@ method-selection bias. Private and unseen-match performance are unknown.
 
 
 \subsection{Predicted Match Statistics}
-Figure~\ref{fig:match} reports 400 possessions averaging 8.59\,s: 202 in the first
-half and 198 in the second. Home has 60.22\% of alive time (197 spells,
-10.51\,s mean); away has 39.78\% (203 spells, 6.74\,s mean). D occupies
-45.90\% of graded time in 130 intervals counted separately by half.
+Figure~\ref{fig:match} reports 401 possessions averaging 8.58\,s: 202 in the first
+half and 199 in the second. Home has 60.20\% of alive time (197 spells,
+10.51\,s mean); away has 39.80\% (204 spells, 6.71\,s mean). D occupies
+45.85\% of graded time in 130 intervals counted separately by half.
 
 \section{Limitations and Reproduction}
 \textbf{Limitations.} Occlusion, small players and crop alignment limit contact
@@ -320,15 +320,15 @@ better contact localisation and calibrated confidence.
 
 \balance
 \textbf{Reproduction.} The public \file{taufiq} branch at
-\texttt{\CodeRevision} uses \file{src/configs/macro_v8.json} and Python 3.11.
+\texttt{\CodeRevision} uses \file{src/configs/macro_v9.json} and Python 3.11.
 Dependencies are pinned in \file{requirements-src.txt}; CV/FILM use separate
 environments. Prepare the provided bundle and regenerate model/video caches
 first. Commands are in \file{src/README.md}, \file{src/bench/README.md} and
-\file{src/MACRO_V7.md}/\file{src/MACRO_V8.md}.
+\file{src/MACRO_V8.md}/\file{src/MACRO_V9.md}.
 \begin{lstlisting}
 OMP_NUM_THREADS=3 OPENBLAS_NUM_THREADS=3 \
   .venv/bin/python src/run.py \
-  --params src/configs/macro_v8.json --name Borrow_Khan
+  --params src/configs/macro_v9.json --name Borrow_Khan
 .venv/bin/python evaluation/validate_submission.py \
   evaluation/results/Borrow_Khan.csv
 .venv/bin/python evaluation/run_evaluation.py \
@@ -337,11 +337,11 @@ OMP_NUM_THREADS=3 OPENBLAS_NUM_THREADS=3 \
 Expect 199,319 rows; the scorer reads every CSV in its results directory.
 All 55 contract tests passed at this checkpoint. Prototype, builder, production
 and tuner agree on every frame. The full CSV checksum, metrics and asset hashes
-are in \file{src/bench/results/macro_v8_2026-11-17.json}.
+are in \file{src/bench/results/macro_v9_2026-11-17.json}.
 
 \begin{thebibliography}{4}
 \bibitem{challenge} More than a Hack 2027, ``Phase 1: Ball Possession,'' 2026.
-\url{https://github.com/taufiqrmadhana/barcahackathon/tree/988bcde}.
+\url{https://github.com/taufiqrmadhana/barcahackathon/tree/0308dae}.
 \bibitem{yolo} Ultralytics, ``YOLO11.'' \url{https://docs.ultralytics.com/models/yolo11/}.
 \bibitem{film} F. Reda et al., ``FILM: Frame Interpolation for Large Motion,'' ECCV, 2022.
 \url{https://github.com/google-research/frame-interpolation}.
