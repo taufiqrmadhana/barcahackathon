@@ -83,8 +83,8 @@ def main():
         archive.writestr('README.txt',
             'Main document: Borrow_Khan.tex. Compile with pdfLaTeX.\n'
             'Four-page IEEEtran conference report: two columns, 10 pt, eight figures.\n'
-            'Figures are vector PDFs generated from aggregate checkpoint metrics.\n'
-            'Edit team.tex for author information. Metrics refer to code 977ee78.\n')
+            'Figures are vector PDFs generated from aggregate evaluation metrics.\n'
+            'Edit team.tex for author information.\n')
     print(f'PDF: {pdf}')
     print(f'Editable source: {output / "Borrow_Khan_Overleaf.zip"}')
     print(f'Checkpoint: macroF1 {public["macro_f1"]:.6f}, spellF1 {public["spell_f1_mean"]:.6f}')

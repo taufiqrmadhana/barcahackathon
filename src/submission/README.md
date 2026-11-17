@@ -3,9 +3,9 @@
 Four-page English technical report using the IEEEtran conference template:
 two columns, 10 pt body text, and eight explanatory/data figures. Author names
 and registered team name are in `team.tex`.
-The described algorithm is frozen at code revision `977ee78` on `taufiq` (macro v11).
-The report explains team ownership before alive/dead refinement, then validation,
-error tradeoffs and match-statistic denominators. Four full pages retain the
+The report presents the final solution: team ownership, alive/dead refinement,
+approach comparisons, validation, error analysis and match statistics. It excludes
+repository history, execution commands and environment setup. Four full pages retain the
 IEEE 10 pt body, eight figures and two explanatory tables.
 
 The separately requested evaluation tables, time-fold results and measured
@@ -44,5 +44,5 @@ The Overleaf archive includes every required vector figure and its aggregate dat
 `build.py` regenerates `metrics.tex` from the committed aggregate checkpoint
 report. If the local `evaluation/results/barca.csv` exists, its SHA-256 must match
 the frozen report. Typesetting otherwise needs no restricted data or models.
-The report's reproduction section distinguishes the final inference command
-from the preprocessing/model caches that must be prepared first.
+Build instructions on this page are for editing the document; they are not
+included in the submitted report.

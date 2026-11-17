@@ -34,6 +34,10 @@ def ablation(report, folder):
               'Broadcast, 50f, joint teams': 'Broadcast changes teams',
               'Retained teams, 50% broadcast': 'Keep teams, 50% phase',
               'Quality-only broadcast (v9)': 'Quality-only, 75% phase',
+              'Availability flag (v10)': 'Availability only',
+              'Context head alone': 'Context only',
+              'Bagged flag head': 'Bagged availability',
+              'Final: flag/context average': 'Proposed: averaged heads',
               'All rows, no availability': 'All rows, no flag',
               'Final: explicit availability': 'Final: availability flag'}
     rows = [(labels.get(name, name), macro, spell) for name, macro, spell in rows]
@@ -86,8 +90,10 @@ def sensitivity(report, folder):
         baseline = report.get('document_baseline', 'Previous (v4)')
         if baseline == 'Previous (v9)':
             baseline = 'Quality-only'
+        elif baseline == 'Availability flag (v10)':
+            baseline = 'Availability only'
         for key, name, color, marker in [('baseline', baseline, GRAY, 'o'),
-                                          ('candidate', 'Final', BLUE, 's')]:
+                                          ('candidate', 'Proposed', BLUE, 's')]:
             scores = [next(x[metric] for x in rows if x['folds'] == f and x['objective'] == key)
                       for f in folds]
             data[f'{metric}_{key}'] = scores
