@@ -16,8 +16,8 @@ evaluation/reports/
 evaluation/scoreboard.csv
 
 # Features, models and generated documents
-cache/
-pretrain_data/
+/cache
+/pretrain_data
 *.joblib
 *.npz
 *.npy
