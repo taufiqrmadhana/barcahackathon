@@ -54,8 +54,10 @@ or unseen-match performance is unknown.
 
 Training the original 17 columns on all rows, without the explicit availability
 feature, reaches 0.962457 / 0.903226 but slightly lowers mean macroF1 across
-partitions. It was not selected. The additional feature improves this control
-at all four partitions. Broadcast audio, naive image motion, FILM residuals and
+partitions. It was not selected. The additional feature improves this control's
+mean and three of four partitions; its four-fold macroF1 falls from 0.948964
+to 0.948389. The four-of-four gain in the main table is relative to v9.
+Broadcast audio, naive image motion, FILM residuals and
 temporal geometry screens are documented in [bench/BROADCAST_FOLLOWUPS.md](bench/BROADCAST_FOLLOWUPS.md).
 
 The final public prediction has 14 spells, all matched at every IoU threshold

@@ -29,6 +29,14 @@ def ablation(report, folder):
                 for x in report['document_ablation']]
     else:
         rows = legacy_ablation(report)
+    # Explain each stage without requiring the reader to know internal versions.
+    labels = {'V7 baseline': 'Team/video baseline',
+              'Broadcast, 50f, joint teams': 'Broadcast changes teams',
+              'Retained teams, 50% broadcast': 'Keep teams, 50% phase',
+              'Quality-only broadcast (v9)': 'Quality-only, 75% phase',
+              'All rows, no availability': 'All rows, no flag',
+              'Final: explicit availability': 'Final: availability flag'}
+    rows = [(labels.get(name, name), macro, spell) for name, macro, spell in rows]
     fig, axes = plt.subplots(1, 2, figsize=(7.15, 2.45), sharey=True)
     y = np.arange(len(rows))
     for ax, index, title, color in [(axes[0], 1, 'Macro-F1', BLUE),
@@ -75,7 +83,10 @@ def sensitivity(report, folder):
     data = dict(folds=folds)
     for ax, metric, title, limits in [(axes[0], 'macroF1', 'Macro-F1', (.92, .97)),
                                       (axes[1], 'spellF1', 'Spell-F1', (.65, .93))]:
-        for key, name, color, marker in [('baseline', report.get('document_baseline', 'Previous (v4)'), GRAY, 'o'),
+        baseline = report.get('document_baseline', 'Previous (v4)')
+        if baseline == 'Previous (v9)':
+            baseline = 'Quality-only'
+        for key, name, color, marker in [('baseline', baseline, GRAY, 'o'),
                                           ('candidate', 'Final', BLUE, 's')]:
             scores = [next(x[metric] for x in rows if x['folds'] == f and x['objective'] == key)
                       for f in folds]
@@ -109,7 +120,7 @@ def match_stats(report, folder):
     axes[0].set_xlim(0, 1)
     axes[0].set_xticks([0, .5, 1])
     axes[0].xaxis.set_major_formatter(PercentFormatter(1))
-    axes[0].set_title('Share of alive time', loc='left', fontsize=10, weight='bold')
+    axes[0].set_title('Alive-time share (full match)', loc='left', fontsize=10, weight='bold')
     for i, (_, x) in enumerate(rows):
         h, a = x['teams']['H']['possessions'], x['teams']['A']['possessions']
         axes[1].barh(i, h, height=.52, color=BLUE)
@@ -119,7 +130,7 @@ def match_stats(report, folder):
         axes[1].text(h+a+8, i, str(h+a), va='center', fontsize=8.5, color=INK, weight='bold')
     axes[1].set_xlim(0, 455)
     axes[1].set_xticks([0, 200, 400])
-    axes[1].set_title('Predicted possession spells', loc='left', fontsize=10, weight='bold')
+    axes[1].set_title('Full match: predicted spells', loc='left', fontsize=10, weight='bold')
     axes[0].set_yticks(y, [name for name, _ in rows], fontsize=8.5)
     axes[0].invert_yaxis()
     fig.legend(*axes[0].get_legend_handles_labels(), loc='lower center', ncol=2,

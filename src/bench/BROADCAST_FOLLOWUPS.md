@@ -17,8 +17,10 @@ operations precede public stitching. The five-fold baseline is
 
 The audio screen's winner is its **geometry-only control**, which changes
 training coverage. Its mean macroF1 across 3/4/5/6 partitions falls slightly.
-Adding an explicit availability feature improves macroF1 in all four
-partitions while retaining spellF1. This becomes [macro v10](../MACRO_V10.md).
+Relative to v9's quality-only head, adding explicit availability improves macroF1
+in all four partitions while retaining spellF1. Compared with the all-row,
+no-indicator control, it improves the mean and three of four partitions.
+This becomes [macro v10](../MACRO_V10.md).
 Ties and overlapping controls in this table are not independent experiments.
 
 ## Features and extraction
