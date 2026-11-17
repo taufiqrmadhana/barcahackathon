@@ -1,5 +1,9 @@
 # External possession benchmark and supervised ownership prototype
 
+[Separate evaluation exports](EVALUATION_BUNDLE.md) provide the v10 metric
+tables, K=3/4/5/6 sensitivity, individual fold results and a measured data-size
+learning curve for the broadcast phase classifier.
+
 The later [broadcast follow-ups](BROADCAST_FOLLOWUPS.md) test temporal geometry,
 second-camera motion/FILM, audio and explicit missingness. The availability-aware
 phase head becomes [macro v10](../MACRO_V10.md); all per-frame outputs remain ignored.
